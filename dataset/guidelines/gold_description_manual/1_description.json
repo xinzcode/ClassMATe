@@ -1,0 +1,23 @@
+{
+    "material": "The materials, elements or substances that are mentioned as a participant in a fuel cell experiment. ",
+    "device": "The device used in the fuel cell experiment. ",
+    "experiment": "The experiment-evoking verb such as test, perform, and report",
+    "value": "Numerical values and their respective units. ",
+    "support_material": "The frame-evoking element and the material that makes up the support of the cell.",
+    "experiment_evoking_word": "The experiment-evoking verb such as test, evaluate,measure, or generate",
+    "fuel_used": "The chemical composition or the class of a fuel or the oxidant species (indicated as a material).",
+    "power_density": "The values of the (maximum/peak) power density obtained from a device. ",
+    "current_density": "The value of the current density of that experimental setup.",
+    "working_temperature": "The value of the temperature at which the cell is operated or at which a certain experiment has been performed. ",
+    "time_of_operation": "The value of the duration of an experiment. The duration of an experiment can be expressed in hours or as a number of RedOx cycles.",
+    "voltage": "The value of the voltage at which a cell was operated. Not to be confused with open_circuit_voltage.",
+    "anode_material": "The material that makes up the anode. Including the fuel electrode (even in case of electrolytic cells), the ion conductive material in a composite anode (even if the electrolyte is made of the same material).",
+    "thickness": "Material’s thickness.",
+    "cathode_material": "The material that makes up the cathode. Including the oxygen electrode as a cathode material (even in case of electrolytic cells), the ion conductive material in a composite cathode (even if the electrolyte is made of the same material).",
+    "electrolyte_material": "The material that makes up the electrolyte.",
+    "resistance": "The electrical resistance of a cell or cell component. In SOFC experiments, the resistance is usually expressed in area specific units: Ω cm2.",
+    "degradation_rate": "The degradation rate of the cell, which can be also expressed as a percentage.",
+    "open_circuit_voltage": "The value of the open circuit voltage (OCV) obtained from a device.",
+    "conductivity": "The electrical conductivity of a certain cell or cell component. Electronic and ionic conductivites can be distinguished via the corresponding entries in the knowledge base.",
+    "interlayer_material": "The material used as interlayer or buffer layer in a SOFC."
+}

@@ -1,0 +1,42 @@
+Named   Entity Recognition  and  Normalization  Applied  to Large Scale Information  Extraction from  the Materials Science  Literature         
+                               
+ABSTRACT:
+The number of published materials science
+articles has increased manyfold over the past few decades.
+Now, a major bottleneck in the materials discovery pipeline arises
+in connecting new results with the previously established
+literature. A potential solution to this problem is to map the
+unstructured raw text of published articles onto structured
+database entries that allow for programmatic querying. To this
+end, we apply text mining with named entity recognition (NER)
+for large-scale information extraction from the published
+materials science literature. The NER model is trained to extract
+summary-level information from materials science documents,
+including inorganic material mentions, sample descriptors, phase
+labels, material properties and applications, as well as any synthesis and characterization methods used. Our classifier achieves
+an accuracy (f1) of 87%, and is applied to information extraction from 3.27 million materials science abstracts. We extract more
+than 80 million materials-science-related named entities, and the content of each abstract is represented as a database entry in a
+structured format. We demonstrate that simple database queries can be used to answer complex “meta-questions” of the
+published literature that would have previously required laborious, manual literature searches to answer. All of our data and
+functionality has been made freely available on our Github (https://github.com/materialsintelligence/matscholar) and website
+(http://matscholar.com), and we expect these results to accelerate the pace of future materials science discovery.
+
+
+Supporting information for:  Named Entity Recognition and Normalization Applied to Large-Scale  Information Extraction from the Materials Science Literature       
+                                                   
+S.4: Named entity annotation                                          
+
+            1. Material (MAT): Any inorganic solid or alloy, any non-gaseous element (at RT),  e.g., “BaTiO3”, “titania”, “Fe”.                                      
+                                                                                    
+            2. Symmetry/phase label (SPL): Names for crystal structures/phases, e.g., “tetragonal”,‘fcc”,“rutile”,“perovskite”; or,anysymmetrylabelsuchas“Pbnm”,or“Pnma”.                                                                        
+                                                                                    
+            3. Sample descriptor (DSC): Special descriptions of the type/shape of the sample. Examples inlcude “single crystal”, “nanotube”, “quantum dot”.         
+                                        
+            4. Property (PRO): Anything measurable that can have a unit and a value, e.g., “conductivity”, “band gap”; or, any qualitative property or phenomenon exhibited by a material, e.g., “ferroelectric”, “metallic”.                          
+                                                                                    
+            5. Application (APL): Any high-level application such as “photovoltaics”, or any specific device such as “field-effect transistor”.                                                                                             
+                                                                                    
+            6. Synthesis method (SMT): Any technique for synthesising a material, e.g., “pulsed laser deposition”, “solid state reaction”, or any other step in sample production such   as “annealing” or “etching”.                                          
+                                                                                                                                                          
+            7. Characterization method (CMT): Any method used to characterize a material, experiment or theory: e.g., “photoluminescence”, “XRD”, ‘tight binding”, “DFT”. It  can also be a name for an equation or model. such “Bethe-Salpeter equation”.
+

@@ -1,0 +1,9 @@
+{
+    "cmt": "Characterization method. Any method used to characterize a material, experiment or theory: e.g., \"photoluminescence\", \"XRD\", \"tight binding\", \"DFT\". It can also be a name for an equation or model. such \"Bethe-Salpeter equation\"",
+    "mat": "Material. Any inorganic solid or alloy, any non-gaseous element (at RT), e.g., \"BaTiO3\", \"titania\", \"Fe\".",
+    "dsc": "Sample descriptor. Special descriptions of the type/shape of the sample. Examples inlcude \"single crystal\", \"nanotube\", \"quantum dot\".",
+    "pro": "Property. Anything measurable that can have a unit and a value, e.g., \"conductivity\", \"band gap\"; or, any qualitative property or phenomenon exhibited by a material, e.g., \"ferroelectric\", \"metallic\".",
+    "smt": "Synthesis method. Any technique for synthesising a material, e.g., \"pulsed laser deposition\", \"solid state reaction\", or any other step in sample production such as \"annealing\" or \"etching\".",
+    "apl": "Application. Any high-level application such as \"photovoltaics\", or any specific device such as \"field-effect transistor\".",
+    "spl": "Symmetry/phase label. Names for crystal structures/phases, e.g., \"tetragonal\", \"fcc\", \"rutile\", \"perovskite\"; or, any symmetry label such as \"P bnm\", or \"P nma\"."
+}

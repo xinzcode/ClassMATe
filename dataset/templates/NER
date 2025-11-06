@@ -1,0 +1,17 @@
+class Entity:
+	def __init__(self, name: str):
+		self.name = name
+
+# The following entity classes describe the entity types
+{% for class_def in class_defs %}
+{{ class_def }}
+{% endfor %}
+
+# This is a material science literature text
+text = "{{text}}"
+
+"""
+{{question_describe}}
+"""
+
+

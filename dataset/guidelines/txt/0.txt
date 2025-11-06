@@ -1,0 +1,1271 @@
+Supporting information for:                          
+                                                                                    
+              Named Entity Recognition and Normalization Applied to Large-Scale     
+                 Information Extraction from the Materials Science Literature       
+                                                                                    
+          L. Weston,1 V. Tshitoyan,2 J. Dagdelen,1, O. Kononova,2 A. Trewartha,2 K. A. Persson,1,
+                                                                                    
+                                  G. Ceder2 and A. Jain1                            
+                                                                                    
+                                                                                    
+          1Lawrence Berkeley National Laboratory, Energy Technologies Area, 1 Cyclotron Road,
+                                                                                    
+          Berkeley, CA 94720, United States                                         
+                                                                                    
+          2Lawrence Berkeley National Laboratory, Materials Science Division, 1 Cyclotron Road,
+                                                                                    
+          Berkeley, CA 94720, United States                                         
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                          1                                         
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+          S.1: Document     preprocessing                                           
+                                                                                    
+                                                                                    
+          Parts of abstracts (or full abstracts) that were in foreign languages were removed using text
+                                                                                    
+          search and regular expression matching, as were articles with metadata types correspond-
+                                                                                    
+          ing to “Announcement”, “BookReview”, “Erratum”, “EditorialNotes”, “News”, “Events”
+                                                                                    
+          and “Acknowledgement”. Abstracts with titles containing keywords “Foreword”, “Prelude”,
+                                                                                    
+          “Commentary”, “Workshop”, “Conference”, “Symposium”, “Comment”, “Retract”, “Cor-
+                                                                                    
+          rection”, “Erratum” and “Memorial” were also selectively removed from the corpus. Some
+                                                                                    
+          abstracts contained leading or trailing copyright information, which were removed using reg-
+          ular expression matching and heuristic rules. Leading words and phrases such as “Abstract:
+                                                                                    
+          ” were also removed using similar methods. Abstracts were tokenized using ChemDataEx-
+                                                                                    
+          tractor.1 Tokens that were identified as valid chemical formulae were normalized, such that
+                                                                                    
+          the order of elements and common multipliers did not matter (e.g. NiFe is the same as
+                                                                                    
+          Fe50Ni50); this was achieved using using pymatgen2 combined with regular expression and
+                                                                                    
+          rule based techniques. Valence states of elements were split into separate tokens (e.g. Fe(III)
+          becametwoseparatetokens,Feand(III)).Additionally,ifatokenwasnotachemicalformula
+                                                                                    
+          or an element symbol, and if only the first letter was uppercase, we lowercased the word.
+                                                                                    
+          This way chemical formulae as well as abbreviations stayed in their common form, whereas
+                                                                                    
+          words at the beginning of sentences as well as proper nouns were converted to lowercase.
+                                                                                    
+          Numbers with units were often not tokenized correctly ChemDataExtractor. We addressed
+                                                                                    
+          this in the processing step by splitting the common units from numbers and converting all
+          numbers to a special token <nUm>. This reduced the vocabulary size by approximately
+                                                                                    
+          20,000 words. We found that correct preprocessing, especially the choice of phrases to in-
+                                                                                    
+          clude as individual tokens, significantly improved the quality of embeddings and subsequent
+                                                                                    
+          named entities.                                                           
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                          2                                         
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+          S.2: Word2vec     training                                                
+                                                                                    
+                                                                                    
+          We used the Word2vec implementation in gensim3 with a few modifications. We found that
+                                                                                    
+          the Skip-gram model with negative sampling loss (n=15) performed the best. The vocabu-
+                                                                                    
+          lary was limited to words that occurred more than 5 times, however, the chemical formulas
+                                                                                    
+          were included independent on their count. The rest of the hyperparameters were as follows:
+                                                                                    
+          we used 200-dimensional embeddings, learning rate of 0.01 decreasing to 0.0001 in 30 epochs,
+                                                                                    
+          context window of 8 and subsampling with 10−4 threshold, which subsamples approximately
+                                                                                    
+          400 most common words. Hyperparameters were optimized for performance on approxi-
+          mately 15,000 grammatical and 15,000 materials science analogies, with the score defined as
+                                                                                    
+          the percentage of correctly ”solved” analogies from the two sets. The full list of analogies
+                                                                                    
+          used in this study is available at https://www.github.com/materialsintelligence/mat2vec.
+                                                                                    
+                                                                                    
+                                                                                    
+          S.3: Relevance    annotation                                              
+                                                                                    
+                                                                                    
+          For annotating abstracts as either “relevant” or “not relevant”, the following guidelines are
+                                                                                    
+          used.                                                                     
+                                                                                    
+            1. The abstract must mention at least one inorganic material.           
+                                                                                    
+                                                                                    
+            2. Studies involving organic/soft-matter materials (e.g., polymers), or biomaterials, are
+                                                                                    
+              not considered relevant.                                              
+                                                                                    
+            3. The abstract should mention either the synthesis or characterization of a specific inor-
+                                                                                    
+              ganic material.                                                       
+                                                                                    
+                                                                                    
+            4. An exception to (3) is review papers discussing applications of a specific material.
+                                                                                    
+                                                                                    
+                                                                                    
+          S.4: Named     entity annotation                                          
+                                                                                    
+                                                                                    
+          The rules for annotating each entity type are shown below.                
+                                                                                    
+                                          3                                         
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+            1. Material (MAT): Any inorganic solid or alloy, any non-gaseous element (at RT),
+                                                                                    
+              e.g., “BaTiO3”, “titania”, “Fe”.                                      
+                                                                                    
+            2. Symmetry/phase label (SPL): Names for crystal structures/phases, e.g., “tetrago-
+                                                                                    
+              nal”,‘fcc”,“rutile”,“perovskite”; or,anysymmetrylabelsuchas“Pbnm”,or“Pnma”.
+                                                                                    
+                                                                                    
+            3. Sample descriptor (DSC): Special descriptions of the type/shape of the sample.
+              Examples inlcude “single crystal”, “nanotube”, “quantum dot”.         
+                                                                                    
+                                                                                    
+            4. Property (PRO): Anything measurable that can have a unit and a value, e.g., “con-
+                                                                                    
+              ductivity”, “band gap”; or, any qualitative property or phenomenon exhibited by a
+                                                                                    
+              material, e.g., “ferroelectric”, “metallic”.                          
+                                                                                    
+            5. Application (APL): Any high-level application such as “photovoltaics”, or any spe-
+                                                                                    
+              cific device such as “field-effect transistor”.                       
+                                                                                    
+                                                                                    
+            6. Synthesis method (SMT): Any technique for synthesising a material, e.g., “pulsed
+              laser deposition”, “solid state reaction”, or any other step in sample production such
+                                                                                    
+              as “annealing” or “etching”.                                          
+                                                                                    
+                                                                                    
+            7. Characterization method (CMT): Any method used to characterize a material,
+                                                                                    
+              experiment or theory: e.g., “photoluminescence”, “XRD”, ‘tight binding”, “DFT”. It
+                                                                                    
+              can also be a name for an equation or model. such “Bethe-Salpeter equation”.
+                                                                                    
+            Overall, weannotated800materialsscienceabstracts. Thisconsistedof22,306annotated
+                                                                                    
+          entities (out of 111380 tokens total).                                    
+                                                                                    
+                                                                                    
+                                                                                    
+          S.5: Entity   normalization    feature  generation                        
+                                                                                    
+                                                                                    
+          Entity normalization is achieved using supervised machine learning. Features are generated
+                                                                                    
+          by concatenating the word embeddings for each entity. We also derive several hand-crafted
+                                                                                    
+          features; these features describe the following properties of the entity pair:
+                                                                                    
+                                          4                                         
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+            1. edit distance (Levenshtein distance)                                 
+                                                                                    
+            2. embedding cosine similarity                                          
+                                                                                    
+                                                                                    
+            3. stemming/lemmatization (are the stems/lemmas equal)                  
+                                                                                    
+                                                                                    
+            4. synonyms/antonyms(aretheentitiesknownsynonymsorantonymsaccordingtoWord-
+              Net4)                                                                 
+                                                                                    
+                                                                                    
+                                                                                    
+          S.6: Entity   normalization    training  data                             
+                                                                                    
+                                                                                    
+          Acquiring training data for entity normalization is a significant challenge. There are of the
+                                                                                    
+          order of roughly 104 unique entities for each entity type, and therefore there are of the order
+                                                                                    
+          108 possible entity pairs for each type. In most cases, each entity will have one (or no)
+                                                                                    
+          synonyms; as a result, if entity pairs were generated randomly, around 104 entities would be
+                                                                                    
+          labelled as negative (i.e., not a synonym) for every positive case that was generated. Thus,
+          labelling of training data would be far too time consuming in this manner.
+                                                                                    
+            In order to overcome this problem, we generate training data in the following way: We
+                                                                                    
+          begin with 200 hand-crafted entity pairs with approximately balanced classes. This is used
+                                                                                    
+          to train a model that classifies synonyms; Logistic Regression was used when the dataset
+                                                                                    
+          was small, and a Random Forest classifier was used once the dataset grew larger. Next, a
+                                                                                    
+          large number (> 1000) of randomly generated entity pairs are created. The classifier is used
+                                                                                    
+          to determine which of these entity pairs are synonyms; any pair that the model identifies as
+          a synonym is sent to the annotator to label. Initially, most of the predictions are incorrect,
+                                                                                    
+          however the initial model does correctly identify some new synonym pairs. The process is
+                                                                                    
+          repeated iteratively, and at each step the amount of training data is increased. Over many
+                                                                                    
+          cycles, the precision of the model improves, and the model begins to make mostly correct
+                                                                                    
+          predictions. In the end, this process yielded 10000 annotated entity pairs, with roughly
+                                                                                    
+          balanced classes.                                                         
+                                                                                    
+                                                                                    
+                                          5                                         
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+          S.7: Model    accuracy   vs. training  set size                           
+                                                                                    
+                                                                                    
+          The final model is optimized with a training set of 620 abstracts. We have performed a
+                                                                                    
+          series of experiments in which the model is assessed as a function of training set size. The
+                                                                                    
+          results are shown in Fig. S1. The model performance quickly increases as more abstracts are
+                                                                                    
+          added to the training set. However, the performance does not significantly improve between
+                                                                                    
+          a training set size of 500 and 620, suggesting that additional data will not provide better
+                                                                                    
+          accuracy with the current model architecture.                             
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+          FIG. S1: Model accuracy (f1) as a function of the number of labelled abstracts in the
+          training set.                                                             
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                          6                                         
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+          S.8: Test  set accuracy   metrics                                         
+                                                                                    
+                                                                                    
+          In this section we show a more detailed analysis (precision, recall, f1) of our final model on
+                                                                                    
+          the test set.                                                             
+                                                                                    
+                          TABLE 1: Accuracy metrics for the test set.               
+                                                                                    
+                                                                                    
+                            Label precision (p) recall (r) f1                       
+                            Total   86.35     87.74 87.04                           
+                                                                                    
+                            MAT     87.33     93.47 90.30                           
+                            SPL     87.65     77.14 82.05                           
+                                                                                    
+                            DSC     90.31     94.03 92.13                           
+                                                                                    
+                            PRO     85.46     81.03 83.19                           
+                            APL     83.69     77.78 80.63                           
+                                                                                    
+                            SMT     79.12     83.75 81.37                           
+                            CMT     83.32     88.88 86.01                           
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    
+          References                                                                
+                                                                                    
+                                                                                    
+          (1) Swain, M. C.; Cole, J. M. Chemdataextractor: a Toolkit for Automated Extraction of
+                                                                                    
+             Chemical Information from the Scientific Literature. J. Chem. Inf. Model. 2016, 56,
+                                                                                    
+             1894–1904.                                                             
+                                                                                    
+          (2) Ong, S. P.; Richards, W. D.; Jain, A.; Hautier, G.; Kocher, M.; Cholia, S.; Gunter, D.;
+                                                                                    
+             Chevrier, V. L.; Persson, K. A.; Ceder, G. Python Materials Genomics (pymatgen): A
+                                                                                    
+             Robust, Open-source Python Library for Materials Analysis. Comp. Mater. Sci. 2013,
+                                                                                    
+             68, 314–319.                                                           
+                                                                                    
+          (3) https://radimrehurek.com/gensim/.                                     
+                                                                                    
+                                                                                    
+          (4) Miller, G. A. WordNet: a Lexical Database for English. Communications of the ACM
+             1995, 38, 39–41.                                                       
+                                                                                    
+                                                                                    
+                                          7                                         
+                                                                                    
+                                                                                    
+
+
+
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                          Article     
+                                   CiteThis:J.Chem.Inf.Model.2019,59,3692−3702 pubs.acs.org/jcim
+                                                                                      
+                                                                                      
+        Named   Entity Recognition  and  Normalization  Applied  to Large-            
+                                                                                      
+        Scale Information  Extraction from  the Materials Science  Literature         
+                †          ‡        †          ‡          ‡         †        ‡        
+        L. Weston, V. Tshitoyan, J. Dagdelen, O. Kononova, A. Trewartha, K. A. Persson, G. Ceder,
+        and A.                                                                        
+             Jain*,†                                                                  
+        †                 ‡                                                           
+         Energy Technologies Area and Materials Science Division Lawrence Berkeley National Laboratory, 1 Cyclotron Road, Berkeley,
+         California 94720, United States                                              
+          *                                                                           
+          S Supporting Information                                                    
+          ABSTRACT: The number of published materials science                         
+          articles has increased manyfold over the past few decades.                  
+          Now,amajorbottleneckinthematerialsdiscoverypipelinearises                   
+          in connecting new results with the previously established                   
+          literature. A potential solution to this problem is to map the              
+          unstructured raw text of published articles onto structured                 
+          database entries that allow for programmatic querying. To this              
+          end,weapplytextminingwithnamedentityrecognition(NER)                        
+          for large-scale information extraction from the published                   
+          materialsscienceliterature.TheNERmodelistrainedtoextract                    
+          summary-level information from materials science documents,                 
+          includinginorganicmaterialmentions,sampledescriptors,phase                  
+          labels, material properties and applications, as wellas any synthesis and characterizationmethods used. Our classifierachieves
+          anaccuracy(f )of87%,andisappliedtoinformationextractionfrom3.27millionmaterialsscienceabstracts.Weextractmore
+                 1                                                                    
+          than80millionmaterials-science-relatednamedentities,andthecontentofeachabstractisrepresentedasadatabaseentryina
+          structured format. We demonstrate that simple database queries can be used to answer complex “meta-questions” of the
+          published literature that would have previously required laborious, manual literature searches to answer. All of our data and
+          functionalityhasbeenmadefreelyavailableonourGithub(https://github.com/materialsintelligence/matscholar)andwebsite
+          (http://matscholar.com), and we expect these results to accelerate the pace of future materials science discovery.
+        1. INTRODUCTION                      an important feature for text mining within the chemical
+                                             sciences.5,6                             
+        Presently, the vast majority of historical materials science                  
+                                              In addition to entity recognition, a major challenge lies in
+        knowledge is stored as unstructured text across millions of mapping each entity onto a unique database identifier in a
+        publishedscientificarticles.Thebodyofresearchcontinuesto                      
+                                             processcalledentitynormalization.Thisissuearisesduetothe
+        grow rapidly; the magnitude of published data is now so large                 
+                                             many ways in which a particular entity may be written. For
+        thatindividualmaterialsscientistswillonlyaccessafractionof example, “age hardening” and “precipitation hardening” refer
+        this information in their lifetime. With the increasing                       
+                                             tothesameprocess.However,trainingamachinetorecognize
+        magnitude of available materials science knowledge, a major thisequivalenceisespeciallychallenging.Asignificantresearch
+        bottleneckinmaterialsdesignarisesfromtheneedtoconnect effort has been applied to entity normalization in the
+        new results with the mass of previously published literature. biomedical domain; for example, the normalization of gene
+          Recent advances in machine learning and natural language nameshasbeenachievedbyusingexternaldatabasesofknown
+        processing have enabled the development of tools capable of gene synonyms.7 No such resources are available for the
+        extracting information from scientific text on a massive materials science domain, and entity normalization has yet to
+        scale.1−3 Of these tools, named entity recognition (NER),4 is be reported.    
+        currently one of the most widely used. Historically, NER was In the field of materials science, there has been significant
+        developed as a text-mining technique for extracting informa- efforttoapplyNERtoextractinginorganicmaterialssynthesis
+        tion, such as the names of people and geographic locations,                   
+                                             recipes;8−11                             
+                                                    furthermore, a number of chemistry-based NER
+        fromunstructuredtext,suchasnewspaperarticles.4Thetaskis systems are capable of extracting inorganic materials
+        typically approached as a supervised machine learning                         
+                                             mentions.12−15                           
+                                                     Some researchers have relied on chemical
+        problem, in which a model learns to identify the keywords NERincombinationwithlookuptablestoextractmentionsof
+        or phrases in a sentence; in this way, documents may be                       
+        represented in a structured format based on the information Received: June6, 2019
+        contained within them. In the past decade, NER has become Published: July31,2019
+                       ©2019AmericanChemicalSociety 3692           DOI:10.1021/acs.jcim.9b00470
+                                                               J.Chem.Inf.Model.2019,59,3692−3702
+.)CTU(                                                                                
+65:13:30                                                                              
+ta                                                                                    
+4202                                                                                  
+,91                                                                                   
+enuJ                                                                                  
+no                                                                                    
+YGOLONHCET                                                                            
+FO                                                                                    
+VINU                                                                                  
+NAHUW                                                                                 
+aiv                                                                                   
+dedaolnwoD                                                                            
+  .selcitra                                                                           
+  dehsilbup                                                                           
+  erahs                                                                               
+  yletamitigel                                                                        
+  ot                                                                                  
+  woh                                                                                 
+  no                                                                                  
+  snoitpo                                                                             
+  rof                                                                                 
+  senilediuggnirahs/gro.sca.sbup//:sptth                                              
+  eeS                                                                                 
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+        Journal of Chemical Information and Modeling                      Article     
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+        Figure1.Workflowfornamedentityrecognition.Thekeystepsareasfollows:(i)documentsarecollectedandaddedtoourcorpus,(ii)thetextis
+        preprocessed (tokenized and cleaned), (iii) for training data, a small subset of documents are labeled (SPL = symmetry/phase label, MAT =
+        material, APL = application), (iv) the labeled documents are combined with word embeddings (Word2vec26) generated from unlabeled text to
+        traina neuralnetwork fornamed entity recognition,and finally(v)entities areextractedfrom our textcorpus.
+        materials properties or processing conditions.16,17 However, machine learning model that learns to recognize whether or
+        there has been no large-scale effort to extract summary-level nottwoentitiesaresynonymswithanf scoreof95%.Wefind
+                                                                 1                    
+        informationfrommaterials sciencetexts. Materialsinformatics that entity normalization greatly increases the number of
+        researchers often make predictions for many hundreds or relevant items identified in document querying. The
+        thousands of materials,18,19 and it would be extremely useful unstructuredtextofeachabstractisconvertedintoastructured
+        for researchers to be able to ask large-scale questions of the database entry containing summary-level information about
+        published literature, such as, “For this list of 10000 materials, the document: inorganic materials studied, sample descriptors
+        whichhavebeenstudiedasathermoelectric,andwhichareyet or phase labels, mentions of any material properties or
+        to be explored?” An experimental materials science researcher applications, as well as any characterization or synthesis
+        might want to ask, “What is the most common synthesis methods used in the study. We demonstrate how this type of
+        method for oxide ferroelectrics? And, give me a list of all large-scale information extraction allows researchers to access
+        documents related to this query”. Currently, answering such and exploit the published literature on a scale that has not
+        questions requires a laborious and tedious literature search, previously been possible. In addition, we release the following
+        performed manually by a domain expert. However, by datasets:(i)800hand-annotatedmaterialsscienceabstractsto
+        representing published articles as structured database entries, be used as training data for NER,20 (ii) JSON files containing
+        such questions may be asked programmatically, and they can details for mapping named entities onto their normalized
+        be answered in a matter of seconds.  form,21and(iii)theextractednamedentities,andcorrespond-
+          In the present report, we apply NER along with entity ing digital object identifier (DOI), for 3.27 million materials
+        normalization for large-scale information extraction from the science articles.22 Finally, we have released a public facing
+        materialsscienceliterature.Weapplyinformationextractionto                     
+                                             website and API for interfacing with the data and trained
+        over 3.27 million materials science journal articles; we focus                
+                                             models, as outlined in section 5.        
+        solely on the article abstract, which is the most information-                
+        dense portion of the article and is also readily available from               
+                                             2. METHODOLOGY                           
+        various publisher application programming interfaces (e.g.,                   
+        Scopus). The NER model is a neural network trained using Our full information-extraction pipeline is shown in Figure 1.
+        800 hand-annotated abstracts and achieves an overall f score Detailed information about each step in the pipeline is
+                                      1                                               
+        of 87%. Entity normalization is achieved using a supervised presented below, along with an analysis of extracted results.
+                                          3693                     DOI:10.1021/acs.jcim.9b00470
+                                                               J.Chem.Inf.Model.2019,59,3692−3702
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+        Journal of Chemical Information and Modeling                      Article     
+        Machinelearningmodelsdescribedbelowaretrainedusingthe of 89% based on 5-fold cross-validation. Only documents
+        Scikit-learn,23 Tensorflow,24 and Keras25 python libraries. predictedtoberelevantareconsideredastraining/testingdata
+          2.1. Data Collection and Preprocessing. 2.1.1. Docu- intheNERstudy;however,weperformNERoverthefull3.27
+        ment Collection. This work focuses on text mining the million abstracts regardless of relevance. We are currently
+        abstracts of materials science articles. Our aim is to collect a developing text-mining tools that are optimized for a greater
+        majorityofallEnglish-languageabstractsformaterials-focused scope of topics (e.g., the polymer literature).
+        articles published between the years 1900 and 2018. To do 2.2. Named Entity Recognition. Using NER, we are
+        this, we create a list of over1100 relevant journals indexed by interestedinextractingspecificentitytypesthatcanbeusedto
+        Elsevier’s Scopus and collect articles published in these summarize a document. To date, there have been several
+        journalsthatfitthesecriteriaviatheScopusandScienceDirect efforts to define an ontology or schema for information
+        APIs,27 the SpringerNature API,28 and web scraping for representation in materials science (see ref 32 for a review of
+        journalspublishedbytheRoyalSocietyofChemistry29andthe theseefforts);inthepresentwork,foreachdocumentwewish
+        Electrochemical Society.30 The abstracts of these articles (and to know what wasstudied, andhow it wasstudied. To extract
+        associated metadata including title, authors, publication year, this information, we design seven entity labels: inorganic
+        journal, keywords, DOI, and url) are then each assigned a material (MAT), symmetry/phase label (SPL), sample
+        unique ID and stored as individual documents in a dual descriptor (DSC), material property (PRO), material
+        MongoDB/ElasticSearch database. Overall, our corpus con- application (APL), synthesis method (SMT), and character-
+        tains more than 3.27 million abstracts. ization method (CMT). The selection of these labels is
+          2.1.2. Text Preprocessing. The first step in document somewhat motivated by the well-known materials science
+        preprocessing is tokenization, which we performed using tetrahedron: “processing”, “structure”, “properties”, and
+        ChemDataExtractor.12 Thisinvolvessplittingtherawtextinto “performance”. Examples for each of these tags are given in
+        sentences, followed by the splitting of each sentence into the Supporting Information (S.4), along with a detailed
+        individual tokens. Following tokenization, we developed explanation regarding the rules for annotating each of these
+        several rule-based preprocessing steps. Our preprocessing tags.               
+        scheme is outlined in detail in the Supporting Information Using the tagging scheme described above, 800 materials
+        (S.1); here, we provide a brief overview. Tokens that are scienceabstractsareannotatedbyhand;onlyabstractsthatare
+        identifiedasvalid chemicalformulas arenormalized,suchthat deemed to be relevant based on the relevance classifier
+        the order of elements and common multipliers do not matter described earlier are annotated. We choose abstracts to
+        (e.g., NiFe is the same as Fe50Ni50); this is achieved using annotate by randomly sampling from relevant abstracts so as
+        regularexpressionandrulebasedtechniques.Valencestatesof to ensure that a diverse range of inorganic materials science
+        elements are split into separate tokens (e.g., Fe(III) becomes topics are covered. The annotations are performed by a single
+        two separate tokens, Fe and (III)). Additionally, if a token is materials scientist. We stress that there is no necessarily
+        neitherachemicalformulanoranelementsymbol,andifonly “correct” way to annotate these abstracts; however, to ensure
+        the first letter is uppercase, we lowercase the word. This way that the labeling scheme is reasonable, a second materials
+        chemical formulas as well as abbreviations stay in their scientist annotated a subset of 25 abstracts to assess the
+        commonform,whereaswordsatthebeginningofsentencesas interannotator agreement, which was 87.4%. This was
+        well as proper nouns are converted to lowercase. Numbers calculated as the percentage of tokens for which the two
+        with units are often not tokenized correctly with Chem- annotators assigned the same label.
+        DataExtractor. We address this in the processing step by For annotation, we use the inside−outside−beginning
+        splitting the common units from numbers and converting all (IOB) format.33 This is necessary to account for multiword
+        numbers to a special token <nUm>. This reduces the entities, such as “thin film”. In this approach, there are special
+        vocabulary size by several tens of thousand words. tags representing a token at the beginning (B), inside (I), or
+          2.1.3. Document Selection. For this work, we focus on outside(O)ofanentity.Forexample,thetextfragment“Thin
+        inorganic materials science papers. However, our materials films of SrTiO were deposited” would be labeled as (token;
+                                                     3                                
+        sciencecorpuscontainssomearticlesthatfalloutsidethescope IOB-tag)pairsinthefollowingway:(Thin;B-DSC),(films;I-
+        of the present work; for example, we consider articles on DSC),(of;O),(SrTiO ;B-MAT),(were;O),(deposited;O).
+                                                         3                            
+        polymer science or biomaterials tonot be relevant. In general, Before training a classifier, the 800 annotated abstracts are
+        we only consider an abstract to be of interest (i.e., useful for splitintotraining,development(validation),andtestsets.The
+        training and testing our NER algorithm) if the abstract developmentsetisusedforoptimizingthehyperparametersof
+        mentionsatleastoneinorganicmaterialalongwithatleastone the model, and the test set is used to assess the final accuracy
+        method for the synthesis or characterization of that material. of the model on new data. We use an 80%−10%−10% split,
+        Forthisreason,beforetraininganNERmodel,wefirsttraina such that there are 640, 80, and 80 abstracts in the training,
+        classifier for document selection. The model is a binary development, and test sets, respectively.
+        classifier capable of labeling abstracts as “relevant” or “not 2.3. Neural Network model. The neural network
+        relevant”. For training data, we label 1094 randomly selected architecture for our model is based on that of Lample et
+        abstracts as “relevant” or “not relevant”; of these, 588 are al.;34aschematicofthisarchitectureisshowninFigure2a.We
+        labeled as “relevant”, and 494 are labeled “not relevant”. explain the key features of the model below.
+        Details and specific rules used for relevance labeling are The aim is to train a model in such a way that materials
+        included in the Supporting Information (S.3). The labeled scienceknowledgeisencoded;forexample,wewishtoteacha
+        abstracts are used to train a classifier; we use a linear classifier computer that the words “alumina” and “SrTiO ” represent
+                                                                       3              
+        based on logistic regression,31 where each document is materials, whereas “sputtering” and “MOCVD” correspond to
+        described by a term frequency−inverse document frequency synthesis methods. There are three main types of information
+        (tf−idf) vector. The classifier achieves an accuracy (f ) score thatcanbeusedtoteachamachinetorecognizewhichwords
+                                     1                                                
+                                          3694                     DOI:10.1021/acs.jcim.9b00470
+                                                               J.Chem.Inf.Model.2019,59,3692−3702
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+        Journal of Chemical Information and Modeling                      Article     
+                                             scienceabstracts.Moreinformationaboutthetrainingofword
+                                             embeddings is included in the Supporting Information (S.2).
+                                              For (ii), context, the model considers a sentence as a
+                                             sequence of words, and it takes into account the local context
+                                             of each word in the sentence. For example, in the sentence
+                                             “The band gap of ___ is 4.5 eV”, it is quite clear that the
+                                             missing word is a material, rather than a synthesis method or
+                                             some other entity, and this is obvious from the local context
+                                             alone. To include such contextual information, we use a
+                                             recurrent neural network (RNN), a type of sequence model
+                                             that is capable of sequence-to-sequence (many-to-many)
+                                             classification. As traditional RNNs suffer from problems in
+                                             dealing with long-range dependencies, we use a variant of the
+                                             RNN called long short-term memory (LSTM).35 In order to
+                                             capture both forward and backward context, we use a
+                                             bidirectionalLSTM;inthisway,oneLSTMreadsthesentence
+                                             forwardandtheotherreadsitbackward,withtheresultsbeing
+                                             combined.                                
+                                              For(iii),wordshape,weincludecharacter-levelinformation
+                                             abouteachword.Forexample,materialformulaslike“SrTiO ”
+                                                                             3        
+                                             have a distinct shape, containing uppercase, lowercase, and
+                                             numerical characters, in a specific order; this word shape can
+                                             be used to help in entity classification. Similarly, prefixes and
+                                             suffixes provide useful information about entity type; for
+                                             example, the suffix “ium”, for example in “strontium”, is
+                                             commonly used for elemental metals, so a word that has this
+                                             suffix has a good chance of being part of a material name. In
+                                             order to encode this information into the model, we use a
+                                             character-level bidirectional LSTM over each word [Figure
+                                             2b]. The final outputs from the character-level LSTM (100
+                                             dimensional vectors) are concatenated with the word
+                                             embeddings for each word; these final vectors are used as
+                                             thewordrepresentationsfortheword-levelLSTM[Figure2a].
+                                              For the word-level LSTM, we use pretrained word
+                                             embeddings that have been trained on our corpus of over
+                                             3.27 million abstracts. For the character-level LSTM, the
+                                             character embeddings are not pretrained, but are learned
+        Figure 2. Neural network architecture for named entity recognition. during the training of the model.
+        Thecoloredrectanglesrepresentvectorsthatareinputs/outputsfrom                 
+                                              Theoutputlayerofthemodelisaconditionalrandomfields
+        differentcomponentsofthemodel.Themodelin(a)representsthe (CRF) classifier, rather than a typical softmax layer. Being a
+        word-level bidirectional LSTM, which takes as input a sequence of sequence-level classifier, the CRF is better at capturing the
+        wordsandreturnsasequenceofentitytagsinIOBformat.Theword- strong interdependencies of the output labels.36
+        levelfeaturesforthismodelarethewordembeddingsforeachword, The model has a number of hyperparameters, including the
+        whichareconcatenatedwiththeoutputofthecharacter-levelLSTM                     
+                                             word-andcharacter-levelLSTMsize,thecharacterembedding
+        runoverthesameword.Thecharacter-levelLSTMisshownin(b).                        
+        This model takes a single word such as “SrTiO” and runs a size, the learning rate, and drop out. The NER performance
+                                  3          wasoptimizedbyrepeatedlytrainingthemodelwithrandomly
+        bidirectionalLSTMovereachcharactertoencodethemorphological                    
+                                             selected hyperparameters; the final model chosen was the one
+        propertiesofeach word.                                                        
+                                             with the highest accuracy when assessed on the development
+                                             set.                                     
+        correspond to a specific entity type: (i) word representation, 2.4. Entity Normalization. After entity recognition, the
+        (ii) local (within sentence) context, and (iii) word shape.                   
+                                             finalstepisentitynormalization.Thisisnecessarilyrequiredas
+          For (i), word representation, we use word embeddings. each entity may be written in numerous forms. For example,
+        Wordembeddings map each word onto a dense vector of real “TiO ”, “titania”, “AO (A = Ti)”, and “titanium dioxide” all
+                                               2         2                            
+        numbers in a high-dimensional space. Words that have a refer to the same specific stoichiometry: TiO . For document
+                                                                     2                
+        similarmeaning,orarefrequentlyusedinasimilarcontext,will querying,itisimportanttostoretheseentitiesinanormalized
+        have a similar word embedding. For example, entities such as format, so that a query for documents that mention “titania”
+        “sputtering” and “MOCVD” will have similar vector also returns documents that mention “titanium dioxide”. In
+        representations; during training, the model learns to associate order to normalize material mentions, we convert all material
+        these word vectors as synthesis methods. The word names into a canonical normalized formula. The normalized
+        embeddings are generated using the Word2vec approach of formula is alphabetized and divided by the highest common
+        Mikolov et al.;26 the embeddings are 200-dimensional and are factor of the stoichiometry. In this way, “TiO ”, “titania”, and
+                                                                     2                
+        based on the skip-gram approach. Word embeddings are “titaniumdioxide”areallnormalizedto“O2Ti”.Insomecases,
+        generated by training on our corpus of 3.27 million materials multiple stoichiometries are extracted from a single material
+                                          3695                     DOI:10.1021/acs.jcim.9b00470
+                                                               J.Chem.Inf.Model.2019,59,3692−3702
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+        Journal of Chemical Information and Modeling                      Article     
+        tm oe “n Oti 2o Tn; i”f ,o “r Oe 4xa Tm iZp rl ”e ,, a“ nZ dr x “T Oi 1 2− ZxO r”3 .W(x h= en0, a0 c.5 o, n1 ti) n” ui os uc so rn av ne gr ete id
+                                         s                                            
+                                              p =  t p                                
+                                                 t + f                                
+        given,e.g,0≥x≤1,weincrementoverthisrangeinstepsof p p               (1)       
+        0.1. Material mentions are normalized using regular t                         
+                                                   p                                  
+        expressions and rule-based methods, as well as by making r =                  
+        use of the PubChem lookup tables;37 final validity checks on t p+ f n (2)     
+        the normalized formula are performed using the pymatgen                       
+                                                   p·r                                
+        library.38                             f = 2                                  
+          Normalization of other entity types is also crucial for 1 p + r   (3)       
+        comprehensive document querying. For example, “chemical                       
+                                             where t , f , and f represent the rates of true positives, false
+        vapor deposition”, “chemical-vapour deposition”, and “CVD” p p n              
+                                             positives,andfalsenegatives,respectively.WeusetheCoNLL
+        all refer to the same synthesis technique; i.e., they are                     
+                                             scoring system, which requires an exact match for the entire
+        synonyms for this entity type. In order to determine that two multiword entity;39 for example, if a CMT (characterization
+        entities have the same meaning, we trained a classifier that is method)islabeled“photoluminescencespectroscopy”,andthe
+        capable of determining whether or not two entities are modelonlylabelsthe“photoluminescence”portionasaCMT,
+        synonyms.                                                                     
+                                             the entire entity is considered as being labeled incorrectly.
+          The model uses the word embeddings for each entity as Theaccuracyofourfinalneuralnetworkmodelispresented
+        features; after performing NER, each multiword entity is                      
+                                             in Table 1 (accuracy as a function of training set size is
+        concatenated into a single word, and new word embeddings                      
+        aretrainedsuchthateverymultiwordentityhasasinglevector Table 1. Accuracy Metric f for Named Entity Recognition
+        representation.Eachsynonymconsistsofanentitypair,sothe 1 a                    
+                                             on the Development and Test Sets         
+        features for the model are created by concatenating the word                  
+        embeddings of the two entities in question. In addition to the accuracy(f)    
+                                                             1                        
+        word embeddings, which mostly capture the context in which                    
+                                               label  devset testset extracted(millions)
+        an entity is used, several other handcrafted features are                     
+                                               total  87.09  87.04     81.23          
+        included (Supporting Information, S.5). To train the model,                   
+                                               MAT    92.58  90.30     19.07          
+        10000entitypairsarelabeledasbeingeithersynonymsornot                          
+                                               SPL    85.24  82.05      0.53          
+        (seetheSupportingInformation,S.6).Usingthisdata,abinary                       
+                                               DSC    91.40  92.13      9.36          
+        randomforestclassifieristrainedtobeabletopredictwhether                       
+                                               PRO    80.19  83.19     31.00          
+        or not two entities are synonyms of one another.                              
+                                               APL    80.60  80.63      7.46          
+          Using the synonym classifier, each extracted entity can be                  
+                                               SMT    81.32  81.37      5.01          
+        normalized to a canonical form. Each entity is stored as its                  
+                                               CMT    86.52  86.01      8.80          
+        mostfrequentlyoccurringsynonym(weexcludeacronymsasa                           
+        normalized form); for example, “chemical vapor deposition”, aResults are shown for the total, material (MAT), phase (SPL),
+                                             sample descriptor (DSC), property (PRO), application (APL),
+        “chemical-vapour deposition”, and “CVD” are all stored as                     
+                                             synthesis method (SMT), and characterization (CMT) tags. Also
+        “chemical vapor deposition”, as this is the most frequently shownisthetotalnumberextractedforeachentitytypeoverthefull
+        occurring synonym that is not an acronym. corpus of abstracts.                
+        3. RESULTS                           presentedintheSupportingInformation,S.7).Weincludethe
+          3.1. NER Classifier Performance. Using the trained overallf 1scoreaswellasthescoreforeachentitytypeforboth
+        classifier, we are able to accurately extract information from the development and test sets (a breakdown of precision and
+        materials science texts. The NER classifier performance is recall for each entity type in the test set is presented in the
+                                             Supporting Information, S.8). The accuracy on the develop-
+        demonstrated in Figure 3; the model can clearly identity the                  
+                                             mentandtestsetsissimilar,suggestingthatthemodelhasnot
+        key information in the text.         been overfit to the development set during hyperparameter
+          Model performance can be assessed more quantitatively by                    
+                                             tuning. The overall f score on the test set is 87.04%. This
+        assessing the accuracy on the development and test sets. We 1                 
+        define our accuracy using the f score, which is the harmonic score is fairly close to the current state-of-the-art NER system
+                         1                   (90.94%)34 based on the same neural network architecture
+        mean of precision (p) and recall (r):                                         
+                                             (which is trained and evaluated on hand-labeled newspaper
+                                             articles39).However,wecautionagainstadirectcomparisonof
+                                             scoresonthesetasks,asthemodelingofmaterialssciencetext
+                                             isexpectedtobequitedifferentfromnewspaperarticles.Thef
+                                                                             1        
+                                             scoreof 90.30% forinorganic materialextractionis asgoodas
+                                             orbetterthanpreviouslyreportedchemicalNERsystems.For
+                                             example, Mysore et al. achieved an f score of 82.11% for
+                                                                  1                   
+                                             extractionmaterialmentions;9Swainetal.reportedanf score
+                                                                          1           
+                                             of 93.4% for extracting chemical entity mentions,12 however
+                                             their model is not specifically trained to identify inorganic
+                                             materials. The f scores for other entity tags are all over 80%,
+                                                     1                                
+                                             suggestingthatthemodelisperformingwellatextractingeach
+        Figure3.ExamplepredictionsofthematerialsscienceNERclassifier. entity type. Materials mentions and sample descriptors have
+        The highlighting indicates regions of text that the model has thehighestscores;thisismostlikelyduetotheirfrequencyin
+        associatedwith aparticularentity type. the training set and because these entities are often single
+                                          3696                     DOI:10.1021/acs.jcim.9b00470
+                                                               J.Chem.Inf.Model.2019,59,3692−3702
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+        Journal of Chemical Information and Modeling                      Article     
+        tokens. We note that this work makes available all 800 hand- result (as is the case for our method), as all three queries are
+        labeledabstractsforthetestingoffuturealgorithmsagainstthe based on the same underlying stoichiometry.
+        current work.                         We find that that by encoding materials science knowledge
+          3.2. Entity Normalization. Following entity extraction, into our entity extraction and normalization scheme, perform-
+        the next step is entity normalization. The trained random ance in document retrieval can be significantly increased. In
+        forest binary classifier exhibits an f score of 94.5% for entity Figure4,theeffectivenessofournormalizedentitydatabasefor
+                           1                                                          
+        normalization. The model is assessed using 10-fold cross-                     
+        validationwitha9000:1000train/testsplit.Theprecisionand                       
+        recall of the model are 94.6% and 94.4%, respectively, when                   
+        assessed on this test set. While theseaccuracy scores are high,               
+        we emphasize that the training/test data are generated in a                   
+        syntheticmanner (seeSupportingInformation,S.6),suchthat                       
+        the test set has roughly balanced classes. In reality, the vast               
+        majority of entities are not synonyms. By artificially reducing               
+        the number of negative test instances, the number of false                    
+        positivesisalsoartificiallyreduced.Inproduction,wefindthat                    
+        the model is prone to making false-positive predictions. In                   
+        terms of false positives, the two mostcommon mistakes made                    
+        by the synonym classifier are (i) when two entities have an                   
+        oppositemeaningbutareusedinasimilarcontext,e.g.“p-type                        
+        doping”and“n-typedoping”,or(ii)whentwoentitiesreferto                         
+                                             Figure 4. Recall statistics for document retrieval are generated by
+        related but not identical concepts, e.g, “hydrothermal syn- performing1000queriesforeachforeachdatabase.Resultsareshown
+        thesis” and “solvothermal synthesis”. fortheentitiesthathavebeenproperlynormalizedusingthescheme
+          Inordertoovercomethelargenumberoffalsepositives,we describedinsection2.4(Ents.Norm),aswellasfornon-normalized
+        performafinal,manualerrorcheckonanynormalizedentities. entities (Ents. Raw).  
+        Ifanentityisincorrectlynormalized,theincorrectsynonymis                       
+        manually removed, and the entity is converted to the most                     
+        frequently occurring correct prediction of the ML model.                      
+                                             document retrieval is explored. To test this, we created two
+          3.3. Text-Mined Information Extraction. We run the                          
+                                             databases, in which (i) each document is represented by the
+        trained NER classifier described in section 2.3 over our full                 
+                                             normalized entities extracted, and (ii) each document is
+        corpus of 3.27 million materials science abstracts. The entities              
+                                             represented by the non-normalized entities extracted. We
+        are normalized using the procedure described in section 2.4.                  
+                                             then randomly choose an entity of any type, and query each
+        Overall,morethan80millionmaterials-science-relatedentities                    
+                                             database based on this entity tosee howmany documents are
+        areextracted;aquantitativebreakdownoftheentityextraction                      
+                                             returned. The process of querying on a randomly selected
+        is shown in Table 1.                                                          
+                                             entity is repeated 1000 times to generate statistics on the
+          After entity extraction, the unstructured raw text of an efficiency of each database in document retrieval. This test is
+        abstract can be represented as a structured database entry,                   
+                                             also performed for two-entity queries, by randomly selecting
+        basedontheentitytagscontainedwithinit.Werepresenteach                         
+                                             twoentitiesandqueryingeachdatabase.Wenotethatbecause
+        abstract as a document in a nonrelational (NoSQL)                             
+                                             theprecisionofourmanuallycheckednormalizationiscloseto
+        MongoDB40 database collection. This type of representation unity,thistesteffectivelymeasurestherelativerecall(eq2)of
+        allows for efficient document retrieval and allows the user to each database (by comparing the false-negative rates).
+        ask summary-level or “meta-questions” of the published FromFigure4,itisclearthatnormalizationoftheentitiesis
+        literature. In section 4, we demonstrate several ways by crucial for achieving high recall in document queries. When
+        which large-scale text mining allows for researchers to access querying on a single entity, the recall for the normalized
+        the published literature programmatically. database is about 5 times higher than for the non-normalized
+                                             case. When querying on two entities this is compounded, and
+        4. APPLICATIONS                                                               
+                                             the non-normalized database only returns about 2% of the
+          4.1. Document Retrieval. Online databases of published documents that are returned from the normalized database.
+        literature work by allowing users to query based on some Our results highlight that a domain-specific approach such as
+        keywords. In the simplest case, the database will return the one we described can greatly improve performance. As
+        documentsthatcontainanexactmatchtothekeywordsinthe describedinsection5,wehavebuiltamaterialsscience aware
+        query. More advanced approaches may employ some kind of document search engine that can be used to more
+        “fuzzy”matching;forinstance,manytext-basedsearchengines comprehensively access the materials science literature.
+        are built upon Apache Lucene,41 which allows for fuzzy 4.2.MaterialsSearch.Inthefieldofmaterialsinformatics,
+        matching based on edit distance. While advanced approaches researchers often use machine learning models to predict
+        to document querying have been developed, to date there has chemical compositions that may be useful for a particular
+        been no freely available “materials science aware” database of application.Apracticalmajorbottleneckinthisprocesscomes
+        published documents; i.e., there is no materials science from needing to understand which of these chemical
+        knowledge base for the published literature. For example, compositionshavebeenpreviouslystudiedforthatapplication,
+        querying for “BaTiO ” in Web of Science returns 19134 which typically requires painstaking manual literature review.
+                    3                                                                 
+        results, whereas querying for “barium titanate” returns 12986 In section 1, we posed the following example question: “For
+        documents, and querying for “TiBaO ” returns only a single this list of 10000 materials, which have been studied as a
+                             3                                                        
+        document. Ideally, all three queries should return the same thermoelectric, and which are yet to be explored?” Analysis of
+                                          3697                     DOI:10.1021/acs.jcim.9b00470
+                                                               J.Chem.Inf.Model.2019,59,3692−3702
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+        Journal of Chemical Information and Modeling                      Article     
+        theextractednamedentitiescanbeausefultoolinautomating separated values (CSV) format, to allow for programmatic
+        the literature review process.       literature search.                       
+          In Figure 5, we illustrate how one can analyze the co- 4.3.GuidedLiteratureSearchesandSummaries.One
+        occurrence of various property/application entities with majorbarrierforaccessingtheliteratureisthatresearchersmay
+                                             not know a priori what are the relevant terms or entities to
+                                             search for a given material. This is especially true for
+                                             researchers who may be entering a new field, or may be
+                                             studying a new material for the first time. In Figure 6, we
+                                             demonstrate how “materials summaries” can be automatically
+                                             generatedbasedontheentities.Thesummariesshowcommon
+                                             entities thatco-occurwithamaterial;inthis way,aresearcher
+                                             can learn how a material is typically synthesized, common
+                                             crystalstructures,orhowandforwhatapplicationamaterialis
+                                             typically studied. The top entities are presented along with a
+                                             score (0−100%), indicating how frequently each entity co-
+                                             occurswithachosenmaterial.Wenotethatthesummariesare
+                                             automatically generated without any human intervention or
+                                             curation.                                
+        Figure5.Screenshotofthematerialssearchfunctionalityonourweb                   
+                                              As an example, in Figure 6 summaries are presented for
+        application,whichallowsonetosearchformaterialsassociatedwitha                 
+        specifiedkeyword(rankedbycountofhits)andwithelementfilters PbTe and BiFeO 3. PbTe is most frequently studied as a
+        applied (in this case,thermoelectric compounds notcontaining Pb). thermoelectric,42 so many of the entities in the summary deal
+        Theapplicationreturnsclickablehyperlinkssothatuserscandirectly with the thermoelectric and semiconducting properties of the
+        accessthe originalresearcharticles.  material,includingdopability.PbTehasacubic(rocksalt,fcc)
+                                             structure as the ground state crystal structure under ambient
+        specific materials on a large scale. Our web application has a conditions.43 PbTe doeshave some metastable phasessuch as
+        “materials search” functionality. Users can enter a specific orthorhombic,44 and this is also reflected in the summary;
+        property or application entity, and the materials search will some of the less frequently occurring phases (i.e., scores less
+        return a table of all materials that co-occur with that entity, than 0.01) arise simply due to co-occurrence with other
+        along with document counts and the corresponding DOIs. As materials, indicating a weakness of the co-occurrence
+        demonstrated, the results can be further filtered based on assumption.        
+        composition; in the example shown in Figure 5, all of the The summary in Figure 6b for BiFeO mostly reflects the
+                                                                   3                  
+        known thermoelectrics compositions that do not contain lead extensive research into this material as a multiferroic (i.e., a
+        are returned. The results can then by downloaded in comma- ferromagnetic ferroelectric).45 The summary shows that
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+        Figure 6.AutomaticallygeneratedmaterialssummariesforPbTe (a) andBiFeO (b). Thescoreis the percentageofpapers thatmention each
+                                               3                                      
+        entityatleastonce.                                                            
+                                          3698                     DOI:10.1021/acs.jcim.9b00470
+                                                               J.Chem.Inf.Model.2019,59,3692−3702
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+        Journal of Chemical Information and Modeling                      Article     
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+        Figure 7. (a) Word embeddings for the 5000 most commonly mentioned applications projected onto a two-dimensional plane. The coloring
+        representsclustersidentifiedbytheDBSCANalgorithm.Theapplicationsfromoneoftheseclustersarehighlightedallapplicationsinthiscluster
+        relatetosolid-statememorydevices.In(b),thematerialswiththelargestnumberofapplicationsareplotted.(c)and(d)showthetopapplications
+        forSiO and steel.                                                             
+            2                                                                         
+        BiFeO hasseveralstableormetastablepolymorphs,including 4.4. Answering Meta-Questions. Rather than simply
+            3                                                                         
+        the rhombohedral (hexagonal) and orthorhombic,46 as well as listing which entity tags co-occur with a given material, one
+        tetragonal47 and others; these phases are all known and have may want to perform more complex analyses of the published
+        been studied in some form. BiFeO is most frequently literature. For example, one may be interested in multifunc-
+                             3                                                        
+        synthesized by either sol−gel or solid state reaction routes, tionalmaterials;aresearchermightask,“Whichmaterialshave
+        which is common for oxides.          the most diverse range of applications?” To answer such a
+          The types of summaries described above are very powerful, question,theco-occurrenceofeachmaterialwiththedifferent
+        and can be used by nondomain experts to get an initial applications can be analyzed.
+        overviewof a new material or new field, or bydomain experts In order to ensure that materials with diverse applications
+        to gain a more quantitative understanding of the published are uncovered, we first perform a clustering analysis on the
+        literature or broader study of their topic (e.g., learning about word embeddings for each application entity that has been
+        other application domains that have studied their target extracted. Clustering on the full 200-dimensional word
+        material). For example, knowledge of the most common embeddings gives poor resultsthis is common for clustering
+        synthesis techniques is often used to justify the choice of of high-dimensional data. Improved results are obtained by
+        chemical potentials in thermodynamic modeling, and these reducing the dimensions of the embeddings using principal
+        quantities are used in calculations of surface chemistry48 and component analysis (PCA)50 and t-distributed stochastic
+        charged point defects49 in inorganic materials. neighbor embedding (t-SNE).51 It is found that t-SNE
+          We note that there may be some inherent bias in the provides qualitatively much better clusters than PCA. t-SNE
+        aforementionedliteraturesummariesthatmayariseduetothe does not necessarily preserve the data density or neighbor
+        analysis of only the abstracts. For example, more novel distances; however, empirically this approach often provides
+        synthesistechniquessuchas“molecularbeamepitaxy”maybe good results when used with certain clustering algorithms.
+        more likely to be mentioned in the abstract than a more Each word embedding is first reduced to three dimensions
+        common technique such as “solid-state reaction”. This could using t-SNE,51 and then a clustering analysis is performed
+        be easily overcome by performing our analysis on full texts using Density-based Spatial Clustering of Applications with
+        ratherthanjustabstracts(seesection6foradiscussiononthe Noise (DBSCAN).52 The results of this analysis are shown in
+        current limitations and future work). Figure 7a (the data is reduced to two dimensions for the
+                                          3699                     DOI:10.1021/acs.jcim.9b00470
+                                                               J.Chem.Inf.Model.2019,59,3692−3702
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+        Journal of Chemical Information and Modeling                      Article     
+        purposes of plotting). The DBSCAN algorithm finds 244 Text mining on such a massive scale provides tremendous
+        distinct application clusters. In Figure 7a, the applications opportunity for accessing information in materials science.
+        foundinonesmallclusterarehighlightedalloftheentitiesin One of the most powerful applications of text mining is in
+        this cluster relate to solid-state memory applications. information retrieval, which is the process of accurately
+          To determine which materials have the most diverse retrieving the correct documents based on a given query. In
+        applications, we look at the co-occurrence of each material thefieldofbiomedicine,thecategorizationandorganizationof
+        withentitiesfromeachcluster.Thetop5000mostcommonly information into a knowledge base has been found to greatly
+        occurring materials and applications are considered. We improve efficiency in information retrieval.54,55 Combining
+        generate a co-occurrence matrix, with rows representing ontologies with large databases of published literature allows
+        materials and columns representing application clusters. A researchers to impart a certain semantic quality onto queries,
+        materialisconsideredtoberelevanttoaclusterifitco-occurs whichisfarmorepowerfulthansimpletext-basedsearchesthat
+        with an application from that cluster in at least 100 abstracts. are agnostic to the domain. We have stored the digital object
+        The results of this analysis are presented in Figure 7b. Based identifier (DOI) for each abstract in our corpus, such that
+        on this analysis, the most widely used materials are SiO , targeted queries can be linked to the original research articles.
+                                         2                                            
+        Al O , TiO , steel, and ZnO. In Figure 7c,d, the most In addition to information retrieval, an even more promising
+          2 3  2                                                                      
+        important applications for SiO and steel are shown in pie andnovelaspectoftextminingonthisscaleisthepotentialto
+                         2                                                            
+        charts. The labels for each segment of a chart are created by ask “meta-questions” of the literature, as outlined in sections
+        manually inspecting the entities in each cluster (we note that 4.2 and 3.3. The potential to connect the extracted entities of
+        automated topic modeling algorithms could also be used to each document and provide summary-level information based
+        create a summary of each application cluster,53 not pursued on an analysis of many thousands of documents can greatly
+        here). For SiO , the most important applications are in improve the efficiency of the interaction between researchers
+                 2                                                                    
+        catalysis and complementary metal oxide semiconductor and the published literature.
+        (CMOS) technologies (SiO is an important dielectric in Weshouldnotesomelimitationsofthepresentinformation
+                        2                                                             
+        CMOSdevices);forsteel,themostimportantapplicationsare extraction system, and the prospects for improvement. First,
+        in various engineering applications. However, both materials certainissuesariseasaresultofonlyanalyzingtheabstractsof
+        have widely varied applications across disparate fields. publications. Not all information about a publication is
+          Being able to answer complex meta-questions of the presented in the abstract; therefore, by considering only the
+        published literature can be a powerful tool for researchers. abstract, the recall in document retrieval can be reduced.
+        With all of the corpus represented as a structured database, Second, the quantitative analysis of the literature, as in Figure
+        generating an answer to these questions requires only a few 6,canbeaffected.ThiscanbeovercomebyapplyingourNER
+        lines of code, and just a few seconds for data transfer and system to the full texts of journal articles. The same tools
+        processingthis is in comparison to a several-weeks-long developedherecanbeappliedtothefulltext,providedthatthe
+        literature search performed by a domain expert that would full text is freely available. A second issue with the current
+        have been previously required.       methodology is that the system is based on co-occurrence of
+                                             entities, and we do not perform explicit entity relation
+        5. DATABASE AND CODE ACCESS          extraction. By considering only co-occurrence, recall is not
+                                             affected, but precision can be reduced. We do note that all of
+        All of the data associated with this project has been made                    
+                                             the other tools available for querying the materials science
+        publicly available, including the 800 hand-annotated abstracts                
+                                             literature rely on co-occurrence.        
+        used as training data for NER,20 as well as JSON files                        
+                                              Despitetheselimitations,wehavedemonstratedthewaysin
+        containing the information for entity normalization.21 The                    
+                                             which large-scale text mining can be used to develop research
+        entire entity database of 3.27 million documents is available tools, and the present work represents a first step toward
+        online for bulk download in JSON format.22 artificiallyintelligentandprogrammaticaccesstothepublished
+          We have also created a public facing API to access the data                 
+                                             m■aterials science literature.           
+        and functionality developed in this project; the code to access               
+        the API is available via the Github repository (https://github.               
+                                               ASSOCIATED CONTENT                     
+        com/materialsintelligence/matscholar). The API allows users                   
+                                             *                                        
+        to not only access the entities in our data set, but also to S Supporting Information
+        performNERonanydesiredmaterialssciencetext.Finally,we The Supporting Information is available free of charge on the
+        have developed a web application, http://matscholar.com, for ACS Publications website at DOI: 10.1021/acs.jcim.9b00470.
+        nonprogrammatic access to the data. The web application has                   
+                                                Further details regarding data cleaning and processing,
+        various materials science aware tools for accessing the                       
+                                                as well as annotation and model training (PDF)
+        published literature.                                                         
+                                             ■                                        
+        6. SUMMARY AND DISCUSSION              AUTHOR INFORMATION                     
+        Using the information extraction pipeline shown in Figure 1, Corresponding Author
+        wehaveperformedinformationextractiononover3.27million *E-mail: ajain@lbl.gov. 
+        materialsscienceabstractswithahighdegreeofaccuracy.Over                       
+                                             ORCID                                    
+        80millionmaterials-science-relatedentitieswereextracted,and                   
+                                             L. Weston: 0000-0002-3973-0161           
+        each abstract is represented as a structured document in a                    
+                                             K. A. Persson: 0000-0003-2495-5509       
+        database collection. The entities in each document are                        
+        normalized (i.e., equivalent terms grouped together), greatly Notes           
+        increasingthenumberofrelevantresultsindocumentretrieval. The authors declare no competing financial interest.
+                                          3700                     DOI:10.1021/acs.jcim.9b00470
+                                                               J.Chem.Inf.Model.2019,59,3692−3702
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+        ■Journal of Chemical Information and Modeling                     Article     
+           ACKNOWLEDGMENTS                   (17) Shah, S.; Vora, D.; Gautham, B.; Reddy, S. A Relation Aware
+                                             Search Engine for Materials Science. Integrating Materials and
+        This work was supported by Toyota Research Institute Manufacturing Innovation2018,7,1−11.
+        through the Accelerated Materials Design and Discovery                        
+                                             (18) Meredig, B.; Agrawal, A.; Kirklin, S.; Saal, J. E.; Doak, J. W.;
+        program. We are thankful to Matthew Horton for useful Thompson, A.; Zhang, K.; Choudhary, A.; Wolverton, C.
+        discussions. A portion of the abstract data was downloaded Combinatorial Screening for New Materials in Unconstrained
+        fromScopusAPIbetweenOctober2017andSeptember2018 Composition Space with Machine Learning. Phys. Rev. B: Condens.
+        via http://api.elsevier.com and http://www.scopus.com. Matter Mater. Phys.2014, 89,094104.
+        ■                                                                             
+                                             (19) Legrain, F.; Carrete, J.; van Roekeghem, A.; Madsen, G. K.;
+                                             Mingo, N. Materials Screening for the Discovery of new Half-
+           REFERENCES                                                                 
+                                             Heuslers:MachineLearningVersusAbInitioMethods.J.Phys.Chem.
+         (1)Voytek,J.B.;Voytek,B.Automatedcognomeconstructionand B 2018,122,625−632.  
+        semi-automated hypothesis generation. J. Neurosci. Methods 2012, (20) https://doi.org/10.6084/m9.figshare.8184428.
+        208, 92−100.                         (21) https://doi.org/10.6084/m9.figshare.8184365.
+         (2) Tshitoyan, V.; Dagdelen, J.; Weston, L.; Dunn, A.; Rong, Z.; (22) https://doi.org/10.6084/m9.figshare.8184413.
+        Kononova,O.;Persson,K.A.;Ceder,G.;Jain,A.Unsupervisedword (23) Pedregosa, F.; Varoquaux, G.; Gramfort, A.; Michel, V.;
+        embeddings capture latent knowledge from materials science Thirion, B.; Grisel, O.; Blondel, M.; Prettenhofer, P.; Weiss, R.;
+        literature.Nature2019,571,95.        Dubourg,V.;etal.Scikit-learn:MachinelearninginPython.J.Mach.
+         (3) Mukund, N.; Thakur, S.; Abraham, S.; Aniyan, A.; Mitra, S.; Learn. Res.2011,12,2825−2830.
+        Philip, N. S.; Vaghmare, K.; Acharjya, D. An Information Retrieval (24)Abadi,M.;Barham,P.;Chen,J.;Chen,Z.;Davis,A.;Dean,J.;
+        and Recommendation System for Astronomical Observatories. Devin,M.;Ghemawat,S.;Irving,G.;Isard,M.Tensorflow:aSystem
+        Astrophys.J. Suppl. S.2018,235,22.   for Large-scale Machine Learning. Proceedings of the 12th USENIX
+         (4) Nadeau, D.; Sekine, S. A Survey of Named Entity Recognition Symposium on Operating Systems Design and Implementation
+        andClassification. Lingvist. Investig. 2007, 30,3−26. (OSDI’16), Nov 2−4, 2016, Savannah, GA, USA; Association for
+         (5)Segura-Bedmar,I.;Martínez,P.;Herrero-Zazo,M.Semeval-2013 Computing Machinery:2016; pp 265−283
+        Task9:ExtractionofDrug-DrugInteractionsfromBiomedicalTexts (25) Chollet,F. Keras;2015.
+        (ddiextraction 2013). Second Joint Conference on Lexical and (26) Mikolov, T.; Chen, K.; Corrado, G.; Dean, J. Efficient
+        ComputationalSemantics(*SEM),Volume2:ProceedingsoftheSeventh Estimation of Word Representations in Vector Space. 2013,
+        International Workshop on Semantic Evaluation (SemEval 2013); arXiv:1301.3781. arXiv.org e-Print archive. https://arxiv.org/abs/
+        AssociationforComputational Linguistics:2013; pp341−350. 1301.3781.           
+         (6) Eltyeb, S.; Salim, N. Chemical Named Entities Recognition: a (27) https://dev.elsevier.com/.
+        Reviewon ApproachesandApplications.J. Cheminf. 2014,6,17. (28) https://dev.springernature.com/.
+         (7)Fang,H.-r.;Murphy,K.;Jin,Y.;Kim,J.S.;White,P.S.Human (29) http://www.rsc.org/.
+        Gene Name Normalization using Text Matching with Automatically (30) https://www.electrochem.org/.
+        Extracted Synonym Dictionaries. Proceedings of the Workshop on (31) Hosmer, D. W., Jr.; Lemeshow, S.; Sturdivant, R. X. Applied
+        Linking Natural Language Processing and Biology: Towards Deeper Logistic Regression; JohnWiley & Sons:2013; Vol. 398.
+        Biological LiteratureAnalysis.2006,41−48. (32) Zhang, X.; Zhao, C.; Wang, X. A. Survey on Knowledge
+         (8) Kim, E.; Huang, K.; Saunders, A.; McCallum, A.; Ceder, G.; RepresentationinMaterialsScienceandEngineering:AnOntological
+        Olivetti,E.MaterialsSynthesisInsightsfromScientificLiteraturevia Perspective. Comput. Ind.2015,73, 8−22.
+        Text Extraction and Machine Learning. Chem. Mater. 2017, 29, (33) Ramshaw, L. A.; Marcus, M. P. Natural Language Processing
+        9436−9444.                           UsingVery LargeCorpora; Springer:1999; pp 157−176.
+         (9) Mysore, S.; Kim, E.; Strubell, E.; Liu, A.; Chang, H.-S.; (34) Lample, G.; Ballesteros, M.; Subramanian, S.; Kawakami, K.;
+        Kompella, S.; Huang, K.; McCallum, A.; Olivetti, E. Automatically Dyer, C. Neural Architectures for Named Entity Recognition. 2016,
+        Extracting Action Graphs from Materials Science Synthesis arXiv:1603.01360. arXiv.org e-Print archive. https://arxiv.org/abs/
+        Procedures. 2017, arXiv:1711.06872. arXiv.org e-Print archive. 1603.01360.    
+        https://arxiv.org/abs/1711.06872.    (35) Hochreiter, S.; Schmidhuber, J. Long Short-term Memory.
+         (10)Kim,E.;Huang,K.;Jegelka,S.;Olivetti,E.VirtualScreeningof Neural Comput. 1997, 9, 1735−1780.
+        Inorganic Materials Synthesis Parameters with Deep Learning. npj (36)Huang,Z.;Xu,W.;Yu,K.BidirectionalLSTM-CRFModelsfor
+        Comput.Mater. 2017, 3, 53.           SequenceTagging.2015,arXiv:1508.01991.arXiv.orge-Printarchive.
+         (11) Kim, E.; Huang, K.; Tomala, A.; Matthews, S.; Strubell, E.; https://arxiv.org/abs/1508.01991.
+        Saunders, A.; McCallum, A.; Olivetti, E. Machine-learned and (37) Kim, S.; Thiessen, P. A.; Bolton, E. E.; Chen, J.; Fu, G.;
+        Codified Synthesis Parameters of Oxide Materials. Sci. Data 2017, Gindulyte, A.; Han, L.; He, J.; He, S.; Shoemaker, B. A.; et al.
+        4, 170127.                           PubChem Substance and Compound Databases. Nucleic Acids Res.
+         (12) Swain, M. C.; Cole, J. M. Chemdataextractor: a Toolkit for 2016,44, D1202−D1213.
+        Automated Extraction of Chemical Information from the Scientific (38)Ong,S.P.;Richards,W.D.;Jain,A.;Hautier,G.;Kocher,M.;
+        Literature.J. Chem. Inf. Model.2016,56,1894−1904. Cholia, S.; Gunter, D.; Chevrier, V. L.; Persson, K. A.; Ceder, G.
+         (13) Rocktas̈chel,T.; Weidlich,M.;Leser,U.ChemSpot:aHybrid Python Materials Genomics (pymatgen): A Robust, Open-source
+        SystemforChemicalNamedEntityRecognition.Bioinformatics2012, Python Library for Materials Analysis. Comput. Mater. Sci. 2013, 68,
+        28,1633−1640.                        314−319.                                 
+         (14)Leaman,R.;Wei,C.-H.;Lu,Z.tmChem:aHighPerformance (39) Tjong Kim Sang, E. F.; De Meulder, F. Introduction to the
+        Approach for Chemical Named Entity Recognition and Normal- CoNLL-2003 Shared Task: Language-independent Named Entity
+        ization. J. Cheminf.2015,7,S3.       Recognition. Proceedings of the seventh conference on Natural language
+         (15)Krallinger,M.;Rabal,O.;Lourenco,A.;Oyarzabal,J.;Valencia, learning atHLT-NAACL2003-Volume4 2003,142−147.
+        A. Information Retrieval and Text Mining Technologies for (40) https://www.mongodb.com/.
+        Chemistry.Chem. Rev.2017, 117, 7673−7761. (41) https://lucene.apache.org/.    
+         (16)Court,C.J.;Cole,J.M.Auto-generatedMaterialsDatabaseof (42) Pei, Y.; LaLonde, A.; Iwanaga, S.; Snyder, G. J. High
+        Curie and Neé l Temperatures via Semi-supervised Relationship Thermoelectric Figure of Merit in Heavy Hole Dominated PbTe.
+        Extraction.Sci.Data 2018,5, 180111.  Energy Environ. Sci. 2011,4,2085−2089.   
+                                          3701                     DOI:10.1021/acs.jcim.9b00470
+                                                               J.Chem.Inf.Model.2019,59,3692−3702
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+        Journal of Chemical Information and Modeling                      Article     
+         (43) Rabe, K. M.; Joannopoulos, J. D. Ab Initio Relativistic                 
+        PseudopotentialStudyof theZero-temperature StructuralProperties               
+        of SnTe and PbTe. Phys.Rev. B: Condens. Matter Mater. Phys. 1985,             
+        32,2302−2314.                                                                 
+         (44)Wang,Y.;Chen,X.;Cui,T.;Niu,Y.;Wang,Y.;Wang,M.;Ma,                        
+        Y.; Zou, G. Enhanced Thermoelectric Performance of PbTe Within                
+        theOrthorhombicPnmaPhase.Phys.Rev.B:Condens.MatterMater.                      
+        Phys.2007, 76,155127.                                                         
+         (45)Wang,J.;Neaton,J.;Zheng,H.;Nagarajan,V.;Ogale,S.;Liu,                    
+        B.; Viehland, D.; Vaithyanathan, V.; Schlom, D.; Waghmare, U.                 
+        Epitaxial BiFeO Multiferroic Thin Film Heterostructures. Science              
+                3                                                                     
+        2003, 299, 1719−1722.                                                         
+         (46) Arnold, D. C.; Knight, K. S.; Morrison, F. D.; Lightfoot, P.            
+        Ferroelectric-paraelectric Transition in BiFeO: Crystal Structure of          
+                               3                                                      
+        theOrthorhombic βPhase. Phys.Rev.Lett.2009,102,No. 027602.                    
+         (47)Fu,Z.;Yin,Z.;Chen,N.;Zhang,X.;Zhao,Y.;Bai,Y.;Chen,Y.;                    
+        Wang, H.-H.; Zhang, X.; Wu, J. Tetragonal-tetragonal-monoclinic-              
+        rhombohedral Transition: Strain Relaxation of Heavily Compressed              
+        BiFeO EpitaxialThinFilms.Appl.Phys.Lett.2014,104,No.052908.                   
+           3                                                                          
+         (48)Reuter,K.;Scheffler,M.Composition,Structure,andStability                 
+        of RuO (110) as a Function of Oxygen Pressure. Phys. Rev. B:                  
+            2                                                                         
+        Condens.Matter Mater.Phys.2001,65, No. 035406.                                
+         (49)Weston,L.;Janotti,A.;Cui,X.Y.;Stampfl,C.;VandeWalle,C.                   
+        G.HybridFunctionalCalculationsofPointDefectsandHydrogenin                     
+        SrZrO.Phys.Rev.B:Condens.MatterMater.Phys.2014,89,184109.                     
+           3                                                                          
+         (50) Jolliffe, I.PrincipalComponentAnalysis; Springer:2011.                  
+         (51) Maaten, L. v. d.; Hinton, G. Visualizing Data using t-SNE. J.           
+        Mach.Learn.Res.2008,9,2579−2605.                                              
+         (52) Ester, M.; Kriegel, H.-P.; Sander, J.; Xu, X. A density-based           
+        Algorithm for Discovering Clusters in Large Spatial Databases with            
+        Noise.KDD-96Proceedings;AAAI: 1996; pp226−231.                                
+         (53)Blei,D.M.;Ng,A.Y.;Jordan,M.I.LatentDirichletAllocation.                  
+        J. Mach.Learn.Res.2003,3,993−1022.                                            
+         (54) Müller, H.-M.; Kenny, E. E.; Sternberg, P. W. Textpresso: an           
+        Ontology-based Information Retrieval and Extraction System for                
+        BiologicalLiterature. PLoSBiol.2004,2,No. e309.                               
+         (55) Bodenreider, O. Biomedical Ontologies in Action: Role in                
+        Knowledge Management, Data Integration and Decision Support.                  
+        Yearb.Med.Inform. 2008,17,67−79.                                              
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                                                                      
+                                          3702                     DOI:10.1021/acs.jcim.9b00470
+                                                               J.Chem.Inf.Model.2019,59,3692−3702

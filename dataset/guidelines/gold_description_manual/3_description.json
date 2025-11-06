@@ -1,0 +1,17 @@
+{
+    "element": "The Element category lists names and symbols of elements and compounds such as Ti, oxygen, and YBa2Cu3O7 or YBCO. This is strictly distinguishable from the Material category as entities in the Element category can be expressed by chemical composition formulae.",
+    "material": "The Material category lists the terms of structural entities and sample descriptors such as tetragonal crystal symmetry, bulk/film sample, and grain boundary. The information augments the details of the sample whose composition is defined by Element.",
+    "main": "",
+    "process": "The Process category lists the terms of Synthesis/Processing such as the sol-gel method for film samples, calcination for bulk samples, and AC/DC sputtering for thin-film preparation.",
+    "sc": "",
+    "characterization": "The Process category lists the terms of Synthesis/Processing such as the sol-gel method for film samples, calcination for bulk samples, and AC/DC sputtering for thin-film preparation.",
+    "property": "The Property category lists the terms of Property/Phenomena and their Theoretical representations such as electrical conductivity, mechanical hardness, electron-phonon coupling, and Fermi surface. ",
+    "value": "The Value category targets numerical values with units, such as 160K. This enables to extract transition temperatures and process conditions, for example.\n",
+    "doping": "Represent doping operations such as doping, substitute, and addition.",
+    "target": "",
+    "equivalent": "",
+    "condition": "",
+    "dopant": "",
+    "site": "",
+    "event": ""
+}

@@ -1,0 +1,48 @@
+MatSciRE: Leveraging Pointer Networks to Automate Entity and Relation Extraction for Material Science Knowledge-base Construction
+
+Abstract
+Material science literature is a rich source of factual information about various categories of entities (like materials and compositions)
+and various relations between these entities, such as conductivity, voltage, etc. Automatically extracting this information to generate
+a material science knowledge base is a challenging task. In this paper, we propose MatSciRE (Material Science Relation Extractor), a
+Pointer Network-based encoder-decoder framework, to jointly extract entities and relations from material science articles as a triplet
+(entity1,relation, entity2). Specifically, we target the battery materials and identify five relations to work on - conductivity, coulombic
+efficiency, capacity, voltage, and energy. Our proposed approach achieved a much better F1-score (0.771) than a previous attempt
+using ChemDataExtractor (0.716). The overall graphical framework of MatSciRE is shown in Fig 1. The material information is
+extracted from material science literature in the form of entity-relation triplets using MatSciRE.
+
+
+3.6. Ground Truth Dataset Annotation
+To verify the correctness of the distant supervision based
+dataset generation and our joint relation-entity extraction model,
+we randomly select 114 papers from the set of 3,812 papers and
+provide them (using tool [53]) to two different material science
+knowledge experts along with a good working proficiency in
+English to manually identify the triplets with the five relations
+(Conductivity, Coulombic Efficiency, Capacity, Voltage, and
+Energy). The total number of sentences annotated by the experts
+for these articles is 1,255. We select three annotators after
+several discussions and conditions of fulfilling many criterias
+like annotators should have domain knowledge expertise along
+with a good working proficiency in English. Annotators are
+experienced in similar tasks earlier also (with earlier publications
+and datasets are public) so the annotators are reliable in these
+annotation tasks. Initial labeling is done by two annotators and
+any annotation discrepancy is checked and resolved by the third
+annotator after discussing with two others. So, the final judgment
+is based on three annotators’ discussion. One common conflict
+arises regarding the inclusion of the material name. For example,
+in the following sentence -“Tin phosphide ( Sn4P3 ) has been
+a promising anode material for SIBs owing to its theoretical
+capacity of 1132 mA h g 1 and high electrical conductivity of
+30.7 S cm 1 " - One annotation contains "Tin phosphide ( Sn4P3
+)" and another contains only "Sn4P3". Finally, "Tin Phosphide"
+is not included. The inter-annotator agreement Cohen κ between
+two annotators is 0.82 including these types of conflicts - which
+is almost perfect κ score as described in Landis and Koch [54].
+The statistics of the five relations are shown below, which exhibit
+a count of different relations among entity pairs.
+• Conductivity: 122
+• Coulombic Efficiency: 553
+• Capacity: 378
+• Voltage: 637
+• Energy: 103

@@ -1,0 +1,643 @@
+The Materials Science Procedural Text Corpus: Annotating             
+                                                                                  
+          Materials Synthesis Procedures with Shallow Semantic Structures         
+                                                                                  
+                                                                                  
+              ShesheraMysore1∗ ZachJensen2∗  EdwardKim2   KevinHuang2             
+                  Haw-ShiuanChang1   EmmaStrubell1  JeffreyFlanigan1              
+                            AndrewMcCallum1   ElsaOlivetti2                       
+                                                                                  
+                         1CollegeofInformationandComputerSciences                 
+                             UniversityofMassachusettsAmherst                     
+           {smysore, hschang, strubell, jflanigan, mccallum}@cs.umass.edu         
+                        2DepartmentofMaterialsScienceandEngineering               
+                             MassachusettsInstituteofTechnology                   
+                     {zjensen, edwardk, kjhuang, elsao}@mit.edu                   
+                                                                                  
+                                                                                  
+                                                                                  
+                      Abstract                                                    
+            Materials science literature contains millions                        
+            of materials synthesis procedures described                           
+            in unstructured natural language text. Large-                         
+            scale analysis of these synthesis procedures                          
+            would facilitate deeper scientific understand-                        
+            ing of materials synthesis and enable auto-                           
+            mated synthesis planning. Such analysis re-                           
+            quiresextractingstructuredrepresentationsof                           
+            synthesis procedures from the raw text as a                           
+            first step. To facilitate the training and evalu- Figure1: Examplesynthesisproceduretextfromama-
+            ationofsynthesisextractionmodels,weintro- terialsjournalarticle(Dongetal.,2009). Boldredin-
+            duceadatasetof230synthesisproceduresan- dicatestheoperations(predicates)involvedinthesyn-
+            notatedbydomainexpertswithlabeledgraphs thesis; bold black indicates arguments; underlines de-
+            thatexpressthesemanticsofthesynthesissen- marcateentityboundaries.    
+            tences. The nodes in this graph are synthe-                           
+            sis operations and their typed arguments, and                         
+            labeled edges specify relations between the                           
+                                          etal.,2017). Automatedsynthesisplanningforor-
+            nodes. Wedescribethisnewresourceindetail                              
+                                          ganicmoleculeshasrecentlyachievedhuman-level
+            and highlight some specific challenges to an-                         
+                                          planning performance using massive organic re-
+            notating scientific text with shallow semantic                        
+            structure. Wemakethecorpusavailabletothe action knowledge bases as training data (Segler
+            communitytopromotefurtherresearchandde- etal.,2018). Thereare,however,currentlynocom-
+            velopmentofscientificinformationextraction prehensiveknowledgebaseswhichsystematically
+            systems.                      documentthemethodsbywhichinorganicmateri-
+          1 Introduction                  alsaresynthesized(Kimetal.,2017a,b). Despite
+                                          effortstostandardizethereportingofchemicaland
+          Systematically reducing the time and effort re-                         
+                                          materials science data (Murray-Rust and Rzepa,
+          quired to synthesize novel materials remains one                        
+                                          1999), inorganic materials synthesis procedures
+          ofthegrandchallengesinmaterialsscience. Mas-                            
+                                          continuetoresideasnaturallanguagedescriptions
+          siveknowledgebaseswhichtabulateknownchem-                               
+                                          inthetextofjournalarticles. Figure1presentsan
+          icalreactionsfororganicchemistry(Lawsonetal.,                           
+                                          exampleofsuchasynthesisprocedure. Toachieve
+          2014)haveaccelerateddata-drivensynthesisplan-                           
+                                          similarsuccessforinorganicsynthesisashasbeen
+          ningandrelatedanalyses(Segleretal.,2018;Coley                           
+                                          achieved for organic materials, we must develop
+            ∗Equalcontribution            newtechniquesforautomaticallyextractingstruc-
+  9102                                                                            
+  luJ                                                                             
+  31                                                                              
+  ]LC.sc[                                                                         
+  2v93960.5091:viXra                                                              
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+          Figure 2: An example annotated sentence. Shallow semantic structures generally consist of verbal predicates
+          and arguments of these predicates as nodes and labeled edges between predicate and argument nodes, example.
+          Heated(Condition of: degC, Atmospheric Material: H2, Condition of: mTorr). We alsolabel relationsbetween
+          argument entities and non-predicate entities, for example. Descriptor of(Cu, foils) and relations between predi-
+          cates,forexample. Next Operation(placed,heated).                        
+                                                                                  
+                                                                                  
+          turedrepresentationsofmaterialssynthesisproce- 2.1 SelectingSynthesisProceduresfor
+          duresfromtheunstructurednarrativeinscientific Annotation                
+          papers(Kimetal.,2017b).                                                 
+           Tofacilitatethedevelopmentandevaluationof                              
+                                          The 230 synthesis procedures annotated were se-
+          machinelearningmodelsforautomaticextraction                             
+                                          lectedfromourdatabaseof2.5millionpublications
+          of materials syntheses from text, in this work we                       
+                                          describingmaterialssynthesis. Thedatabasewas
+          presentanewdatasetofsynthesisproceduresanno-                            
+                                          builtfromagreementswithmajorscientificpubli-
+          tatedwithsemanticstructurebydomainexpertsin                             
+                                          cationcompanies. Synthesisproceduretextwere
+          materialsscience. Weannotateeachstepinasyn-                             
+                                          obtainedbyfirstparsingtheHTMLtextofthefull
+          thesiswithastructuredframe-semanticrepresenta-                          
+                                          publications,thenautomaticallyidentifyingcandi-
+          tion,withallthestepsinasynthesismakingupa                               
+                                          datesynthesisparagraphsusingatrainedclassifier.
+          DirectedAcyclicGraph(DAG).Thetypesofnodes                               
+                                          This paragraph classifier was trained on a set of
+          inthegraphincludesynthesisoperations(i.e. predi-                        
+                                          manuallylabeledparagraphexamplesandhasaF1
+          cates),andthematerials,conditions,apparatusand                          
+                                          scoreof90.2onaheldouttestset.3 Theparagraphs
+          other entities participating in each synthesis step.                    
+                                          selected by the classifier were manually verified
+          Labelededgesrepresentrelationshipsbetweenen-                            
+                                          ascontainingcomplete, validmaterialssynthesis
+          tities,forexampleCondition of orNext Operation.                         
+                                          proceduresbydomainexperts. Whileagivensyn-
+          Our dataset consists of 230 synthesis procedures                        
+                                          thesisprocedureismostoftenasingleparagraph,
+          annotatedwiththesestructures. Anexamplesen-                             
+                                          therearecaseswhereitspansmultipleparagraphs,
+          tencelevelannotationisgiveninFig. 2. Wemake                             
+                                          weconsideralltheparagraphstobeasinglesyn-
+          thecorpusavailabletothecommunitytopromote                               
+                                          thesisprocedure. Allthesemanticstructureswere
+          furtherresearchanddevelopmentofscientificin-                            
+                                          thenmanuallyannotatedintheseselectedsynthesis
+          formationextractionsystemsforproceduraltext.1                           
+                                          procedures. Fig 1 depicts an example paragraph
+                                          containing a synthesis procedure. In selecting a
+          2 DescriptionoftheAnnotatedDataset                                      
+                                          synthesisprocedureforannotation,asmallnumber
+                                          ofvalidsynthesisprocedures(∼ 20%)areignored;
+          Here we describe the manner in which synthe-                            
+                                          thisisdoneforthesynthesisprocedureswhichare
+          sisprocedureswerechosenforannotation(§2.1),                             
+                                          notamenabletoannotationfromasentence-level
+          present a description of the structures we an-                          
+                                          frame-semanticviewofsynthesissteps,oronesin
+          notate (§2.2), summarize key statistics of the                          
+                                          which most entities in the synthesis do not agree
+          dataset (§2.3), highlight specific annotation deci-                     
+                                          with our definitions of operations and argument
+          sions(§2.4)andpresentinter-annotatoragreements                          
+                                          entities(see§2.4forfurtherdiscussion).  
+          (§2.5). All annotations were performed by three                         
+          materials scientists using the BRAT2 annotation                         
+          tool(Stenetorpetal.,2012).                                              
+                                            3Thelabeleddataforthisclassifierisnotpartofthedata
+            1Publicdataset:https://bit.ly/2WLCbyh releaseassociatedwiththispaperduetolicensingrestrictions
+            2http://brat.nlplab.org/      frompublishers.                         
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+             Entitytype      Count                                                
+             Material         4843                                                
+                                                Recipe-target,Solvent-material,   
+             Number           4095                                                
+                                    Operation-argument Atmospheric-material,Recipe-precursor,
+             Operation        3786                                                
+                                       relations Participant-material,Apparatus-of
+             Amount-Unit      1659                                                
+                                                Condition-of                      
+             Condition-Unit   1621                                                
+                                    Non-operationentity Descriptor-of,Number-of,Amount-of,
+             Material-Descriptor 1430                                             
+                                       relations Apparatus-attr-of,Brand-of,Coref-of,
+             Condition-Misc   535                                                 
+                                    Operation-Operation                           
+             Synthesis-Apparatus 490            Next-operation                    
+                                       relations                                  
+             Nonrecipe-Material 475                                               
+             Brand            348                   (b)                           
+                       (a)                                                        
+          Table1: Entitytypesandrelationlabelsannotatedinourdataset. Thetable(a)depictsthe10mostfrequentofthe
+          21entitytypesdefinedinourdataset,andthetable(b)highlightsthe14relationlabelsamongentitiespossiblein
+          ourdataset.                                                             
+          2.2 StructuresAnnotated          Operation: Discrete actions physically per-
+                                             formedbytheresearcherordiscreteprocess
+          Anannotatedgraphconsistsofnodesdenotingthe                              
+                                             stepstakentosynthesizethetarget.     
+          participantsofsynthesisstepsandedgesdenoting                            
+                                           Material-Descriptor: Describes a mate- 
+          relationships between the participants in the syn-                      
+                                             rial’s structure, shape, form, type, role, etc.
+          thesis. Operationnodesdefinethemainstructure                            
+                                             and must be directly or nearly adjacent to
+          ofthegraphandtheargumentsforeachoperation                               
+                                             the material it describes. Does not include
+          includedifferentmaterials,conditionsandappara-                          
+                                             amounts,concentrations,orpuritiesofmate-
+          tus. Forannotatingthetextdescribingasynthesis                           
+                                             rials. Forexample: CaCu Ti O compound,
+          procedure,wedefineasetofspan-levellabelsthat       3 4 12               
+                                             Copper ion, GaAs nanowires, Anatase TiO ,
+          identifytheoperationsandtypedargumentsinthe                   2         
+                                             Deionizedwater.                      
+          text,i.e. thenodesofthegraph. Wealsodefinea                             
+                                           Meta: A canonical name to specify a par-
+          setofrelationshipsbetweentextspans,whichlabel                           
+                                             ticular overall synthesis method used
+          the edges of the synthesis graph. We detail these                       
+                                             for synthesis. For example: “Graphite
+          twokindsoflabelsnext.                                                   
+                                             oxide was prepared by oxidation of   
+           Span-levelLabels: Eachspanisasequenceof                                
+                                             graphite powder according to the modified
+          tokens or characters which form one entity men-                         
+                                             Hummers’method”. “Bi2S3 nanorods with
+          tion (for example. “quartz tubefurnace”). Entity                        
+                                             orthorhombicstructurewerepreparedthrough
+          mentions are associated with entity types which                         
+                                             thehydrothermalmethod”. “Grapheneoxide
+          specifyacategory/kindfortheentitymention. Our                           
+                                             (GO)waspreparedfromgraphitepowderby  
+          datasetdefinesatotalof21entitytypes,withthe                             
+                                             theStaudenmaiermethod.”              
+          leastfrequententitytypeoccuring32times. The10                           
+                                           Amount-Unit: These describe absolute   
+          mostfrequententitytypesdefinedforourdataset                             
+                                             amounts,concentrations,purities,ratios,flow
+          arelistedinTable1a. Wedescribeanotablesubset                            
+                                             ratesandsoon. Forexample: mg,mL,M,%. 
+          oftheentitytypesinmoredetailbelowalongside                              
+                                           Condition-Unit: Thesedescribetheunitsof
+          examplesoftheiroccurrenceintext. Inexamples,                            
+                                             measurementforintangibleconditionsunder
+          thetextunderlinedisthespantobeannotated.                                
+                                             whichoperationsareperformed. Forex: °C,
+           Material: Materials that are used in the syn- K,sec,RPM,mW.            
+             thesis of the target. For example: Cr O , Condition-Misc: Qualitativedescriptionsof
+                                      2 3                                         
+             Strontiumcarbonate,BaTiO ,Li CO ,Water, conditions. Forexample: Roomtemperature,
+                              3 2  3                                              
+             Ethanol.                        Dropwise,Naturally,Vacuum.           
+           Nonrecipe-Material: Chemicallyspecified Synthesis-Apparatus: Equipmentusedto
+             materialsthatarenotusedinthesynthesisof performanoperationinvolvedinthesynthe-
+             the synthesis target. For example: “BaTiO sis.                       
+                                       3                                          
+             powder(Ba/Ti=0.999)”,“Li CO wasusedas Characterization-Apparatus: Equip-
+                              2 3                                                 
+             theLisource”,“Si/Alratiowas5”.  ment used to characterize a materials prop-
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+             erties.                       Item                         Count     
+                                           Synthesisprocedures            230     
+           Relation Labels: We define a set of relation- Sentences       2113     
+          ships between entity mentions, which label the Tokens         56510     
+          edges of the synthesis graph. A subset of these Entitymentions 20849    
+          relationsdescribedirectrelationshipsbetweenop- Entities        4883     
+          erations and their arguments, others describe re- Uniqueoperations 409  
+          lationships between argument mentions, and the Entitytypes(Table1a) 21  
+          Next-Operationrelationdescribesrelationshipsbe- Relationtypes(Table1b) 14
+          tweenoperationssoastosteptowardsannotating Avg. sentencelength(Fig.3b) 26
+          fullrecipegraphs. Thedifferentrelationlabelswe Avg. sentences/synthesisprocedure(Fig.3a) 9
+          definearetabulatedinTable1b,asubsetofthese                              
+                                          Table 2: Various dataset statistics. Additional details
+          aredefinedbelow:                                                        
+                                          provided in referred figures. To determine unique op-
+                                          erations,Operationentitymentionsarelemmatized
+           Recipe-target: Indicatesamaterialassignedtoan                          
+                                          with the WordNet lemmatizer and the unique lemmas
+             operationwhichisthetargetofthesynthesis                              
+                                          arecounted.                             
+             procedure.                                                           
+           Participant-material: Amaterialthatispartofa                           
+             particularsynthesisstep.     these statistics we perform tokenization and sen-
+           Recipe-precursor: Indicates a material which is tencesegmentationusingtheChemDataExtractor
+             thesourceofanelementforthetargetmaterial package(SwainandCole,2016).4
+             usedinaspecificsynthesisoperation.                                   
+           Apparatus-of: Denotesanapparatustobeusedin 2.4 AnnotationDecisions     
+             asynthesisoperation.         Nextwehighlightspecificpointsofcontentionin
+           Condition-of: Denotesareactionconditionfora creatingthecurrentsetofannotations.
+             synthesisoperation.            What constitutes an operation?: While our
+           Coref-of: Intendedtocapturecoreferentmentions definition of the Operation entity type speci-
+             ofentitiespresentedbyabbreviations,textin fiesonlyactionsperformedbyalabresearcherto
+             parenthesis and so on. For example: “Air bevalidoperations,therearecaseswhereouranno-
+             (O 2/N 2 mixture gases)” and “He were sup- tationsdivergefromthisdefinition. Thishappens
+             pliedtotheporoussupportside...”. “Air”is inthefollowingcases:        
+             coreferentwithO andN .                                               
+                        2   2                                                     
+           Amount-of: Links a number entity to the corre- • Caseswhereanoperationisn’texplicitlyper-
+             spondingunitofmeasurement.      formedbytheresearcher. Forexample: “After
+           Next-operation: Arelationintendedtodenotethe this,theautoclavewascooledtoroomtem-
+             truesynthesisorderofthesynthesissteps;the peraturenaturally”.        
+             relationisalsointendedtoimplicitlydenote • Cases with nested verb structures. For
+             theflowofintermediatematerialsinthesyn- example: “white precipitate which was
+             thesis. However, in this first release of the harvestedbycentrifugation...”.
+             data,asaplaceholderforfutureannotations,                             
+             Next-Operation is used simply used to indi- Inthecurrentsetofannotations,weallowexperts
+             catethenextoperationintextorderratherthan to decide when a particular candidate operation
+             intruesynthesisorder.        should be considered valid and when it can be
+                                          omitted. As our inter-annotator agreements will
+          We refer readers to our annotation guidelines for demonstrate, experts tend to agree often on what
+          definitions of the complete set of entity type and should be considered an operation. The question
+          relationlabelsinthedataset.     ofwhatconstitutesanoperationisanalogoustothe
+                                          notionofwhatconstitutesan“event”inthebroader
+          2.3 DatasetStatistics           NLPliteratureashighlightedbyMostafazadehetal.
+                                          (2016).                                 
+          Somekeystatisticsofthedatasetsuchasnumber                               
+          of documents, tokens, entities and unique opera-                        
+                                            4https://pypi.org/project/            
+          tionsarelistedinTable2andFig. 3. Inreporting ChemDataExtractor/1.2.2/   
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                (a)Sentencespersynthesisdocument.  (b)Tokenspersentence.          
+          Figure3: Sentencescountstatisticsofthecorpus;Onaverageasynthesisprocedurecontains9sentences,eachof
+          whichcontain26tokensonaverage.                                          
+                                                                                  
+                                                                                  
+           Argument state and argument re-use: Anno- doesnotallowforargumentstohavemultiplepar-
+          tation of semantic structures often allow for ar- ents. Further, the tracking of state itself is also
+          gumentspanstohavemultipleparents(Surdeanu complicatedbythedifficultyinbeingabletowrite
+          et al., 2008; Banarescu et al., 2013; Oepen et al., downprecisestatesatameaningfullevelofgran-
+          2015). ForexampleinFigure2,thematerial“Cu” ularity for all possible materials, this is further
+          couldbeconsideredanargumentoftheoperations complicatedbytheambiguitypresentedbyunder-
+          “placed” and “heated”. Allowing for arguments specifiedmaterialsinsynthesistext,forexamplein
+          to have multiple parents however runs into com- thesentence:            
+          plications when the operation causes the state of                       
+                                             With the indraught of ozone,         
+          a material to change (incidentally, this is not the                     
+                                             blacksolid appeared gradually and the
+          caseintheexamplewehighlightabove). Whena                                
+                                             clearsolution turned into blackslurry
+          materialsstatechangesduetoaspecificoperation,                           
+                                             finally.                             
+          consideringthesametextspantobetheargument                               
+          of a different operation would not be chemically                        
+                                          Mostoftheentities,“blacksolid”,“clearsolution”
+          valid. Forexample,inthesentence:                                        
+                                          and“blackslurry”arechemicallyunder-specified,
+                                          withprecisespecificationevenunnecessaryforde-
+             Afterthat,themixedsolutionwasaged                                    
+                                          scribingthesynthesisprocedure.          
+             at60degCfor48h,followedbyheating                                     
+                                            Relations across sentences: Often, in synthe-
+             at 900 degC for 2 h with a heating rate                              
+                                          sisprocedures,agivensynthesisstepisdescribed
+             of5degCmin-1inanN2atmosphere.                                        
+                                          acrossmultiplesentences. Inthesecasesitwould
+          “solution” is labeled as Participant-material for                       
+                                          bemeaningfultoallowforrelationshipsbetween
+          “aged”,butitisntconsideredaParticipant-material                         
+                                          operation-argumententitieswhichareindifferent
+          to“heating”sinceagingcausedittobeadifferent                             
+                                          sentences. Forthesakeofsimplicityandtostick
+          material. Similarly,in:                                                 
+                                          morecloselytoasentencelevelshallowsemantic
+             1.6632 g lithiumacetate was dissolved annotation,ourcurrentiterationoftheannotations
+             into 26 mL of ethanol-water mixture hasavoidedthisannotation,howeveraverysmall
+             (12:1involume)andslowlydroppedinto numberofinstancesofcross-sentencerelationsdo
+             theabovesuspension.          exist(< 1%ofallrelationsinthedataset). Exam-
+                                          plesofthistypeareasfollows:             
+          “lithium acetate” is only labeled as Participant-                       
+          material for “dissolved” and not for “dropped” First, sulfuric acid and nitric acid were
+          whosesoleargumentis“suspension”. Thisclearly mixed well by stirring 15 min in an
+          highlightsaninstanceofamaterialentirelyabsent icebath,andthengraphitepowderwas
+          from the text being the true argument of an op- dispersedintothesolution. After15min,
+          eration. Therefore the current set of annotations potassium chlorate was added into the
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+           Entitytype         Fleiss’Kappa labels to be 0.861. A break down of this agree-
+           Material              0.916    ment by the entity type is presented in Table
+           Number                0.971    3a. As this indicates, there seems to be high
+           Operation             0.859    agreement on labels which have clear defini-
+           Amount-Unit           0.967    tions; namely. Number, Amount-Unit. La- 
+           Condition-Unit        0.985    bels which by definition are a lot more ambigu-
+           Material-Descriptor   0.638    ous, however, have a lower agreement. The
+           Condition-Misc        0.784    two entity types Material-Descriptor and
+           Synthesis-Apparatus   0.860    Nonrecipe-Material see the lowest agree-
+           Nonrecipe-Material    0.371    ments. We believe these to be inherently
+           Brand                 0.862    more subjective entity types. In the case of
+                                                                                  
+                        (a)               Material-Descriptor it is often that some
+                                          annotatorsmayconsiderthedescriptorandthead-
+               Annotation  Fleiss’Kappa   jacentmaterialtobeMaterialinitsownright,
+               Span-levellabels 0.861     for example: “Deionized Water” may be consid-
+               Relationlabels 0.941       ered as a material in its own right or ”deionized”
+                        (b)               maybeconsideredtobeadescriptor. Inthecase
+                                          of Nonrecipe-Material, a similarly harder
+          Table3:Annotatoragreementsinourdataset.Thetable                         
+                                          decisionneedstobemadebytheannotator,since
+          (a)depictsthepercentagreementson10mostfrequent                          
+                                          these are materials which aren’t involved in the
+          of the 21 entity types defined in our dataset, and the                  
+          table (b) denotes overall agreements on the different synthesis but are still mentioned in the text for
+          annotationsinourdataset.        completeness information. Often it is up to the
+                                          interpretationoftheannotatortodecidewhethera
+                                          materialisindeedinvolvedinthesynthesisleading
+             system - very slowly to prevent strong                               
+                                          tothelowagreementonthisentitytype.      
+             reactionduringtheoxidationprocess.                                   
+                                            RelationLabels: Agreementonrelationlabels
+             Oxygenwith20sccmflowrateandargon werecomputedforthesetofcaseswhereapairof
+             with40sccmflowratewereusedasthe annotators agreed on the token level annotations,
+             sputteringgas. Growthtemperaturewas this happens 66% of the time in our repeated an-
+             400degCandtheRFpowerwas90W.  notations. Forapairofentities,ifbothannotators
+                                          indicatethesamerelationtypetheannotatorsare
+          Here“min”and“dispersed”arerelatedbyaCon- consideredtobeinagreement. Forrelationlabels
+          dition Of relation. Similarly, “degC” and “W”, weobserveaagreementscoreof0.941. Sincewe
+          bothareannotatedwithCondition Of relationsto onlyconsidercaseswherethetokenlabelsarein
+          “used”. Annotationsofthiskindwerecreatedwhen agreement,webelievethatitislikelythatwhenan-
+          annotatorsdeemedsuchanannotationabsolutely notatorsagreeonthetokenlevelannotationsthey
+          necessary. Synthesisprocedureswhichrequiredan- alsotendtoagreeontherelationlevellabels.
+          notationprimarilyofcross-sentencerelationswere                          
+          ignored.                        3  RelatedWork                          
+          2.5 Inter-annotatorAgreement                                            
+                                          ShallowsemanticparsinginNLP:Priorworkin 
+          Nextwereportahostofinter-annotatoragreements theNLPcommunityhasdefinedandannotatedse-
+          for the different levels of semantic annotation in mantic structures for text. These structured rep-
+          ourdataset. Theagreementswereportarebasedon resentations often seek to generalize about sen-
+          acollectionof5synthesisprocedureswhichwere tencelevelpredicate-argumentstructure,abstract-
+          annotatedseparatelybyallthreeexpertannotators. ingawayfromthesurfacenuancesofnaturallan-
+          AllthenumberswereportareFleiss’Kappascores guageandrepresentingitssemantics(Abendand
+          forthe3expertannotators.        Rappoport, 2017). A large body of work has
+           Span-level Labels: Agreements on span level created these resources for non-scientific text, as
+          labelscorrespondtotheagreementonentitytype doneinPropBank(Palmeretal.,2005;Surdeanu
+          labels assigned to individual tokens. We ob- etal.,2008),FrameNet(FillmoreandBaker,2010),
+          serve the overall agreement on the token level AMR(Banarescuetal.,2013),semanticdependen-
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+          cies(Oepenetal.,2015)andACEeventschemas (2017a)havebothpresentedpreliminarymethod-
+          (Doddingtonetal.,2004). TheGENIAprojecthas ologicalexplorationsforautomatedextractionof
+          definedeventstructuresforbiomedicaldata(Kim elements of a synthesis graph from materials sci-
+          etal.,2003)whileGargetal.(2016)extendedthe enceliterature. However,theselinesofworkhave
+          AMRframeworktobiomedicaltext. Closerstillto notpresentedgeneralpurposeannotateddatawith
+          the work presented here, Mori et al. (2014) have which to train information extraction models for
+          annotated cooking recipes with sentence and dis- extraction ofstructured synthesis representations
+          course level semantic relations. There has also atscale,thefocusofthiswork.
+          beenaninterestinlabelingscientificwetlabproto-                          
+          coltext,withsemanticstructuresandtofacilitate                           
+                                          4  ConclusionandFutureDirections        
+          training supervised models for the extraction of                        
+          thesestructures(Kulkarnietal.,2018). Kulkarniet                         
+                                          Inthisworkwepresentashallowsemanticparsing
+          al.makeuseofanalteredversionoftheEXACT2                                 
+                                          datasetconsistingof230synthesisprocedures. The
+          ontology, created for the annotation of biomedi-                        
+                                          datasetwasannotatedbydomainexpertsinmateri-
+          cal procedural text (Soldatova et al., 2014). The                       
+                                          alsscience. Wealsohighlightspecificdifficulties
+          datasetpresentedherecanbeviewedtofitwithin                              
+                                          in the annotation process and present agreement
+          thethemeofsentencelevelsemanticsforprocedu-                             
+                                          metrics on the different levels of our annotation.
+          ral text, specifically tailored to materials science                    
+                                          Webelievethedatasetwillenablethedevelopment
+          synthesis.                                                              
+                                          ofrobustsupervisedentitytaggingmodelsandis
+           Materials Science & Chemistry: Prior work suitable for evaluating models trained to extract
+          in the materials science community have shown shallowsemanticstructures. Thisisevidencedby
+          thatmanualextractionandsubsequenttextmining theadoptionofthedatasetbyworkcontemporane-
+          canbeaneffectiveapproachtoanalysisofsynthe- ouswiththiswork(Kimetal.,2018;Tamarietal.,
+          sis routes for specific compounds and classes of 2019).                 
+          materials(Raccugliaetal.,2016;Ghadbeigietal., Futureworkinthedevelopmentofthisdataset
+          2015); these approaches however have been lim- could involve methods for the scaling up of the
+          ited by scale due to the manual extraction step. annotationprocess,perhapsbyadaptingtheguide-
+          Therehasalsobeenstrongaconsensusthatcom- linestoenableannotationbynon-expertsatsome
+          prehensively extracting the knowledge contained stagesoftheannotationprocess. Further,wealso
+          within written inorganic materials syntheses is a plan to quantitatively establish the limits of our
+          keysteptowardsreducingtheoveralldiscoveryand annotationschemaforthekindsofinformationit
+          developmenttimefornovelmaterials(Butleretal., isn’tabletocapture. Wealsoplantoaddadditional
+          2018). Webelievethatthedatasetwereleasefills layersofannotation,including: co-referencerela-
+          animportantgapintheexistingworkonextraction tionsbetweensynthesissteps, statesofargument
+          ofinorganicmaterialssynthesisprocedures,byal- entities, and linking annotated entities to entries
+          lowing exploration into extraction at a scale not inmaterialsscienceknowledgebasessuchasThe
+          attemptedbefore. Parallelwiththiswork,workby MaterialsProject.5         
+          Kimetal.(2018)andTamarietal.(2019)adoptthe                              
+          datasetreleasedheretoaidextractionofstructured                          
+                                          5  Acknowledgements                     
+          representationsfromsynthesisproceduresandwith                           
+          Kimetal.presentingearlyexperimentsinsynthesis                           
+                                          The authors would like to acknowledge fund-
+          planningfromextractedsynthesis.                                         
+                                          ingfromtheNationalScienceFoundationAward
+           Thefocusofexistingdatasetsandresourcesin 1534340/1534341 DMREF and support from the
+          thematerialssciencecommunity,hasbeenonma- Office of Naval Research (ONR) under Contract
+          terialsstructuresandpropertiesknowledgebases No. N00014-16-1-2432. Early work was collab-
+          (Jainetal.,2013),ratherthanreactionsandsynthe- orative under the Dept. of Energys Basic Energy
+          sis. Inpursuitofmorescalablemethodsformate- ScienceProgramthroughtheMaterialsProjectun-
+          rialssynthesisdataextraction,Youngetal.(2018) derGrantNo. EDCBEE.       
+          havemadeuseofautomatedmethodsforextracting                              
+          specificcategoriesofmaterialssynthesisparame-                           
+          ters, while Mysore et al. (2017) and Kim et al. 5https://materialsproject.org/
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+          References                      Edward Kim, Zach Jensen, Alexander van Grootel,
+                                            Kevin Huang, Matthew Staib, Sheshera Mysore,
+          OmriAbendandAriRappoport.2017. Thestateofthe                            
+                                            Haw-Shiuan Chang, Emma Strubell, Andrew Mc-
+           artinsemanticrepresentation. InACL.                                    
+                                            Callum,StefanieJegelka,etal.2018. Inorganicma-
+                                            terialssynthesisplanningwithliterature-trainedneu-
+          Laura Banarescu, Claire Bonial, Shu Cai, Madalina                       
+                                            ralnetworks. arXivpreprintarXiv:1901.00032.
+           Georgescu, Kira Griffitt, Ulf Hermjakob, Kevin                         
+           Knight,PhilippKoehn,MarthaPalmer,andNathan                             
+                                          J-DKim,TomokoOhta,YukaTateisi,andJunichiTsu-
+           Schneider. 2013. Abstract meaning representation                       
+                                            jii.2003. Geniacorpusasemanticallyannotatedcor-
+           forsembanking. In Proceedingsofthe 7thLinguis-                         
+                                            pusforbio-textmining. Bioinformatics. 
+           tic Annotation Workshop and Interoperability with                      
+           Discourse.                                                             
+                                          Chaitanya Kulkarni, Wei Xu, Alan Ritter, and Raghu
+                                            Machiraju.2018. Anannotatedcorpusformachine
+          Keith T Butler, Daniel W Davies, Hugh Cartwright,                       
+                                            readingofinstructionsinwetlabprotocols. NAACL.
+           Olexandr Isayev, and Aron Walsh. 2018. Machine                         
+           learning for molecular and materials science. Na-                      
+                                          Alexander J Lawson, Ju¨rgen Swienty-Busch, Thibault
+           ture.                                                                  
+                                            Ge´oui, and David Evans. 2014. The making of
+          ConnorWColey,ReginaBarzilay,TommiSJaakkola, reaxystowardsunobstructedaccesstorelevantchem-
+           William H Green, and Klavs F Jensen. 2017. Pre- istry information. In The Future of the History of
+           dictionoforganicreactionoutcomesusingmachine ChemicalInformation.      
+           learning. ACScentralscience.                                           
+                                          Shinsuke Mori, Hirokuni Maeta, Yoko Yamakata, and
+          George R Doddington, Alexis Mitchell, Mark A Przy- Tetsuro Sasada. 2014. Flow graph corpus from
+           bocki, Lance A Ramshaw, Stephanie Strassel, and recipetexts. InLREC,pages2370–2377.
+           RalphMWeischedel.2004. Theautomaticcontent                             
+           extraction(ace)program-tasks,data,andevaluation. Nasrin Mostafazadeh, Alyson Grealish, Nathanael
+           InLREC.                          Chambers, James Allen, and Lucy Vanderwende.
+                                            2016. Caters: Causalandtemporalrelationscheme
+          Yuming Dong, Hongxiao Yang, Kun He, Shaoqing forsemanticannotationofeventstructures. InPro-
+           Song,andAiminZhang.2009. β-mno2nanowires: ceedings of the Fourth Workshop on Events, pages
+           a novel ozonation catalyst for water treatment. Ap- 51–61.             
+           pliedCatalysisB:Environmental.                                         
+                                          Peter Murray-Rust and Henry S Rzepa. 1999. Chem-
+          Charles J Fillmore and Collin Baker. 2010. A frames                     
+                                            ical markup, xml, and the worldwide web. 1. basic
+           approachtosemanticanalysis. InTheOxfordhand- principles. Journal of Chemical Information and
+           bookoflinguisticanalysis.                                              
+                                            ComputerSciences.                     
+          Sahil Garg, Aram Galstyan, Ulf Hermjakob, and                           
+                                          Sheshera Mysore, Edward Kim, Emma Strubell,
+           DanielMarcu.2016. Extractingbiomolecularinter-                         
+                                            Ao Liu, Haw-Shiuan Chang, Srikrishna Kompella,
+           actions using semantic parsing of biomedical text.                     
+                                            KevinHuang,AndrewMcCallum,andElsaOlivetti.
+           In Thirtieth AAAI Conference on Artificial Intelli-                    
+                                            2017. Automatically extracting action graphs from
+           gence.                                                                 
+                                            materials science synthesis procedures. Workshop
+                                            on Machine Learning for Molecules and Materials
+          Leila Ghadbeigi, Jaye K Harada, Bethany R Lettiere,                     
+                                            atNIPS.                               
+           and Taylor D Sparks. 2015. Performance and re-                         
+           sourceconsiderationsofli-ionbatteryelectrodema-                        
+                                          Stephan Oepen, Marco Kuhlmann, Yusuke Miyao,
+           terials. Energy&EnvironmentalScience.                                  
+                                            Daniel Zeman, Silvie Cinkova´, Dan Flickinger, Jan
+          AnubhavJain,ShyuePingOng,GeoffroyHautier,Wei Hajic, and Zdenka Uresˇova´. 2015. Semeval 2015
+           Chen, William Davidson Richards, Stephen Dacek, task18: Broad-coveragesemanticdependencypars-
+           Shreyas Cholia, Dan Gunter, David Skinner, Ger- ing. SemEval-2015,page915.
+           brand Ceder, et al. 2013. Commentary: The mate-                        
+                                          Martha Palmer, Paul Kingsbury, and Daniel Gildea.
+           rialsproject: Amaterialsgenomeapproachtoaccel-                         
+           eratingmaterialsinnovation. AplMaterials. 2005. ThePropositionBank: AnAnnotatedCorpus
+                                            ofSemanticRoles. ComputationalLinguistics.
+          Edward Kim, Kevin Huang, Adam Saunders, An-                             
+           drewMcCallum,GerbrandCeder,andElsaOlivetti. Paul Raccuglia, Katherine C Elbert, Philip DF Adler,
+           2017a. Materials synthesis insights from scientific Casey Falk, Malia B Wenny, Aurelio Mollo,
+           literature via text extraction and machine learning. Matthias Zeller, Sorelle A Friedler, Joshua Schrier,
+           ChemistryofMaterials.            andAlexanderJNorquist.2016. Machine-learning-
+                                            assisted materials discovery using failed experi-
+          Edward Kim, Kevin Huang, Alex Tomala, Sara ments. Nature.               
+           Matthews,EmmaStrubell,AdamSaunders,Andrew                              
+           McCallum, and Elsa Olivetti. 2017b. Machine- Marwin HS Segler, Mike Preuss, and Mark P Waller.
+           learned and codified synthesis parameters of oxide 2018. Planningchemicalsyntheseswithdeepneural
+           materials. ScientificData.       networksandsymbolicai. Nature.        
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+          Larisa N Soldatova, Daniel Nadis, Ross D King,                          
+           Piyali S Basu, Emma Haddi, Ve´ronique Baumle´,                         
+           Nigel J Saunders, Wolfgang Marwan, and Brian B                         
+           Rudkin.2014. Exact2: thesemanticsofbiomedical                          
+           protocols. BMCbioinformatics.                                          
+          Pontus Stenetorp, Sampo Pyysalo, Goran Topi,                            
+           TomokoOhta,SophiaAnaniadou,andJun’ichiTsu-                             
+           jii.2012. BRAT:Aweb-basedtoolforNLP-assisted                           
+           textannotation.                                                        
+          Mihai Surdeanu, Richard Johansson, Adam Meyers,                         
+           Llu´ısMa`rquez,andJoakimNivre.2008. Theconll-                          
+           2008sharedtaskonjointparsingofsyntacticandse-                          
+           manticdependencies. InProceedingsoftheTwelfth                          
+           Conference on Computational Natural Language                           
+           Learning, pages 159–177. Association for Compu-                        
+           tationalLinguistics.                                                   
+          MatthewCSwainandJacquelineMCole.2016. Chem-                             
+           dataextractor: a toolkit for automated extraction                      
+           of chemical information from the scientific litera-                    
+           ture. Journalofchemicalinformationandmodeling,                         
+           56(10):1894–1904.                                                      
+          Ronen Tamari, Hiroyuki Shindo, Dafna Shahaf, and                        
+           YujiMatsumoto.2019. Playingbythebook: Anin-                            
+           teractivegameapproachforactiongraphextraction                          
+           from text. In Workshop on Extracting Structured                        
+           Knowledge from Scientific Publications at NAACL                        
+           2019.                                                                  
+          Steven R Young, Artem Maksov, Maxim Ziatdinov,                          
+           Ye Cao, Matthew Burch, Janakiraman Balachan-                           
+           dran,LinglongLi,SuhasSomnath,RobertMPatton,                            
+           SergeiVKalinin,etal.2018. Dataminingforbetter                          
+           materialsynthesis: Thecaseofpulsedlaserdeposi-                         
+           tionofcomplexoxides. JournalofAppliedPhysics.

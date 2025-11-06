@@ -1,0 +1,34 @@
+Looking through glass: Knowledge discovery from materials science literature using natural language processing
+
+SUMMARY
+Most of the knowledge in materials science literature is in the form of unstructured data such as text and images. Here, we present a framework employing natural language processing, which automates text and image comprehension and precision knowledge extraction from inorganic glasses’ literature. The abstracts are
+automatically categorized using latent Dirichlet allocation (LDA) to classify and search semantically linked
+publications. Similarly, a comprehensive summary of images and plots is presented using the caption cluster
+plot (CCP), providing direct access to images buried in the papers. Finally, we combine the LDA and CCP with
+chemical elements to present an elemental map, a topical and image-wise distribution of elements occurring
+in the literature. Overall, the framework presented here can be a generic and powerful tool to extract and
+disseminate material-specific information on composition–structure–processing–property dataspaces,
+allowing insights into fundamental problems relevant to the materials science community and accelerated
+materials discovery.
+
+
+To demonstrate the proposed approach, we downloaded more
+than 600,000 research articles, full texts, and images related to
+the keyword ‘‘oxide glasses’’ and ‘‘materials science’’ using
+the CrossRef metadata query API45 and the Elsevier Science
+Direct API.46 Following this, supervised learning was performed
+on the abstracts of the manuscripts to filter them (see Methods
+for details). Abstracts are the most information-dense organ of
+a scientific paper, containing information on the material under
+study, property being explored, and characterization/synthesis
+methods being used in service of the investigation. As such,
+they are unlikely to contain spurious information or refer to materials or properties not mentioned in the text. This specificity
+makes an abstract the most useful part of a text, and it is therefore not surprising that many NLP studies on materials have only
+aken paper abstracts as the input.7 Based on the supervised
+learning, approximately 100,000 research articles were classified as relevant to the topic ‘‘glass,’’ with precision, accuracy,
+and recall of 92%, 86%, and 67%, respectively, on the test
+set. Note that the model with the highest recall was selected to
+include as many glass-related articles as possible. Although
+not an exhaustive list, the total number of articles downloaded
+are in the same range as the number of texts identified in other
+comprehensive literature surveys on glass.

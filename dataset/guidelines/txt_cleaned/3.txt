@@ -1,0 +1,133 @@
+SC-CoMIcs: A Superconductivity Corpus for Materials Informatics
+
+Abstract
+This paper describes a novel corpus tailored for the text mining of superconducting materials in Materials Informatics (MI), named
+SuperConductivety Corpus for Materials Informatics (SC-CoMIcs). Different from biomedical informatics, there exist very few corpora
+targeting Materials Science and Engineering (MSE). Especially, there is no sizable corpus which can be used to assist the search of
+superconducting materials. A team of materials scientists and natural language processing experts jointly designed the annotation and
+constructed a corpus consisting of manually-annotated 1,000 MSE abstracts related to superconductivity. We conducted experiments on
+the corpus with a neural Named Entity Recognition (NER) tool. The experimental results show that NER performance over the corpus
+is around 77% in terms of micro-F1, which is comparable to human annotator agreement rates. Using the trained NER model, we
+automatically annotated 9,000 abstracts and created a term retrieval tool based on the term similarity. This tool can find superconductivity
+terms relevant to a query term within a specified Named Entity category, which demonstrates the power of our SC-CoMIcs, efficiently
+providing knowledge for Materials Informatics applications from rapidly expanding publications.
+
+
+Category Explanation Example
+Characterization characterization methods X-ray diffraction, SEM
+Process synthesis and process sol-gel, calcination, sputtering
+Property materials properties electrical, cryogenic, magnetic fields
+Material structural entities, sample descriptors tetragonal, P4/nmm, bulk, film, grain
+Element elements, compounds Ti, oxygen, YBa2Cu3O7
+Doping doping operation doping, addition, doped
+Value quantitative information with units 100K, 5-10µm
+Table 1: Term categories
+
+
+2. Annotation Design
+A team of materials scientists and natural language processing experts jointly designed annotations. Term categories are carefully considered to match the requirements
+from the domain experts. As a preparation for annotations, we initially referred to a keyword list1 of letter journal scripta materialia, and the domain experts updated it
+for enrichment. The original keyword list has five categories: Synthesis/Processing, Characterization, Material
+Type, Property/Phenomena, and Theory/Computer Simulation/Modeling. We modified this categorization and defined
+the following seven categories as summarized in Table 1:
+Characterization: The Characterization
+category lists the terms of characterization methods such as
+X-ray diffraction (XRD) and scanning electron microscope
+(SEM). The information is useful in MSE in relation to
+Element and Property.
+Process: The Process category lists the terms of
+Synthesis/Processing such as the sol-gel method for film
+samples, calcination for bulk samples, and AC/DC sputtering for thin-film preparation. This information is hardly
+obtained from theoretical simulations such as density functional theory, thus providing unique database useful for materials scientists.
+Property: The Property category lists the terms
+of Property/Phenomena and their Theoretical representations such as electrical conductivity, mechanical hardness,
+electron-phonon coupling, and Fermi surface. Property and
+Theory including Simulation and Modeling can belong to
+each different category. In this work, we unified them into
+the Property category because they are sometimes difficult to be distinguished.
+Material: The Material category lists the terms of
+structural entities and sample descriptors such as tetragonal crystal symmetry, bulk/film sample, and grain boundary. The information augments the details of the sample
+whose composition is defined by Element.
+Element: The Element category lists names and
+symbols of elements and compounds such as Ti, oxygen,
+and YBa2Cu3O7 or YBCO. This is strictly distinguishable
+from the Material category as entities in the Element
+category can be expressed by chemical composition formulae.
+Doping: Since the doping often changes materials
+properties significantly, we added the Doping category to
+represent doping operations such as doping, substitute, and
+addition.
+Value: The Value category targets numerical values
+with units, such as 160K. This enables to extract transition
+temperatures and process conditions, for example.
+
+3.2. Automatic Labeling by Pattern Matching
+We then conducted pattern matching-based automatic annotation using a term list for each category complied from
+the annotated corpus and the keyword list enriched by experts in addition to the original list of scripta materialia.
+This pattern matching-based annotation step was included
+to alleviate the manual annotation burden.
+In the pattern matching of term lists against abstracts, we
+basically performed matching within generated variations
+of term list entries. Specifically, we applied lemmatization process and regular expression based pattern matching.
+In the lemmatization process, we removed entry inflections
+such as “ing” and “ed”. By combining a lemma word and
+suffixes such as “ing” or “ed” with OR operator by using
+regular expression, we extend the coverage of their word
+forms. Note that this process targets for term labels other
+than Element and Value. This is because Element
+can take various kinds of compound names and Value can
+have a different value each time.
+3.3. Manual Annotation
+The first round was performed by a well-experienced domain expert and the second round was conducted by four
+annotators, who are undergraduate and master students in
+material science or relevant areas according to the annotation guideline created during the first round annotation. We
+used BRAT (Stenetorp et al., 2012) annotation tool, which is
+a browser-based annotation environment for collaborative
+text annotation. After the first and second rounds, we corrected minor errors while checking the data formats, such
+as dual labeling of the same terms. This is because when a
+term has two category labels, training and testing of NER
+are interfered. At the same time, when a term had different categories in a different appearance, we left this dual
+labels as contextual difference. Figure 1 shows an example
+of completed annotations that is visualized with BRAT.
+
+4. Corpus Analysis
+This section explains corpus statistics and annotator agreement results.
+4.1. Corpus Statistics
+Table 2 shows statistics of the SC-CoMIcs corpus. Terms
+in the Material, Property and Element categories
+appear a lot in the corpus. The Doping and Value
+categories also appear sufficient number times; the latter
+is beneficial to extract quantitative information from text
+in relation to superconductivity terms. The number of
+Characterization terms is relatively small; however,
+the frequency of Characterization terms per se is not
+a problem as described in Section 5.3. Figures 2 and 3 show
+the histograms of the numbers of sentences per abstract and
+tokens per sentence. Most abstracts contain round 4-8 sentences and most sentences have around 20-35 words.
+4.2. Annotator Agreements
+For the second round, we evaluated annotator agreement.
+We asked the four annotators to annotate extra 10 abstracts
+independently, without telling that they were annotating the
+same 10 abstracts. The domain expert, who annotated in
+the first round, also created reference annotations for the 10
+abstracts.
+The annotation scores were calculated based on the both
+exact-span and label match. Table 3 shows the agreement
+between each annotator and the domain expert. Annotator
+A performed slightly better than others, although there is no
+significant difference in the total scores. On the other hand,
+there are some variations in the agreement rates by categories. Characterization and Doping have high
+agreement rates. Material and Property have relatively low agreement rates of around 70% because these are
+difficult or ambiguous for annotation, e.g., “anisotropic”
+and “order”; the annotator needs to consider contexts based
+on the domain knowledge to judge the annotation.
+We also calculated the Fleiss’ kappa to measure the agreement between the four annotators, which is independent of
+expert annotation. This is a token level evaluation based on
+the BIO labels and it takes into account all pairs of four annotators. As a result, we obtained the Fleiss’ kappa score
+of 83.1%.
+After the independent annotation by the four annotators in
+the second round, all the annotations of 800 abstracts were
+reviewed by four annotators. This implies that the resulting
+corpus would have better annotation quality than the agreement rates in Table 3.
+
+

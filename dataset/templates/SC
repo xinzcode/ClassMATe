@@ -1,0 +1,15 @@
+class MaterialScienceText:
+	def __init__(self, text: str):
+		self.text = text
+
+# The following class describe the Experimental Facts Text Class
+{% for class_def in class_defs %}
+{{ class_def }}
+{% endfor %}
+
+# This is a material science literature text
+text = "{{text}}"
+
+"""
+{{question_describe}}
+"""

@@ -1,0 +1,24 @@
+class Entity:
+    def __init__(self, name, entity_type):
+        self.name = name
+        self.entity_type = entity_type
+
+class B-{{entity}}(Entity):
+    # B-entity_type in BIO tagging
+    def __init__(self, name, entity_type):
+        super().__init__(name, entity_type)
+        self.position = "Begin"
+
+class I-{{entity}}(Entity):
+    # I-entity_type in BIO tagging
+    def __init__(self, name, entity_type):
+        super().__init__(name, entity_type)
+        self.position = "Inside"
+
+# This is a material science literature text
+text = "{{text}}"
+
+"""
+{{question_describe}}
+"""
+

@@ -1,0 +1,1103 @@
+Digital                                                                     
+                                                                                  
+      Discovery                                                                   
+                                                                                  
+                                                                                  
+       PAPER                                                                      
+                                                                                  
+                                                                                  
+                                  fi                                              
+                        ULSA:  uni ed language  of synthesis actions for the      
+                        representation  of inorganic synthesis protocols          
+      Citethis:DigitalDiscovery,2022,1,313                                        
+                        Zheren Wang, †ab Kevin Cruse, †ab Yuxing Fei,ab Ann Chia,‡a Yan Zeng,b
+                        Haoyan Huo, ab Tanjin He,ab Bowen Deng,ab Olga Kononova§*a
+                        and Gerbrand Ceder *ab                                    
+                        Applying AI power to predict syntheses of novel materials requires high-quality, large-scale datasets.
+                        Extraction of synthesis information from scientific publications is still challenging, especially for
+                        extracting synthesis actions, because of the lack of a comprehensive labeled dataset using a solid,
+                        robust,andwell-establishedontologyfordescribingsynthesisprocedures.Inthiswork,weproposethe
+                        first unified language of synthesis actions (ULSA) for describing inorganic synthesis procedures. We
+                        createdadatasetof3040synthesisproceduresannotatedbydomainexpertsaccordingtotheproposed
+                        ULSAscheme.TodemonstratethecapabilitiesofULSA,webuiltaneuralnetwork-basedmodeltomap
+                        arbitrary inorganic synthesis paragraphs into ULSA and used it to construct synthesis flowcharts for
+                        synthesisprocedures. Analysisoftheflowchartsshowedthat(a) ULSAcoversessentialvocabularyused
+                        by researchers when describing synthesis procedures and (b) it can capture important features of
+      Received4thNovember2021 synthesis protocols. The present work focuses on the synthesis protocols for solid-state, sol–gel, and Accepted18thApril2022
+                        solution-based inorganic synthesis, but the language could be extended in the future to include other
+      DOI:10.1039/d1dd00034a                                                      
+                        synthesis methods. This work is an important step towards creating a synthesis ontology and a solid
+      rsc.li/digitaldiscovery foundationforautonomousroboticsynthesis.            
+      1  Introduction                     datasetsonavarietyofmaterialsandtheirproperties8–10aswell
+                                          assynthesisprotocols.11–14Nonetheless,amajorityofthesetext
+      In the past decade, we have witnessed the growing success of mining studies have been focused on extracting chemical
+      data-drivenandarticialintelligence(AI)-basedmethodologies entitiessuchasmaterialnames,formulas,properties,andother
+      promoting breakthroughs in predicting materials structure, characteristics.15–19 There have only been a few attempts to
+      properties,andfunctionality.1–3Still,adaptingthepowerofAIto extractinformationaboutchemicalsynthesisandreactionsand
+      predict and control materials synthesis and fabrication is                  
+                                          compilethemintoaowchartofsynthesisactions.20–28Hawizy
+      challenging and requires substantial effort in gathering high- et al.20 were early developers for such extraction, using
+      qualitylarge-scaledatasets.Oneapproachtogathersuchdata- a combination of rule-based regular expressions (regex)29 and
+      setsofsynthesisparametersandconditionswouldberunning syntax tree parsing to identify and classify action phrases in
+      high-throughputexperiments.Thisrequiresacostlysetupand their tool, ChemicalTagger. This approach shows very good
+      substantialhumanlaborandexpertise,andistypicallylimited performance on organic synthesis procedures. Vaucher et al.21
+      to a small part of chemical space. Another way to acquire the used a combination of rule-based approaches and machine
+      data or augment existing datasets is to extract information learningmodelstrainedonover2millionproceduralsentences
+      about materials synthesis from the wealth of scientic publi- toextractsynthesisactionsfromtheorganicchemistrypatents
+      cations(e.g.papers,archives,patents)availableonline. texts and map them into well-dened language schemas. We
+        Scientictextmininghasreceiveditsrecognitioninthepast found this work to be one of the most robust and accurate in
+      few years,4–7 providing the materials science community with describing organic synthesis procedures. Mehr et al.22 devel-
+                                          oped a semi-automated workow that uses NLP-based
+                                          approaches to translate human-written text into an internal
+      aDepartmentofMaterialsScience&Engineering,UniversityofCalifornia,Berkeley,CA
+                                          ChemicalDescriptionLanguage(so-calledXDL)andthenmap
+      94720,USA.E-mail:olga_kononova@berkeley.edu;gceder@berkeley.edu             
+                                          itintoroboticoperations.Tothebestofourknowledge,thisis
+      bMaterials Sciences Division,LawrenceBerkeley National Laboratory, Berkeley,CA
+      94720,USA                           theonlyworkthatappliedthedevelopedsynthesisontologyto
+      †Equalcontribution.                 robotic synthesis for organic molecules. Mysore et al.23 paved
+      ‡Present address: Nanyang Technological University, Republic of Singapore, thewayforsynthesisactiongraphextractionfromtheinorganic
+      639798.                             synthesis text. For this, they applied several neural network-
+      §Presentaddress:RoivantSciences,NewYork,NY10036,USA.                        
+      ©2022TheAuthor(s).PublishedbytheRoyalSocietyofChemistry DigitalDiscovery,2022,1,313–324 | 313
+ .MA                                                                              
+ 91:95:6                                                                          
+ 4202/91/6                                                                        
+ no                                                                               
+ dedaolnwoD                                                                       
+ .2202                                                                            
+ lirpA                                                                            
+ 72 no                                                                            
+ dehsilbuP                                                                        
+ .elcitrA                                                                         
+ sseccA                                                                           
+ nepO                                                                             
+  .ecneciL                                                                        
+  detropnU                                                                        
+  0.3                                                                             
+  laicremmoCnoN-noitubirttA                                                       
+  snommoC                                                                         
+  evitaerC                                                                        
+  a                                                                               
+  rednu                                                                           
+  desnecil                                                                        
+  si                                                                              
+  elcitra                                                                         
+  sihT                                                                            
+                                                              View Article Online 
+                                                              View Journal | View Issue
+                                                                                  
+                                                                                  
+      DigitalDiscovery                                                   Paper    
+                                                                                  
+      basedmodelsanduseddependencytreeparsingtocombinethe human readers, the growing interest in automated AI-guided
+      extracted information into synthesis graphs. Similarly, materials synthesis demands a robust and unied language
+      Kuniyoshi et al. used bi-LSTM combined with BERT word for describing synthesis protocols in order to make them
+      embeddings to construct synthesis graphs for solid-state applicabletoautonomousroboticplatforms.22,36,37
+      batteries fabrication,24 which showed excellent results on the The previous works describing inorganic synthesis action
+      extraction of operations using the science literature-specic extraction from the text23,24 have laid the groundwork for
+      SciBERTpretrainedlanguagemodel.     extendingsuchmethodstothismaterialseld,andhavemade
+        As is apparent from the above survey, the automation of their datasets available for interested researchers; however,
+      synthesis procedures for organic molecules has made signi- neither provide an ontology for the actions that their models
+      cant progress. This is mainly due to the facts that (a) organic extract. Although development of synthesis action extraction
+      synthesis is more deterministic and hence more common in fromthetextinorganicchemistryhassignicantlyaccelerated
+      materialsscienceandbiochemicaldomains,and(b)thereexist and some groups have developed specic ontologies21,22 for
+      large-scale databases and repositories of organic reactions30,31 such vocabulary, we found that the existing models do not
+      andannotatedsets32,33thathelptospeedupdevelopmentofthe transfer well to the inorganic synthesis space due to the
+      machine-learningapproachesforinterpretationandprediction disparate natures of these two approaches. For example, we
+      oforganicsynthesis.Evenwithsuchdataavailability,tothebest found that vocabulary unique to inorganic synthesis like sin-
+      ofourknowledge,therehavebeenonlyafewattemptstocreate tering and calcining would be frequently misclassied. Addi-
+      a publicly available annotated corpus containing materials tionally, existing models with developed ontologies do not
+      synthesis protocols extracted from the text.13,21,25 The dataset include tags for important inorganic synthesis actions like
+      created by Mysore et al.13 contains 230 labeled synthesis para- shapingofsamplesintopellets.
+      graphs with labels assigned to material entities, synthesis Inthiswork,wediscussapotentialapproachtotheproblem
+      actions,andothersynthesisattributesforinorganicsynthesis, of inorganic synthesis ontology based on creating a unied
+      and is freely available to users. The dataset used by Vaucher language of synthesis actions (ULSA). We demonstrate an
+      et al.21 was obtained by augmenting the existing Pistachio application of this approach in describing solid-state, sol–gel,
+      dataset34oforganicsynthesisprocedures,andisavailableupon precipitation, and solvo-/hydrothermal synthesis procedures,
+      request. Kuniyoshi et al.25 annotated an in-house dataset of whichcoverthemajorityofinorganicsynthesisprocedures.38,39
+      inorganicmaterialssynthesisentitiesthatispubliclyavailable. Specically, we built and created a dataset of 3040 synthesis
+        Amajorobstacleinannotatingsynthesisactionsinthetext sentences labeled according to the ULSA schema and trained
+      corpora is the lack of a solid, robust, and well-established a neural network-based model that identies a sequence of
+      ontology for describing synthesis procedures in materials synthesisactionsinaparagraph,mapsthemintotheULSA,and
+      science.35 Indeed, researchers prefer to vaguely sketch builds a graph of the synthesis procedure (Fig. 1). We applied
+      “methods” sections of the manuscript in general human- thismodeltothousandsofsynthesisparagraphsandanalysed
+      readable language rather than follow a specic protocol. This theresultingsynthesisgraphs.Theobtainedresultsshowthat
+      signicantly impacts reproducibility of the results, not to ourULSAvocabularyiscomprehensiveenoughtoobtainhigh-
+      mention ambiguity in understanding even when read by accuracy extraction of synthesis actions as well as to identify
+      a human expert.35 While such ambiguity is inconvenient for theimportantfeaturesofeachoftheaforementionedsynthesis
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+      Fig.1 Schematicworkflowofdataannotation,extractionandanalysis.First,thesetofparagraphswereannotatedusinganAmazonMechanical
+      Turkengine.Highlightedingreenaretheactiontokensthatwereannotatedandthenextractedusinganeuralnetworkmodel.Otherhighlighted
+      tokensandphrases(i.e.synthesisactionattributesandsubjects)wereobtainedusingrule-basedsentenceparsingsolelyforthepurposeofdata
+      analysisandarenotpresentedintheannotateddataset.TheobtainedlabeleddatasetisstoredasasingleJSONfileandisalsousedfortraining
+      aneuralnetworkmodeltoidentifysynthesisactionsinthetext.Obtainedsynthesisactions,attributes,andsubjectswereconvertedintosynthesis
+      flowchartsthatwerefurtherusedfordataanalysis.                               
+      314 | DigitalDiscovery,2022,1,313–324 ©2022TheAuthor(s).PublishedbytheRoyalSocietyofChemistry
+ .MA                                                                              
+ 91:95:6                                                                          
+ 4202/91/6                                                                        
+ no                                                                               
+ dedaolnwoD                                                                       
+ .2202                                                                            
+ lirpA                                                                            
+ 72                                                                               
+ no                                                                               
+ dehsilbuP                                                                        
+ .elcitrA                                                                         
+ sseccA                                                                           
+ nepO                                                                             
+  .ecneciL                                                                        
+  detropnU                                                                        
+  0.3                                                                             
+  laicremmoCnoN-noitubirttA                                                       
+  snommoC                                                                         
+  evitaerC                                                                        
+  a                                                                               
+  rednu                                                                           
+  desnecil                                                                        
+  si                                                                              
+  elcitra                                                                         
+  sihT                                                                            
+                                                                     View Article Online
+                                                                                  
+                                                                                  
+      Paper                                                       DigitalDiscovery
+                                                                                  
+      types. Additionally, the ULSA as it is encoded in the labeled (cid:1) Shaping: a word or a multi-word phrase that marks the
+      datasetcanbeeasilycustomizedandaugmentedtoaccountfor compression of powder or forming the sample to a specic
+      otherinorganicsynthesismethods.Thedatasetandthescripts shape. For example: “the powder was pressed into circular
+      for building such a synthesis owchart are publicly available. pellets”,“thepowderwasthenpelletizedwithauniaxialpress”.
+      We anticipate these results will be widely used by the (cid:1) Reaction: a word or a multi-word phrase that marks
+      researchersinterestedinscientictextminingandwillhelp(a) atransformationwithoutanyexternalaction.Forexample:“the
+      toachieveabreakthroughinpredictiveandAI-guidedautono- samplewasletoreactfor6h”,“thetemperaturewaskeptat
+      mous materials synthesis and (b) build a robust materials 1000K”,“thesolutionwasmaintainedat200Kfor12h”.
+      synthesisontology.                   (cid:1)Non-Altering:awordoramulti-wordphrasethatmarksan
+                                          action done on a sample that either does not induce any
+      2  Methodology                      transformationofthesampleordoesnotbelongtoanyofthe
+                                          above classes. “The pellets were placed in a sealed alumina
+      2.1 Uniedlanguageofsynthesisactionsandannotation crucible”, “the reaction vessel was wrapped with aluminum
+      scheme                              foil”,“thesamplewassealedinatube”,“thegelwastransferred
+      Tounifyterminologyusedtodescribeasynthesisprocedure,we toanoven”.           
+      dened 8 action terms that unambiguously identify a type of                 
+      synthesis action. Every action word (or multi-word phrase) in 2.2 Datasetannotation
+      the dataset is mapped to the corresponding action term                      
+                                          Toannotatesynthesisparagraphswiththeuniedlanguageof
+      accordingtothefollowingrule:theword(ormulti-wordphrase)                     
+                                          synthesisactions(ULSA),weselected535synthesisparagraphs
+      isrecognizedasanactionifit(a)resultsinmodicationofthe                      
+                                          from the database of (cid:4)420000 full-text publications acquired
+      state of the material or mixture during the synthesis or (b)                
+                                          previously.12 The paragraphs where chosen to proportionally
+      carries a piece of information affecting the outcome of the                 
+                                          represent four major types of inorganic synthesis: solid-state,
+      synthesisprocedure.Theactiontermsusedwithintheunied                        
+                                          sol–gel, solvo-/hydrothermal, and precipitation. The details of
+      language are explained below. In each example, the text                     
+                                          the content acquisition and synthesis type classication have
+      underlinedisthewordorphrasethatisannotated.                                 
+                                          beendescribedinpreviouspapers.12,39     
+        (cid:1) Starting: a word or a multi-word phrase that marks the The535paragraphsconsistedof3781tokenizedsentences.16
+      beginning of a synthesis procedure. Specically, this oen First,eachsentencewasclassiedaseitherrelatedtosynthesis
+      indicateswhichmaterialswillbeproduced.Forexample:“PMN-                      
+                                          or not related to synthesis. The latter case usually contains
+      PTwassynthesizedbythecolumbiteprecursormethod”,“solid-                      
+                                          sentences about product characterization and other details.
+      state synthesis was used to prepare the target material”, “the              
+                                          Next,weisolated3040synthesissentencesandassignedlabels
+      powderwasobtainedaertheaforementionedprocedure”.                           
+                                          toeachwordormulti-wordphraseinthesentenceonthebasis
+        (cid:1) Mixing: a word or a multi-word phrase that marks the              
+                                          of the ULSA protocol with annotation schema described in
+      combinationofdifferentmaterials(inasolidorliquidphase)to                    
+                                          Section 2.1. Only words and phrases describing synthesis
+      form one substance or mass. For example: “precursors were actionswereannotated.Thenaldatasetconsistsofthese3040
+      weighted and ball-milled”, “precursors were mixed in appro-                 
+                                          labeled synthesis sentences. All annotations were performed
+      priateamounts”,“Sb O isaddedtothesolution”,“thesolution                     
+                 2 3                      usingacustomAmazonMechanicalTurk-basedserver.
+      wasneutralized”,“themixturewasstabilizedbytheadditionof                     
+      sodiumcitrate”.                                                             
+        (cid:1)Purication:awordoramulti-wordphrasethatmarksthe 2.3 Annotationdecisionsandambiguouscases
+      separation of the sample phases. This also includes drying of TheULSAwasdevelopedbasedontheauthors'ownexperiences
+      a material. For example: “samples were exfoliated from with the extraction of information from materials synthesis
+      substrates”, “the liquid was discarded and the remaining paragraphs12 and extensive communication with experimen-
+      productwaslteredoffandwashedseveraltimeswithdistilled talists actively involved in various types of materials synthesis
+      water”, “the precursors were heated in order to remove the research.Theannotationschemaandthechoiceofactionterms
+      moisture”, “the precipitate was collected by washing the solu- were designed to provide maximum exibility to future users
+      tionindistilledwater”.              and allow them to adjust the schema according to their pref-
+        (cid:1) Heating: a word or a multi-word phrase that marks erences and tasks. For example, the annotated multi-word
+      increasingormaintaininghightemperatureforthepurposeof phrases such as“letoreact”and “heated to evaporate”were
+      obtaining a specic sample phase or promoting a reaction handledasoneentity.Thisway,theycanbesplitintoindividual
+      ratherthandryingasample.Forexample:“thepowdersample terms or modied later with a simple set of rules to make
+      was annealed to obtain a crystalline phase”, “the mixture was acustomizedlabeleddataset.
+      subjectedtoheatingat240(cid:3)Cfor24h”. Itisimportanttokeepinmindthatwemappedwordsinto
+        (cid:1) Cooling: a word ora multi-word phrase thatmarks rapid, the terms of synthesis action per sentence, meaning that we
+      regular,orslowcoolingofasample.Forexample:“theproduct used only information in the context of a given sentence to
+      was cooled down to room temperature in the furnace”, “the makeadecisionabouttheannotationofaword,ratherthanthe
+      sample was quenched rapidly in the solid CO ”, “the product wholeparagraph.Thereasonforthischoiceisthemultipleand
+                               2                                                  
+      wasletocooldowntoroomtemperature”. diversepossibilitiestocombineandaugmentsentencesleading
+      ©2022TheAuthor(s).PublishedbytheRoyalSocietyofChemistry DigitalDiscovery,2022,1,313–324 | 315
+ .MA                                                                              
+ 91:95:6                                                                          
+ 4202/91/6                                                                        
+ no                                                                               
+ dedaolnwoD                                                                       
+ .2202                                                                            
+ lirpA                                                                            
+ 72                                                                               
+ no                                                                               
+ dehsilbuP                                                                        
+ .elcitrA                                                                         
+ sseccA                                                                           
+ nepO                                                                             
+  .ecneciL                                                                        
+  detropnU                                                                        
+  0.3                                                                             
+  laicremmoCnoN-noitubirttA                                                       
+  snommoC                                                                         
+  evitaerC                                                                        
+  a                                                                               
+  rednu                                                                           
+  desnecil                                                                        
+  si                                                                              
+  elcitra                                                                         
+  sihT                                                                            
+                                                                     View Article Online
+                                                                                  
+                                                                                  
+      DigitalDiscovery                                                   Paper    
+                                                                                  
+      to different meanings of the terms. The interpretation of the The situation when a method is specied along with the
+      wholetextorparagraphisanentirelyseparateeldofresearch synthesis action is also common. In a phrase of the form
+      thatisoutsidethescopeofthiswork.    “transformedbyaspecicprocedure,”weconsideronlythekey
+        Wechosetoannotatethosewordsthatarecharacteristicof action(thetransformation)asasynthesisaction.Forexample:
+      a synthesis procedure or result in the transformation of “the precipitates were separated by centrifugation.” When
+      asubstance.Forexample,inthesentence“theprecursorswere required,themethodcanberetrievedwithasetofsimplerules.
+      weighed and mixed,” the term “weighed” is not a synthesis Redundant action phrases are also abundant in many
+      actionsinceitistobeexpectedinsynthesis,while“mixing”is descriptions of the procedures. In a phrase of the form “sub-
+      asynthesisactionbecauseitmayhaveaspecicconditionand jectedtoaprocess”,weconsideredonlytheprocessingverbas
+      transformthesample,orcanbeprecededbycalcinationofthe asynthesisaction.Forexample:“thesamplesweresubjectedto
+      precursors in other syntheses. The exclusion from this rule is aninitialcalcinationprocess.”
+      theStartingaction.Eventhoughtermsbelongingtothisaction Finally, phrases that attempt to reason the purpose of the
+      do not bring any special information or explicit action to the action, such as “le to react”, “brought to a boil”, “heated to
+      synthesis, we chose to distinguish Starting actions because in evaporate,”areconsideredasonesynthesisaction.Thisisdone
+      asubstantialnumberofcasestheycanserveasagstoseparate forthepurposeofprovidingexibilitytoauserandtoletthem
+      multiplesynthesisproceduresfromoneanother.Anillustration makeadecisiononhowtotreatthesecases.
+      of this situation is when precursors are prepared prior to                  
+      synthesizingatargetmaterial,asinsol–gelsynthesis.                           
+                                          2.4 Synthesistermsmapping               
+        For the annotation of Mixing synthesis actions, we did not                
+      differentiate between powder mixing, ball milling (grinding), Weusedlookuptable(baseline)andneuralnetworkmodelsto
+      addition of droplets, or dissolving of substances. In many mapsynthesissentencesintotheULSA.
+      situations, this precise denition depends on the solubility of 2.4.1 Baseline model. Two baseline models were imple-
+      reactantsandmixingenvironment,aswellasonotherdetailsof mented,bothbasedonalookuptable.Forthelookuptable,we
+      theprocedurethatareneverexplicitlymentionedinthetext.We chosethemostfrequentwordsusedtodescribesynthesissteps
+      leave it up to the user to create their own application-based inthe“methods”sectionofthepapers.Therstbaselinemodel
+      denitions of these Mixing categories. Nonetheless, in the matches every token against the lookup table and assigns the
+      applicationbelowweprovidearule-basedexampleofhowthese corresponding action term if anyappear. The second baseline
+      typesofsynthesisactionscanbeidentiedinthetext. model uses information about the part of speech of a given
+        TheNon-Alteringactiontermwasintroducedtomakeroom word(assignedbySpaCy40)andmatchesonlyverbsagainstthe
+      forthosesynthesisactionsthatarenottypicalordonotfallinto lookuptable.       
+      anyothercategorybutneverthelessappearasasynthesisaction 2.4.2 Word embeddings. Word embeddings were used as
+      withinourdenitions.WhileNon-Alteringactionterms canbe a vectorized representation of the word tokens for the neural
+      easily confused withReaction actions or non-actions, the deci- networkmodel.Tocreateanembedding,wetrainedaWord2-
+      sion depends on the sentence context and can be arbitrarily Vec model41 implemented in the Gensim library.42 We used
+      extended or removed by a user. Comparing “the sample was (cid:4)420000 paragraphs describing four synthesis types: solid-
+      keptinthecrucible”and“thesamplewaskeptovernight,”the state,sol–gel,solvo-/hydrothermalandprecipitationsynthesis.
+      former is not a synthesis action while the latter should be The paragraphs were obtained as described in our previous
+      consideredanimportantsynthesisstep. work.12Priortotraining,thetextwasnormalizedandtokenized
+        Ambiguous situations as in the ones mentioned above are using ChemDataExtractor.16 Conjunctive adverbs describing
+      ubiquitous indescriptions ofsyntheses.Asubstantial amount consequences,suchas“therefore”,“whereas”,and“next”,were
+      of these situations occur when authors try to be wordy or use removed from the text. All quantity tokens were replaced with
+      owery language when writing the synthesis methods. Unfor- the keyword <NUM> and all chemical formulas were replaced
+      tunately, this oen presents a challenge for accurate machine with the keyword <CHEM>. All words that occur less than 5
+      interpretationofthetext.Weaccountedforsomeofthesecases timesinthetextcorpuswerereplacedwiththekeyword<UNK>.
+      whenannotatingthedataasdescribedbelow. Wefoundthatskip-gramwithnegativesamplingloss(n¼10)
+        First,implicitmentionsofsynthesisactions(i.e.whenapast performedbest,andthenalembeddingdimensionwassetto
+      participle form of a verb is used as a descriptive adjective 100.           
+      referring to an already processed material) are the most 2.4.3 Neuralnetworkmodel.Weusedabi-directionallong
+      frequent source of confusion. We chose to annotate these as short-term memory (bi-LSTM) neural network model to map
+      synthesis actions. For example: “the calcined powder was synthesis tokens into the aforementioned action terms. The
+      pressedandannealed.”Inthissentence,thedescriptiveadjec- model was implemented using the Keras library (https://
+      tive “calcined” could be either a restatement of the fact that keras.io/) with latent dimensionality 32 and dropout
+      therewasacalcinationsteporitcouldbeadditionalinforma- probability 0.2. Word embeddings were used as model input.
+      tion which had not been mentioned previously. These situa- The categorical cross-entropy was calculated as the loss func-
+      tionscanbelaterresolvedwitharule-basedapproach,hencewe tion.Thelabeleddatasetwassplitintotraining,validation,and
+      leaveitasataskforusersofthedata.    test sets using a 70:20:10 split, respectively. Early stopping
+                                          wasusedtoobtainthebestperformance.      
+      316 | DigitalDiscovery,2022,1,313–324 ©2022TheAuthor(s).PublishedbytheRoyalSocietyofChemistry
+ .MA                                                                              
+ 91:95:6                                                                          
+ 4202/91/6                                                                        
+ no                                                                               
+ dedaolnwoD                                                                       
+ .2202                                                                            
+ lirpA                                                                            
+ 72                                                                               
+ no                                                                               
+ dehsilbuP                                                                        
+ .elcitrA                                                                         
+ sseccA                                                                           
+ nepO                                                                             
+  .ecneciL                                                                        
+  detropnU                                                                        
+  0.3                                                                             
+  laicremmoCnoN-noitubirttA                                                       
+  snommoC                                                                         
+  evitaerC                                                                        
+  a                                                                               
+  rednu                                                                           
+  desnecil                                                                        
+  si                                                                              
+  elcitra                                                                         
+  sihT                                                                            
+                                                                     View Article Online
+                                                                                  
+                                                                                  
+      Paper                                                       DigitalDiscovery
+                                                                                  
+      2.5 Dataanalysis                     {                                      
+                                              “annotations”:                      
+        2.5.1 Reassignment of mixing terms. For the purposes of                   
+                                                [                                 
+      data analysis and to demonstrate potential directions for cus-              
+                                                  {                               
+      tomization of the labeled dataset, we additionally reassigned               
+                                                     “tag”:token_tag,             
+      Mixing synthesis action terms as Dispersion Mixing, Solution                
+                                                     “token”:token                
+      Mixing, and Ball-Milling whenever there was enough informa-                 
+      tiontodistinguishbetweenthethree,otherwisetheywereleas }                   
+      Mixing actions. Here, Dispersion Mixing is identied either by ],           
+      explicit “dispersion” action words or by words such as                      
+                                              “sentence”:sentence                 
+      “disperse”or“suspend”plusanyliquidenvironment.Solution }                    
+      Mixing is identied by a list of specic action words such as Therepositoryalsocontainsascriptfortrainingabi-LSTM
+      “dissolve”, “dropwise added”, and others. Ball-Milling is iden- modelthatcanbeusedtomapwordsintoactionterms.Users
+      tiedmorespecicallythroughtermsrelatedto“ball-milling”. are not limited to using only the provided dataset, but can
+                                          augment their usage with other labeled data as long as they
+      This was achieved by constructing and traversing the depen-                 
+                                          satisfy the data format described above. Finally, we also share
+      dency trees of the sentences using the SpaCy library40 and by               
+                                          scriptsusedfortheinferenceofsynthesisactionstermsandfor
+      usingdictionariesofcommonsolutionandmixingterms.                            
+                                          buildingsynthesisowchartsforalistofparagraphs.Examples
+        2.5.2 Assigning synthesis actions attributes. Synthesis                   
+      actionsidentiedasMixing,Heating,andCooling,aswellasthe ofmodelapplicationareavailableaswell.
+      actions referring to drying processes (identied by the stem                
+      “dry” and “evaporate”), were assigned attributes such as                    
+                                          3.2 Datasetstatistics                   
+      temperature, time, and environment. This was done by ana-                   
+                                          ThequantitativecharacteristicsofthesetareprovidedinTable lysingdependencysub-treesassociatedwitheachactiontoken40
+                                          1 and displayed in Fig. 2. Briey, 535 synthesis paragraphs
+      andbyapplyingrule-basedregularexpressionmatching.29Itis                     
+                                          resulted in 3781 sentences of which 3040 describe actual
+      importanttonoticethatthisapproachfailswhentheactionand                      
+                                          synthesis procedures. While we tried to maintain an even
+      its attributes are not mentioned in the same context or the                 
+                                          distribution of the action terms in the labeled set, it is still dependencytreeisbuiltincorrectly.
+        2.5.3 Constructingsynthesisowchartforparagraphs.For highly skewed toward Mixing and Purication actions. This is
+                                          not surprising, since mixing of precursors occupies any
+      every paragraph in the set, we then applied the bi-LSTM                     
+                                          synthesisprocedureandpuricationisrequiredinalmostany
+      mappingmodel(Section2.4)toextractthe sequenceofaction                       
+                                          non-solid-state method for inorganic synthesis. Heating is the
+      terms from every sentence. Next, we merged all the synthesis                
+                                          nextmostprevalentsynthesisactionsinceitisalsooneofthe
+      actionsobtainedfromallsentenceswithintheparagraphinto                       
+      a synthesis owchart. This was performed with a rule-based basicoperationsininorganicsynthesis.
+                                           To probe the robustness of ULSA and our annotation
+      approach by traversing grammar trees and analysing the                      
+                                          schema, we asked 6 human experts to annotate the same surroundingwordsofeachactiontermandcomparingthemto
+      the words and action terms of the previous sentence. Finally,               
+      the owchart of synthesis actions for a given paragraph was                 
+                                          Table1 Quantitativecharacteristicsofthedatasetchosenforanno-
+      converted into an adjacency matrix. For this, synthesis action              
+                                          tationwithULSAschema                    
+      terms were ordered and assigned to rows and columns of the                  
+      matrixandinitializedwithzeros,resultingina10-by-10matrix          Amount    
+      foreveryparagraph(8actiontermsfromthevocabularyofULSA                       
+      plus three additional terms for Mixing and Non-Altering terms Paragraphsusedforannotation 535
+      removed).Whenevertherewasastepfromactionitoactionj,                         
+                                          Persynthesistype                        
+      the corresponding value in the matrix was incremented by 1.                 
+                                          Solid-statesynthesis          199       
+      The matrices for all paragraphs were attened and merged Sol–gelsynthesis 51
+      togetherforfurtherprincipalcomponentanalysis. Solvo-/hydrothermalsynthesis 148
+                                          Precipitation                 137       
+                                          Totalsentences                3781      
+      3  Results                          Synthesissentences            3040      
+                                          Actiontokens                  5547      
+      3.1 Codeanddataavailability                                                 
+                                          Peractioncategory                       
+      Thedatasetof3040annotatedsynthesissentencesaswellasthe Starting   619       
+      processing scripts are available at CederGroupHub/synthesis- Mixing 1853    
+      action-retriever at https://doi.org/10.5281/zenodo.6383380. In Purication 1080
+                                          Heating                       973       
+      the dataset, each record contains the raw sentence tokens                   
+                                          Cooling                       259       
+      concatenated with a space between each token and a list of                  
+                                          Shaping                       225       
+      objects, each containing a token and the tag assigned to that Reaction 232  
+      token.Forexample:                   Non-Altering                  306       
+      ©2022TheAuthor(s).PublishedbytheRoyalSocietyofChemistry DigitalDiscovery,2022,1,313–324 | 317
+ .MA                                                                              
+ 91:95:6                                                                          
+ 4202/91/6                                                                        
+ no                                                                               
+ dedaolnwoD                                                                       
+ .2202                                                                            
+ lirpA                                                                            
+ 72                                                                               
+ no                                                                               
+ dehsilbuP                                                                        
+ .elcitrA                                                                         
+ sseccA                                                                           
+ nepO                                                                             
+  .ecneciL                                                                        
+  detropnU                                                                        
+  0.3                                                                             
+  laicremmoCnoN-noitubirttA                                                       
+  snommoC                                                                         
+  evitaerC                                                                        
+  a                                                                               
+  rednu                                                                           
+  desnecil                                                                        
+  si                                                                              
+  elcitra                                                                         
+  sihT                                                                            
+                                                                     View Article Online
+                                                                                  
+                                                                                  
+      DigitalDiscovery                                                   Paper    
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+      Fig. 2 Quantitative characteristics of the annotated dataset. (a) Number of sentences per paragraph (blue), including sentences related to
+      synthesisprocedures(red).(b)Numberofalltokenspersentenceintheannotatedset.(c)Numberoftokensdenotingasynthesisactionper
+      sentenceintheannotatedset.                                                  
+                                                                                  
+      paragraphsinourdatasetandusedFleiss'kappascoretoesti- can also be associated with many synthesis operations. For
+      matetheinter-annotatoragreementbetweentheannotations.43 instance, granulating procedures that break a sample into
+      Ingeneral,theFleiss'kappascoreevaluatesthedegreefrom(cid:5)1 smaller chunks could be considered a Shaping action; at the
+      to1towhichdifferentannotatorsagreewithoneanotherabove sametime,abenchchemistcouldconsider“granulation”tobe
+      theagreementexpectedbypurechance.ApositiveFleiss'kappa Mixing action term since it requires performing a grinding
+      indicates good agreement, scores close to zero indicate near operation to obtain the new shape. Less ambiguous actions
+      randomness in categorization, and negative scores indicate terms,suchasHeatingandMixing,showedhigheragreement.
+      conictingannotations.Thisisageneralizedreliabilitymetric                   
+      andisusefulforagreementbetweenthreeormoreannotators                         
+      acrossthreeormorecategories.Table2liststheFleiss'kappa 3.3 Mappingsynthesisproceduresintoauniedlanguageof
+      scores for agreement between human experts annotating the synthesisactions  
+      sentencesaccordingtotheschemadescribedinSection2.1.The 3.3.1 Mapping model. As a rst approach for mapping of
+      table shows good agreement on distinguishing synthesis sen- synthesis paragraphs into ULSA, we used dictionary lookup
+      tencesfromnon-synthesissentences,aswellasforallandfor constructed as described in Section 2.4.1. We use the labeled
+      each individual synthesis action, including non-actions. The dataset of 3040 sentences to assess the performance of the
+      agreement across all action terms is 0.83. Among those, the model. We considered two options: mapping of all sentence
+      action terms with lower scores are Shaping and Non-Altering. words and mapping the verbs only. In both cases, the overall
+      ThelowscoreforNon-Alteringisexpectedsinceawiderangeof accuracyoftheprediction(i.e.F1score)is(cid:4)60–70%(Table3).
+      actions which do not induce a transformation in the sample Nonetheless,mappingofallwordsshowsrelativelygoodrecall
+      could be mapped into this category. The Shaping action term andpoorprecision,whilemappingofonlyverbsimprovesthe
+                                          precisionbutdiminishesrecall.           
+                                           These results moved us toward considering a recurrent
+      Table2 Fleiss'kappascoreforinter-annotatoragreementusingULSA neuralnetworkmodelformappingparagraphsintoULSA.Itis
+      scheme                                                                      
+                                          generallyacceptedthatrecurrentneuralnetworks(RNNs),and
+                                          specically bi-LSTMs, can effectively process sequential data
+                                      Score                                       
+                                          and keep track of past events.44 Indeed, bi-LSTM is simple
+      Identicationofsynthesissentences 0.69 enough and does not require exhaustive training and ne-
+      Actiontermstagging              0.83 tuning,asiscommonforBERT45andGPTmodels.46–48Thebi-
+                                          LSTM model combined with word embeddings (Section 2.4.3)
+      Peractionterms                                                              
+                                          was trained on the labeled dataset of 3040 sentences. The bi-
+      Starting                        0.82                                        
+      Mixing                          0.86 LSTM model signicantly improves mapping accuracy,
+      Purication                     0.79 yielding>90%F1score(Table3).Itisimportanttonoticehere
+      Heating                         0.84 that all the metrics for baseline and neural network models
+      Cooling                         0.88                                        
+                                          were computed per sentence, i.e. we evaluated the whole sen-
+      Shaping                         0.59                                        
+                                          tencebeingmappedcorrectlyratherthanindividualterms.
+      Reaction                        0.66                                        
+      Non-Altering                    0.45 The output of the baseline models and the bi-LSTM model
+      Noaction                        0.87 for exemplary solid-state and hydrothermal synthesis
+      318 | DigitalDiscovery,2022,1,313–324 ©2022TheAuthor(s).PublishedbytheRoyalSocietyofChemistry
+ .MA                                                                              
+ 91:95:6                                                                          
+ 4202/91/6                                                                        
+ no                                                                               
+ dedaolnwoD                                                                       
+ .2202                                                                            
+ lirpA                                                                            
+ 72                                                                               
+ no                                                                               
+ dehsilbuP                                                                        
+ .elcitrA                                                                         
+ sseccA                                                                           
+ nepO                                                                             
+  .ecneciL                                                                        
+  detropnU                                                                        
+  0.3                                                                             
+  laicremmoCnoN-noitubirttA                                                       
+  snommoC                                                                         
+  evitaerC                                                                        
+  a                                                                               
+  rednu                                                                           
+  desnecil                                                                        
+  si                                                                              
+  elcitra                                                                         
+  sihT                                                                            
+                                                                     View Article Online
+                                                                                  
+                                                                                  
+      Paper                                                       DigitalDiscovery
+                                                                                  
+      Table3 Performance of baselineand bi-LSTMmodelsfor mapping case, a word embedding model helps to signicantly improve
+      synthesis sentences into ULSA terms. In baseline 1, all words in the thescoreevenforthosetermsthathaveneverappearedinthe
+      sentencearematchedagainstalookuptable.Inbaseline2,onlyverbs training set (e.g. “degas”, “triturate”). Second, a given verb is
+      taggedbySpaCyarematchedagainstthelookuptable.Thequantities                  
+                                          denedasasynthesisactiontermlargelybasedonthecontext.
+      arecomputedpersentence,i.e.thenumberofsentenceswithallthe                   
+      actiontokensidentifiedandassignedcorrectly Prominentexamplesare“heatingrate”,“mixingenvironment”,
+                                          “ground powder”, etc. That is well captured by the recurrent
+      Model       Precision Recall  F1score neural network architecture. Lastly, synthesis actions are not
+                                          onlydenotedbyverbtokens,butalsobynouns,adjectives,and
+      Baseline1   0.54      0.61    0.57                                          
+                                          gerunds. This can be also learnt by the neural network better
+      Solid-state 0.53      0.72    0.61                                          
+      Sol–gel     0.57      0.75    0.65  thanbyasetofrules.                      
+      Hydrothermal 0.54     0.53    0.54   Insummary,wedesignedaneuralnetwork-basedmodelthat
+      Precipitation 0.55    0.50    0.53  maps any synthesis paragraph into ULSA with high accuracy
+      Baseline2   0.84      0.50    0.63  and signicantly outperforms a plain dictionary lookup
+      Solid-state 0.84      0.54    0.66                                          
+      Sol–gel     0.79      0.62    0.69  approach.                               
+      Hydrothermal 0.84     0.47    0.61   3.3.2 Analysis of action embeddings. To analyse how well
+      Precipitation 0.84    0.44    0.54  the ULSA represents the space of synthesis operations
+      Bi-LSTM     0.90      0.88    0.89  commonlyusedwhendescribinginorganicsynthesisprocesses,
+      Solid-state 0.90      0.90    0.90                                          
+                                          weplotteda2Dprojectionofthewordembeddingscalculated
+      Sol–gel     0.88      0.86    0.87                                          
+                                          with a t-SNE approach. The results are shown in Fig. 3. To
+      Hydrothermal 0.90     0.86    0.88                                          
+      Precipitation 0.90    0.91    0.91  achieveaclearrepresentation,weonlyanalysedthoseverbsthat
+                                          appearmorethan10times.Wethenmappedtheseparagraphs
+                                          intoULSAbyusingthebi-LSTMmodel.Thoseverbsthatwere
+      paragraphs are shown in Table 4, which shows signicant assignedwithaULSAlabelarecolor-codedinthegurecorre-
+      improvementinthebi-LSTMmodelperformancecomparedto spondingly,theothernon-synthesisactiontermsarecoloredin
+      thebaselinemodels.Thereareafewreasonswhythebi-LSTM grey.                    
+      model outperforms plain dictionary lookup. First, researchers First,weobservethattheverbsmappedintoULSAandhence
+      usediversevocabularytodescribesynthesisprocedures,hence representing synthesis actions are all grouped in the top-le
+      thereareunlimitedpossibilitiesinconstructingalookuptable. corner of the projection. Indeed, analysis of the individual
+      Forinstance,“heating”canbereferredtoas“calcining”,“sin- wordsintherestofthespaceshowedthatthosearethewords
+      tering”,“ring”,“burning”,“heattreatment”,andsoon.Inthis thatgenerallyappearinsynthesisparagraphsbutdonotcarry
+      Table4 Examplesofprocessingasolid-stateandhydrothermalsynthesisparagraphbybaselinemodelsandthebi-LSTMmodelusingULSA
+      scheme                                                                      
+      Paragraph                Baseline1        Baseline2         Bi-LSTM         
+      Targetwassynthesizedbysolid Starting(synthesized) Starting(synthesized) Starting(synthesized)
+      statereaction.Precursorswere Mixing(milled) Mixing(milled)  Mixing(milled)  
+      milledtogetherwithamortarand Mixing(mixture) Cooling(cooled) Heating(heated)
+      pestlefor10min.Themixturewas Heating(heated)                Reaction(held)  
+      thenplacedintoaaluminacrucible, Heating(heating)            Cooling(cooled) 
+      heatedto1200(cid:3)Cataheatingrate Cooling(cooled)          Mixing(ground)  
+      of5(cid:3)Cmin(cid:5)1inambientair,heldat                                   
+      1200(cid:3)Cfor2h,andthencooledto                                           
+      roomtemperatureat20(cid:3)Cmin(cid:5)1.                                     
+      Theresultingpowderwasthen                                                   
+      groundfor5mintobreakup                                                      
+      agglomerates                                                                
+      Titaniumisopropoxideand  Mixing(mixed)    Mixing(stirred)   Mixing(mixed)   
+      isopropanolweremixedandstirred Mixing(stirred) Mixing(added) Mixing(stirred)
+      for30min.Then,thesolutionwas Mixing(added) Heating(heated)  Mixing(added)   
+      addedto40mLnitricacidsolution. Mixing(mixture) Reaction(kept) Heating(heated)
+      Themixturewasheatedat80(cid:3)Cfor Heating(heated) Purication(dried) Mixing(stirring)
+      10hunderstirring,theresulting Mixing(stirring)              Reaction(kept)  
+      solutionwastransferredinto Reaction(kept)                   Purication(washed)
+      Teon-linedautoclaveandkeptat Purication(dried)            Purication(dried)
+      200(cid:3)Cfor24h.Theprecipitates                                           
+      werewashedthoroughlywith                                                    
+      distilledwaterandethanol,and                                                
+      driedovernight                                                              
+      ©2022TheAuthor(s).PublishedbytheRoyalSocietyofChemistry DigitalDiscovery,2022,1,313–324 | 319
+ .MA                                                                              
+ 91:95:6                                                                          
+ 4202/91/6                                                                        
+ no                                                                               
+ dedaolnwoD                                                                       
+ .2202                                                                            
+ lirpA                                                                            
+ 72                                                                               
+ no                                                                               
+ dehsilbuP                                                                        
+ .elcitrA                                                                         
+ sseccA                                                                           
+ nepO                                                                             
+  .ecneciL                                                                        
+  detropnU                                                                        
+  0.3                                                                             
+  laicremmoCnoN-noitubirttA                                                       
+  snommoC                                                                         
+  evitaerC                                                                        
+  a rednu                                                                         
+  desnecil                                                                        
+  si                                                                              
+  elcitra                                                                         
+  sihT                                                                            
+                                                                     View Article Online
+                                                                                  
+                                                                                  
+      DigitalDiscovery                                                   Paper    
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+      Fig.3 2Dprojectionofwordembeddingsvectors.Shownarethemostfrequentverbtokensencounteredinthesetof(cid:4)420000paragraphs
+      describingasynthesisprocedure.Highlightedindifferentcolorsarethevectorsthatcorrespondtothecommonverbsfromthecategoriesof
+      synthesisactionsusedforannotation.Otherprominentclustersofvectorsaredenotedwithcirclesandlabeledbyacommonterm.Dimen-
+      sionalityreductionwasperformedusingat-SNEapproach.                          
+                                                                                  
+      any information about the synthesis procedure. For instance, Taken together, these results demonstrate that (a) the
+      these are verbs denoting characterization of a material embeddingsmodelwecreatedreectswellthesimilarityofthe
+      (“detect”, “quantify”, “examine”, “measure”), naming of verbsusedforsynthesisdescriptionsand(b)thevocabularyof
+      a sample (“denoted”, “referred”, “named”, “labeled”) or refer- ULSA covers all common synthesis actions used in inorganic
+      ringtoatableorgure.Theblobofdotsinthemiddleofthe synthesis.                
+      plot are all words that were either mis-tokenized during text 3.3.3 Analysis of graphs clustering. As we showed above,
+      segmentation or mistakenly recognized as verbs by the SpaCy ULSA can capture well the vocabulary commonly used for the
+      algorithm. In the embeddings mapping, these words are description of synthesis and, further, we were able to design
+      replacedwiththe<UNK>token.          a high-accuracy model that maps arbitrary synthesis descrip-
+        A second interesting observation is that the embeddings tions into ULSA. Here, we would like to demonstrate how the
+      relatedtosintering(bluedots),pelletizing(purpledots)andre- dataset can be modied and augmented with the additional
+      grinding (orange dots) are all located next to each other. This user-dened data to apply it to a specic task. To show that
+      agrees well with the fact that those actions together describe unication of synthesis actions still allows for distinguishing
+      solid-statesynthesisprocesses.Oppositely,theverbsdescribing between inorganic synthesis types, we constructed synthesis
+      solution mixing (orange dots) are in close proximity with the owcharts for 4000 paragraphs (1000 per each synthesis type)
+      verbsreferringtopurication,suchaslteringordrying(green randomlypulledfromthesetof(cid:4)420000inorganicsynthesis
+      dots). Similarly, verbs indicating cooling processes (magenta paragraphs (see Section 2.5.3 for procedure description). To
+      dots)andtheverbsreferringtoreactionprocesses(reddots)are construct the owchart of synthesis (represented by an adja-
+      clustered together. This agrees with the oen encountered cency matrix), we used the synthesis action terms assigned to
+      constructions of “le to react” or “kept and then cooled” each sentence in a paragraph. Additionally, we augmented
+      describingthenalstepsofagivensynthesis. Mixingactionswiththreecategories,DispersionMixing,Solution
+                                          Mixing, and Ball-Milling, by using heuristics and dictionary
+      320 | DigitalDiscovery,2022,1,313–324 ©2022TheAuthor(s).PublishedbytheRoyalSocietyofChemistry
+ .MA                                                                              
+ 91:95:6                                                                          
+ 4202/91/6                                                                        
+ no                                                                               
+ dedaolnwoD                                                                       
+ .2202                                                                            
+ lirpA                                                                            
+ 72                                                                               
+ no                                                                               
+ dehsilbuP                                                                        
+ .elcitrA                                                                         
+ sseccA                                                                           
+ nepO                                                                             
+  .ecneciL                                                                        
+  detropnU                                                                        
+  0.3                                                                             
+  laicremmoCnoN-noitubirttA                                                       
+  snommoC                                                                         
+  evitaerC                                                                        
+  a                                                                               
+  rednu                                                                           
+  desnecil                                                                        
+  si                                                                              
+  elcitra                                                                         
+  sihT                                                                            
+                                                                     View Article Online
+                                                                                  
+                                                                                  
+      Paper                                                       DigitalDiscovery
+                                                                                  
+      lookup (Section 2.5.1). It is important to note here that we precursors, ring the mixture, and obtaining nal products;
+      assumealinearorderofsynthesisactions,i.e.thatthesequence sol–gel synthesis is considered as a solid-state synthesis with
+      ofsentencesandsynthesisactionsinaparagraphcorresponds solution-assisted mixing of precursors; hydrothermal and
+      tothetruesequenceofsynthesisstepsdoneduringexperiment. precipitation syntheses usually involve preparation of the
+      Accordingtoourestimation,thisassumptionisviolatedonlyin sample in solution, then ltering (Purication) to separate the
+      2%ofparagraphsinthe(cid:4)420000paragraphset.Alltheadja- liquidandobtainthenalproductinsteadofincludingaring
+      cency matrices were attened and concatenated, resulting in step.           
+      amatrixofsize100-by-4000,i.e.10-by-10matrixpereachof4000 Togetfurtherinsights,wemanuallysampledandcompared
+      paragraphs,where10isthesizeoftheULSAvocabularyminus synthesis procedures corresponding to the data points along
+      Non-Altering and with three additional Mixing actions. Next, eachofthettedlines.Theresultsshowthatthe1stprincipal
+      principal component analysis was used to perform dimen- component correlates with the involvement of Solution Mixing
+      sionalityreductionofthematrix.      for precursors in synthesis procedures. In other words, the
+        Fig. 4 displays the projection of the 1st and 2nd principal larger a coordinate the data point has along the 1st principal
+      components.Eachdatapointherecorrespondstoonesynthesis component,themorestepsofdissolvingandmixingprecursors
+      paragraph, i.e. one synthesis owchart. Different colors high- insolutionaswellasPuricationthatdatapointinvolves.This
+      light different types of synthesis. A few observations can be agreeswellwiththefactthatsolid-statesynthesismostlyoper-
+      madefromtheplot.First,theclustersofsynthesisprocedures ates with powders while hydrothermal and precipitation
+      are well separated and aggregated according to the synthesis procedures are solution-based procedures, and sol–gel
+      types.Specically,thedatapointscorrespondingtosolid-state synthesesexistinbetween.
+      synthesis are narrowly clustered along a line with negative The 2nd principal component corresponds to the level of
+      slope while the other synthesis types are spread more widely complexity of the synthesis procedure. The larger and more
+      andtheslopeoftheirlineartispositive.Second,theclusters positivethedatapointalongthe2ndprincipalcomponent,the
+      of data points for precipitation and hydrothermal synthesis morestepsareinvolvedinthesynthesisprocess.Interestingly,
+      almost completely overlap and partially overlap with sol–gel all four synthesis types exhibit simple synthesis procedures
+      synthesis, while the overlap with solid-state synthesis is (fewer steps) and complex synthesis procedures (many steps).
+      negligible.                         Nonetheless, solid-state synthesis has the largest deviation
+        Thesetwoobservationsagreewellwiththestandardproce- alongthe2ndprincipalcomponentcomparedtohydrothermal
+      duresassociatedwitheachofthefoursynthesistypes.Indeed, and precipitation synthesis since solid-state procedures can
+      solid-state syntheses usually operate with mixing powder involvemultipleheatingandre-grindingstepsforthesampleto
+                                          obtain the desired phase while in solution synthesis this can
+                                          oenbeachievedinoneortwosteps.          
+                                          4  Discussion and conclusions           
+                                          In this work, we aim to ll the gap in automated synthesis
+                                          information extraction from scientic publications by
+                                          proposingauniedlanguageforsynthesisactions(ULSA).We
+                                          used the ULSA on an annotated set of 3040 sentences about
+                                          inorganicsynthesisincludingsolid-state,sol–gel,precipitation
+                                          and solvo-/hydrothermal syntheses. The dataset is publicly
+                                          available and can be easily customized by researchers accord-
+                                          inglytottheirapplication.Asanexampleofsuchapplication,
+                                          we used a recurrent neural network and grammar parsing to
+                                          build a mapping model that converts written synthesis proce-
+                                          dures into a ULSA-based synthesis owchart. Analysis of the
+                                          results demonstrates that the ULSA vocabulary spans the
+                                          essentialsetofwordsusedbyresearcherstodescribesynthesis
+                                          procedures in scientic literature and that the owchart
+                                          representationofsynthesisconstructedusingULSAcancapture
+                                          important synthesis features and distinguish between solid-
+                                          state, sol–gel, precipitation and solvo-/hydrothermal synthesis
+      Fig. 4 Visualization of the first two principal components for the methods. 
+      adjacencymatricesofsynthesisactiongraphs.Eachdotontheplot Despite these promising results, the ULSA scheme is not
+      represents a synthesis graph colored according to its type. Dashed considered a complete language and can be signicantly
+      lines display linear fitting of each data subset and show the overall       
+                                          improved in the future with contributions from other
+      direction for clustering of each synthesis graph. Note that the lines       
+      were shifted to have a common origin for representation purposes researchers. First, we only demonstrated that it works for
+      whilepreservingtheslope.            specic inorganic synthesis methods, and introduction of
+      ©2022TheAuthor(s).PublishedbytheRoyalSocietyofChemistry DigitalDiscovery,2022,1,313–324 | 321
+ .MA                                                                              
+ 91:95:6                                                                          
+ 4202/91/6                                                                        
+ no                                                                               
+ dedaolnwoD                                                                       
+ .2202                                                                            
+ lirpA                                                                            
+ 72                                                                               
+ no                                                                               
+ dehsilbuP                                                                        
+ .elcitrA                                                                         
+ sseccA                                                                           
+ nepO                                                                             
+  .ecneciL                                                                        
+  detropnU                                                                        
+  0.3                                                                             
+  laicremmoCnoN-noitubirttA                                                       
+  snommoC                                                                         
+  evitaerC                                                                        
+  a                                                                               
+  rednu                                                                           
+  desnecil                                                                        
+  si                                                                              
+  elcitra                                                                         
+  sihT                                                                            
+                                                                     View Article Online
+                                                                                  
+                                                                                  
+      DigitalDiscovery                                                   Paper    
+                                                                                  
+      synthesis techniques such as deposition, crystal growth, and language wepropose inthisworkcan becomea solidfounda-
+      others will require extending the ULSA vocabulary or reconsi- tionforthefuturedevelopmentinthisdirection.
+      deringthedenitionsofsometerms.Second,theschemeand                          
+      methodologywillbenetfromarobustapproachtodistinguish Author contributions  
+      between various mixing procedures since this is one of the                  
+      dening items in understanding synthesis protocols. This Z.W.,K.C.,O.K.,andG.C.conceivedtheideaanddraedthe
+      includes separation between, for example, dissolving precur- manuscript. Z. W., K. C., A. C., and O. K. implemented the
+      sorsanddispersivemixinginaliquidenvironment,usingball- algorithmsandanalysedthedata.Z.W.,Y.F.,andH.H.built
+      millingtohomogenizethesampleandusinghigh-energyball- theannotationtool.Z.W.,K.C.,Y.F.,Y.Z.,andO.K.dened
+      milling to actually achieve the nal product, adding reagents theannotationschema.Z.W.,K.C.,Y.F.,H.H.,T.H.,andB.D.
+      to promote reaction and adding precursors to compensate for prepared the annotation dataset. All authors discussed and
+      loss due to volatility, and other cases. We have demonstrated revisedthemanuscript.
+      that the details of mixing are important for distinguishing                 
+      between inorganicsynthesis methods usingsimple heuristics, Conflicts of interest
+      however,theschemewillbenetfromahigh-delityapproach.                       
+      Nonetheless, we anticipate that our results and the ULSA Therearenoconictstodeclare.
+      schemawill helpresearcherstodevelopadata-orientedmeth-                      
+      odologytopredictsynthesisroutesofnovelmaterials. Acknowledgements           
+        Efficientandcontrollablematerialssynthesisisabottleneck                   
+      in technological breakthroughs. While predicting materials Theauthorswouldliketothanktheteamoflibrariansfromthe
+      withadvancedpropertiesandfunctionalityhasbeenbroughtto University of California, Berkeley: Anna Sackmann (Data
+      a state-of-the-art level with the development of computational Services Librarian), Rachael Samberg (Scholarly Communica-
+      and data-driven approaches, the design and optimization of tionOfficer)andTimothyVollmer(ScholarlyCommunication&
+      synthesis routes for those materials is still a tedious experi- Copyright Librarian) for helping us to navigate through
+      mental task. The progress in inorganic materials synthesis is publisherscopyrightpoliciesandrelatedissues.Wealsothank
+      mainlyimpededdueto(a)alackofpubliclyavailablelarge-scale Prof. Wenhao Sun (University of Michigan) for helpful discus-
+      repositories with high-quality synthesis data and (b) a lack of sions and thoughts about materials synthesis. This work was
+      ontologyandstandardizationforcommunicationonsynthesis primarilysupportedbytheNationalScienceFoundationunder
+      protocols.Indeed,therstmatterarisesfromthefactthatthe Grant No. DMR-1922372. Dr Olga Kononova was in part sup-
+      vastmajorityofexperimentaldatagetsburiedinlabnotebooks ported by the U.S. Department of Energy, Office of Science,
+      and is never published anywhere. As a result, researchers are Basic Energy Sciences, Materials Sciences and Engineering
+      liable to perform redundant and wasteful experimental Division under Contract No. DE-AC02-05-CH11231 within the
+      screenings through those parameters of synthesis that have GENESIS EFRC program (DE-SC0019212). Expert validation of
+      alreadybeenperformedbysomeone,butarenotreported.Even the extracted data was supported by the U.S. Department of
+      published experimental procedures face the problem ofambi- Energy, Office of Science, Office of Basic Energy Sciences,
+      guityofthelanguageusedbyresearchers.Thiscreatesamajor Materials Sciences and Engineering Division under Contract
+      challenge in acquiring synthesis data from publications by No.DE-AC02-05-CH11231(D2S2programKCD2S2).
+      automatedapproachesincludingtextmining.                                     
+        Theadvantageoftheparadigmweestablishinthisworkis References               
+      that it brings us closer to addressing important questions in               
+      materialssynthesis:“Howshouldwethinkaboutthesynthesis 1 K. Alberi, et al., The 2019 materials by design roadmap, J.
+      process?“, “What is the minimum information required to Phys.D:Appl.Phys.,2018,52,013001.
+      unambiguously identify a synthesis procedure?“, and “Can 2 L. Himanen, A. Geurts, A. Foster and P. Rinke, Data-driven
+      synthesisbethoughtofasacombinationofxedactionblocks materialsscience:Status,challenges,andperspectives,Adv.
+      augmented with attributes such as temperature, time, and Sci.,2019,6(21),1900808.
+      environment,orarethereotherimportantaspectsthathaveto 3 J. Schmidt, M. Marques, S. Botti and M. Marques, Recent
+      be taken into account?“. These questions will become crucial advances and applications of machine learning in solid-
+      whentransitioningtowardAI-drivensynthesis. statematerialsscience,npjComput.Mater.,2019,5,83.
+        Recentdevelopments inautonomous roboticsynthesisand 4 O. Kononova, et al., Opportunities and challenges of text
+      theattemptsto“closethefeedbackloop”inmakingdecisions mininginmaterialsresearch,iScience,2021,24,102155.
+      for the next synthesis step make the question of synthesis 5 E.Olivetti,etal.,Data-drivenmaterialsresearchenabledby
+      ontology and unication especially important.36,37,49 Indeed, natural language processing, Appl. Phys. Rev., 2020, 7,
+      while theoretical decision-making and AI-guided systems can 041317.         
+      operate with abstract synthesis representations, implementa- 6 M. Krallinger, O. Rabal, A. Lourenço, J. Oyarzabal and
+      tion of this methodology to an autonomous robotic platform A. Valencia, Information retrieval and text mining
+      willrequirewell-denedandrobustmappingontoaxedsetof technologies for chemistry, Chem. Rev., 2017, 117, 7673–
+      manipulations and devices available to the robot. The unied 7761.          
+      322 | DigitalDiscovery,2022,1,313–324 ©2022TheAuthor(s).PublishedbytheRoyalSocietyofChemistry
+ .MA                                                                              
+ 91:95:6                                                                          
+ 4202/91/6                                                                        
+ no                                                                               
+ dedaolnwoD                                                                       
+ .2202                                                                            
+ lirpA                                                                            
+ 72                                                                               
+ no                                                                               
+ dehsilbuP                                                                        
+ .elcitrA                                                                         
+ sseccA                                                                           
+ nepO                                                                             
+  .ecneciL                                                                        
+  detropnU                                                                        
+  0.3                                                                             
+  laicremmoCnoN-noitubirttA                                                       
+  snommoC                                                                         
+  evitaerC                                                                        
+  a                                                                               
+  rednu                                                                           
+  desnecil                                                                        
+  si                                                                              
+  elcitra                                                                         
+  sihT                                                                            
+                                                                     View Article Online
+                                                                                  
+                                                                                  
+      Paper                                                       DigitalDiscovery
+                                                                                  
+      7 E. Kim, et al., Materials synthesis insights from scientic Resources and Evaluation Conference, European Language
+        literature via text extraction and machine learning, Chem. ResourcesAssociation,2020,pp.1941–1950.
+        Mater.,2017,29,9436–9444.         25 F. Kuniyoshi, J. Ozawa and M. Miwa, Analyzing research
+      8 S.HuangandJ.M.Cole,Adatabaseofbatterymaterialsauto- trends in inorganic materials literature using nlp, 2021, vol.
+        generatedusingchemdataextractor,Sci.Data,2020,7,1–13. 2106,p.14157.       
+      9 C.CourtandJ.M.Cole,Auto-generatedmaterialsdatabase 26 T. Dieb, M. Yoshioka, S. Hara and M. Newton, Framework
+        of curie and n´eel temperatures via semi-supervised for automatic information extraction from research papers
+        relationshipextraction,Sci.Data,2018,5,180111. on nanocrystal devices, Beilstein J. Nanotechnol., 2015, 6,
+      10 C.CourtandJ.Cole,Magneticandsuperconductingphase 1872–1882.              
+        diagrams and transition temperatures predicted using text 27 C. Kulkarni, W. Xu, A. Ritter & R. Machiraju An annotated
+        miningandmachinelearning,npjComput.Mater.,2020,6, corpus for machine reading of instructions in wet lab
+        1–9.                                protocols,inProceedingsofthe2018ConferenceoftheNorth
+      11 E. Kim, et al., Machine-learned and codied synthesis American Chapter of the Association for Computational
+        parametersofoxidematerials,Sci.Data,2017,4,170127. Linguistics: Human Language Technologies, Volume 2 (Short
+      12 O. Kononova, et al., Text-mined dataset of inorganic Papers), vol. 97–106, Association for Computational
+        materialssynthesisrecipes,Sci.Data,2019,6,1–11. Linguistics,Stroudsburg,PA,USA,2018.
+      13 S. Mysore et al., The materials science procedural text 28 A. Friedrich et al., The SOFC-exp corpus and neural
+        corpus: Annotating materials synthesis procedures with approaches to information extraction in the materials
+        shallow semantic structures. LAW 2019 - 13th Linguistic science domain, in Proceedings of the 58th Annual Meeting
+        Annotation Workshop, Proceedings of the Workshop pp. 56– of the Association for Computational Linguistics, Association
+        64,2019).1905.06939.                forComputationalLinguistics,2020,pp.1255–1268.
+      14 E.Kim,K.Huang,S.JegelkaandE.Olivetti,Virtualscreening 29 D.Jurafsky&J.H.Martin,SpeechandLanguageProcessing:An
+        of inorganic materials synthesis parameters with deep Introduction to Natural Language Processing, Computational
+        learning,npjComput.Mater.,2017,3,53. Linguistics, and Speech Recognition, Prentice Hall, 2nd edn,
+      15 S.EltyebandN.Salim,Chemicalnamedentitiesrecognition: 2009.               
+        Areviewonapproachesandapplications,J.Cheminf.,2014, 30 J.Goodman,Computersowarereview:Reaxys,J.Chem.Inf.
+        6,1–12.                             Model.,2009,49,2897–2898.             
+      16 M.C.SwainandJ.M.Cole,Chemdataextractor:atoolkitfor 31 S. Kim, et al., PubChem 2019 update: improved access to
+        automated extraction of chemical information from the chemicaldata,NucleicAcidsRes.,2018,47,D1102–D1109.
+        scienticliterature,J.Chem.Inf.Model.,2016,56,1894–1904. 32 J.-D. Kim, T. Ohta, Y. Tateisi and J. Tsujii, Genia corpus –
+      17 D.M.Jessop,S.E.Adams,E.L.Willighagen,L.Hawizyand a semantically annotated corpus for bio-textmining,
+        P.Murray-Rust, Oscar4:aexiblearchitectureforchemical Bioinformatics,2003,19,i180–i182.
+        text-mining,J.Cheminf.,2011,3,41. 33 M.Krallinger,etal.,Thechemdnercorpusofchemicalsand
+      18 L. Weston, et al., Named entity recognition and drugsanditsannotationprinciples,J.Cheminf.,2015,7,S2.
+        normalizationappliedtolarge-scaleinformationextraction 34 J. Mayeld, I. Lagerstedt and R. Sayle, Pistachio, in NIH
+        from the materials science literature, J. Chem. Inf. Model., VirtualWorkshoponReactionInformatics,May2021.
+        2019,59,3692–3702.                35 E. Kim, K. Huang, O. Kononova, G. Ceder and E. Olivetti,
+      19 A.Hiszpanski,etal.,Nanomaterialssynthesisinsightsfrom Distilling a materials synthesis ontology, Matter, 2019, 1,
+        machine learning of scientic articles by extracting, 8–12.               
+        structuring, and visualizing knowledge, J. Chem. Inf. 36 N. J. Szymanski, et al., Toward autonomous design and
+        Model.,2020,60,2876–2887.           synthesis of novel inorganic materials, Mater. Horiz., 2021,
+      20 L. Hawizy, D. M. Jessop, N. Adams and P. Murray-Rust, 8,2169–2198.       
+        Chemicaltagger: A tool for semantic text-mining in 37 A. J. S. Hammer, A. I. Leonov, N. L. Bell and L. Cronin,
+        chemistry,J.Cheminf.,2011,3,1–13.   Chemputation and the standardization of chemical
+      21 A. Vaucher, et al., Automated extraction of chemical informatics,JACSAu,2021,1,1572–1587.
+        synthesis actions from experimental procedures, Nat. 38 R.-R. Xu, Chapter 1 - introduction, in Modern Inorganic
+        Commun.,2020,11,3601.               SyntheticChemistry,ed.R.XuandY.Xu,2ndedn,Elsevier,
+      22 S. H. M. Mehr, M. Craven, A. I. Leonov, G. Keenan and Amsterdam,2017,pp.1–7.
+        L. Cronin, A universal system for digitization and 39 H. Huo, et al., Semi-supervised machine-learning
+        automatic execution of the chemical synthesis literature, classication of materials synthesis procedures, npj
+        Science,2020,370,101–108.           Comput.Mater.,2019,5,1–7.             
+      23 S. Mysore et al., Automatically extracting action graphs from 40 M. Honnibal & M. Johnson An improved non-monotonic
+        materialssciencesynthesisprocedures(2017).1711,p.06872. transitionsystemfordependencyparsing.inProceedingsof
+      24 F.Kuniyoshi,K.Makino,J.OzawaandM.Miwa,Annotating the 2015 Conference on Empirical Methods in Natural
+        and extracting synthesis process of all-solid-state batteries Language Processing (Association for Computational
+        from scientic, in Proceedings of The 12th Language Linguistics,Lisbon,Portugal,2015,pp.1373–1378.
+      ©2022TheAuthor(s).PublishedbytheRoyalSocietyofChemistry DigitalDiscovery,2022,1,313–324 | 323
+ .MA                                                                              
+ 91:95:6                                                                          
+ 4202/91/6                                                                        
+ no                                                                               
+ dedaolnwoD                                                                       
+ .2202                                                                            
+ lirpA                                                                            
+ 72                                                                               
+ no                                                                               
+ dehsilbuP                                                                        
+ .elcitrA                                                                         
+ sseccA                                                                           
+ nepO                                                                             
+  .ecneciL                                                                        
+  detropnU                                                                        
+  0.3                                                                             
+  laicremmoCnoN-noitubirttA                                                       
+  snommoC                                                                         
+  evitaerC                                                                        
+  a                                                                               
+  rednu                                                                           
+  desnecil                                                                        
+  si                                                                              
+  elcitra                                                                         
+  sihT                                                                            
+                                                                     View Article Online
+                                                                                  
+                                                                                  
+      DigitalDiscovery                                                   Paper    
+                                                                                  
+      41 T. Mikolov, I. Sutskever, K. Chen, G. Corrado & J. Dean understanding, Association for Computational Linguistics,
+        Distributed representations of words and phrases and their Minneapolis,Minnesota,2019,pp.4171–4186,URLhttps://
+        compositionally,2013.vol.1310,p.4546. aclanthology.org/N19-1423.          
+      42 R. Rˇ ehu˚ˇrek & P. Sojka Soware framework for topic 46 A. Radford & K. Narasimhan Improving language
+        modelling with large corpora. in Proceedings of the LREC understandingbygenerativepre-training(2018).
+        2010 Workshop on New Challenges for NLP Frameworks, vol. 47 A.Radfordetal.,Languagemodelsareunsupervisedmultitask
+        45–50,ELRA,Valletta,Malta,2010.     learners(2019).                       
+      43 J.Fleiss,Measuringnominalscaleagreementamongmany 48 T. Brown et al., Language models are few-shot learners,
+        raters,Psychol.Bull.,1971,76,378–382. Advances in Neural Information Processing Systems. ed.
+      44 S.HochreiterandJ.Schmidhuber,Longshort-termmemory, Larochelle H., Ranzato M., Hadsell R., Balcan M. F. & Lin
+        NeuralComput.,1997,9,1735–1780.     H.,vol.33,1877–1901(CurranAssociates,Inc.,2020).
+      45 J. Devlin, M.-W. Chang, K. Lee & K. Toutanova BERT: Pre- 49 B.Burger,etal.,Amobileroboticchemist,Nature,2020,583,
+        training of deep bidirectional transformers for language 237–241.         
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+      324 | DigitalDiscovery,2022,1,313–324 ©2022TheAuthor(s).PublishedbytheRoyalSocietyofChemistry
+ .MA                                                                              
+ 91:95:6                                                                          
+ 4202/91/6                                                                        
+ no                                                                               
+ dedaolnwoD                                                                       
+ .2202                                                                            
+ lirpA                                                                            
+ 72                                                                               
+ no                                                                               
+ dehsilbuP                                                                        
+ .elcitrA                                                                         
+ sseccA                                                                           
+ nepO                                                                             
+  .ecneciL                                                                        
+  detropnU                                                                        
+  0.3                                                                             
+  laicremmoCnoN-noitubirttA                                                       
+  snommoC                                                                         
+  evitaerC                                                                        
+  a                                                                               
+  rednu                                                                           
+  desnecil                                                                        
+  si                                                                              
+  elcitra                                                                         
+  sihT                                                                            
+                                                                     View Article Online

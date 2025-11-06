@@ -1,0 +1,853 @@
+Article         
+                                                                                   
+                                                                                   
+                                                                                   
+       Looking    through    glass:   Knowledge      discovery    from             
+       materials    science    literature   using   natural   language             
+                                                                                   
+       processing                                                                  
+                                                                                   
+       Highlights                                Authors                           
+                                                                                   
+       d Naturallanguageprocessingisusedforinformation VineethVenugopal,SouravSahoo,
+         extractionfromresearchpapers            MohdZaki,ManishAgarwal,           
+                                                 NityaNandGosvami,                 
+       d Captionclusterplotsareusedforexploringfigurecaptions                      
+                                                 N.M.AnoopKrishnan                 
+         acrosstheentirecorpus                                                     
+                                                 Correspondence                    
+       d Elementalmapsareusedtoidentifythechemicalelements                         
+                                                 vinven7@gmail.com(V.V.),          
+         reportedinastudy                                                          
+                                                 krishnan@iitd.ac.in(N.M.A.K.)     
+       d Aframeworktoextractdomain-specificqueriesfromthe                          
+                                                 In brief                          
+         literature                                                                
+                                                 Thisworkdemonstratestheuseofnatural
+                                                 languageprocessingtoolstoextract  
+                                                 informationfromalargecorpusof     
+                                                 scientificliteratureinthefieldofinorganic
+                                                 glasses.Thescalableapproach       
+                                                 presentedherecombinesinformation  
+                                                 fromthetextandimagestoanswer      
+                                                 domain-specificqueries,thereby    
+                                                 enablingacceleratedmaterialsdiscovery.
+                                                                                   
+                                                                                   
+                                                                                   
+                                                                                   
+                                                                                   
+                                                                                   
+                                                                                   
+                                                                                   
+                                                                                   
+                                                                                   
+                                                                                   
+                                                                                   
+                                                                                   
+                                                                                   
+                                                                                   
+                                                                                   
+              Venugopaletal.,2021,Patterns2,100290                                 
+              July9,2021ª2021TheAuthor(s).                                         
+                                                                     ll            
+              https://doi.org/10.1016/j.patter.2021.100290                         
+                                                                                   
+                                                                                   
+                                                                                   
+                                                                                   
+                                                                                   
+                                                                     ll            
+                                                                  OPENACCESS       
+                                                                                   
+                                                                                   
+       Article                                                                     
+       Looking    through    glass:  Knowledge      discovery                      
+       from   materials   science    literature                                    
+                                                                                   
+       using   natural  language     processing                                    
+                                                                                   
+                                                                                   
+       VineethVenugopal,1,*SouravSahoo,2MohdZaki,1ManishAgarwal,3NityaNandGosvami,2
+       andN.M.AnoopKrishnan1,2,4,*                                                 
+       1DepartmentofCivilEngineering,IndianInstituteofTechnologyDelhi,HauzKhas,NewDelhi110016,India
+       2DepartmentofMaterialsScienceandEngineering,IndianInstituteofTechnologyDelhi,HauzKhas,NewDelhi110016,India
+       3ComputerServicesCenter,IndianInstituteofTechnologyDelhi,HauzKhas,NewDelhi110016,India
+       4Leadcontact                                                                
+       *Correspondence:vinven7@gmail.com(V.V.),krishnan@iitd.ac.in(N.M.A.K.)       
+       https://doi.org/10.1016/j.patter.2021.100290                                
+                                                                                   
+         THEBIGGERPICTURE Mostknowledge generatedthroughscientificenquiry inmaterials domainispre-
+         sented in the form of unstructured data. Among the available sources such as online websites, digital
+         data, and publications, peer-reviewed journals serve as the undisputed source of reliable information
+         regardingmaterialssynthesis,characterization,andproperties.Despitetheavailabilityoflargedata,only
+         a limited fraction is compiled in the form of machine-readable databases, most of which are manually
+         curated.Here,applyingnaturallanguageprocessingonalargecorpusofjournalpublicationsoninorganic
+         glasses,wepresentaframeworkofinformationextractionfromtextandimages,whichanswersqueries
+         related to synthesis and characterization techniques, and even chemical elements used. The scalable
+         approachpresentedherecanbeappliedtootherdomainsforefficientinformationretrievalfromscientific
+         literature.                                                               
+                     Development/Pre-production:Datascienceoutputhasbeen           
+                     rolledout/validatedacrossmultipledomains/problems             
+                                                                                   
+       SUMMARY                                                                     
+                                                                                   
+       Mostoftheknowledgeinmaterialsscienceliteratureisintheformofunstructureddatasuchastextandim-
+       ages.Here,wepresentaframeworkemployingnaturallanguageprocessing,whichautomatestextandim-
+       agecomprehensionandprecisionknowledgeextractionfrominorganicglasses’literature.Theabstractsare
+       automatically categorized using latent Dirichlet allocation (LDA) to classify and search semantically linked
+       publications.Similarly,acomprehensivesummaryofimagesandplotsispresentedusingthecaptioncluster
+       plot(CCP),providingdirectaccesstoimagesburiedinthepapers.Finally,wecombinetheLDAandCCPwith
+       chemicalelementstopresentanelementalmap,atopicalandimage-wisedistributionofelementsoccurring
+       in the literature. Overall, the framework presented here can be a generic and powerful tool to extract and
+       disseminate material-specific information on composition–structure–processing–property dataspaces,
+       allowing insights into fundamental problems relevant to the materials science community and accelerated
+       materialsdiscovery.                                                         
+                                                                                   
+       INTRODUCTION                       repositoryofscientificpublications.However,onlyalimitedfrac-
+                                          tion of this knowledge is collected and curated in the form of
+       The overwhelmingly large amount of knowledge generated structureddata,forexample,adatabaseofcomposition–struc-
+       throughscientificenquiryismostlystoredasunstructureddata ture–propertyrelationships.Theinformationonmaterialscience
+       intheformoftextsandimages.Theserangefromexpositoryar- isincreasinglysiloedandsimplytoolargefortheefficientutiliza-
+       chives,suchasbooks,journals,anddissertations,tocondensed tionofanyoneindividualorgroup.Justasinallotherbranchesof
+       representations,suchashandbooksandmanuals.Materialssci- science, the materials community is afflicted by the curse of
+       ence, being a highly interdisciplinary area, commands a large knowledge incommensurate with the available information.1,2
+                                               Patterns2,100290,July9,2021ª2021TheAuthor(s). 1
+                         ThisisanopenaccessarticleundertheCCBYlicense(http://creativecommons.org/licenses/by/4.0/).
+                                                                                   
+                                                                                   
+                                                                                   
+                                                                                   
+             ll                                                                    
+           OPENACCESS                                                Article       
+                                                                                   
+                                                                                   
+        Thus,theaccessibilitytothevastmajorityofknowledgeinthe providehighlyspecific,nuanced,andautomatedexplorationof
+        literatureislimited,asit(1)istime-consumingtomanuallyread materials science literature. Specifically, we analyze the texts
+        andanalyzetextsandimages,and(2)requiresadomainexpert andimagesfromapproximately100,000researcharticlesinthe
+        tounderstand,interpret,andsummarizetheinformation. area of glasses, an archetypical disordered material. Glasses
+         Recent advancements in natural language processing (NLP) areoneofthemostcommonandwidelyusedamongengineering
+        provideapromisingsolutiontothisproblemthroughtheautoma- materials with uses spanning architectural, functional, and
+        tionoftextcomprehension,querying,andknowledgeextraction biomedical applications.26,27 Recently, machine learning (ML)
+        fromscientifictexts.NLPhasbeenappliedextensivelytoscien- approacheshavebeenusedtodeveloppredictivemodelsforop-
+        tificliteraturespecificallyinbiologicalsciencesformorethan2 tical, electronic, and mechanical properties of glasses.26,28–38
+        decades.3–5 A biomedical-specific language model, namely, Severalrecentworkshavesharedcomposition–propertydata-
+        BioBERT,4whichisusedextensivelyforbiomedicaltextmining, basesalongwiththetrainedMLmodels.28,30,36,39Forinstance,
+        standsasatestimonytotheadvancesandcontributionsofNLP thesoftwarepackage,PythonforGlassGenomics(PyGGi),has
+        inbiologicalsciences.Incontrast,theapplicationsofNLPtoma- alargecomposition–propertydatabase,MLmodelsforpredict-
+        terialsscienceremainsparse.6–8Similartobiologicalsciences, ingninekeyproperties and anoptimization framework for tar-
+        the study of materials present some unique challenges to the geted glass discovery.40 These models, however, have relied
+        directapplicationofNLPtominetextdataduetothedomain- onexistingdatabasesfortheirtrainingandanalysis,41andhence
+        specific jargons and lack of uniform conventions in scientific havebeenrestrictedtoparameterpredictionsthroughregression
+        writing.6,9Despitethesechallenges,recentstudieshaveshown models.Itiswellknownthatthepropertiesofglasses,anonequi-
+        thatNLPcanindeedbeusedtoaddresssomeopenchallenges libriumstate,arenotjustafunctionofcomposition,butarealso
+        inmaterialssciencesuchasnovelmaterialsdiscovery,7unravel- fundamentallyinfluencedbytheprocessinghistoryandtesting
+        ingsynthesispathways,10andextractingcomposition–property conditions.27,42–44
+        databases.11                                                               
+                                            Through a combination of NLP algorithms, chemical entity
+         Coleetal12–14havedemonstratedtheautomatedgeneration                       
+                                           extraction protocols, and visualization tools, we show that the
+        of databases for magnetic15 and battery materials11 using answers to very specific questions on glass literature can be
+        ChemDataExtractor,16 which has also been used in predicting answered. These include material/property specific questions
+        phase diagrams.17 Olivetti et al6,10,18 have used NLP together aswellasbroadercommunityissues,suchasthefollowing:
+        with artificial neural networks to predict synthesis parameters            
+        ofinorganicoxides10,19,20andinextractingthepropertiesofze- 1. What are the common microstructural characterizations
+        olites21 and cementitious materials.22 Jain et al7 have demon- forglasses? 
+        stratedtheuseofwordvectorsinconvertingsemanticqueries 2. Aremoreofthepaperspublishedinglasssciencetheoret-
+        tovectoralgebraandextendedthemethodtothepredictionof icalasopposedtoexperimental?
+        thermoelectrics.Cederetal10haveshowntheextractionofauto- 3. Whereisamericiumusedinglasses?
+        matedsynthesisrecipesofinorganicoxidesthroughasemi-su- 4. WhatchemicalelementshavebeenusedinLEDs?
+        pervisedapproach.Recently,Matscholar9hasbeenintroduced 5. Aretherephotoluminescencestudiesofbioactiveglasses
+        asacomprehensivematerialsciencesearchanddiscoveryen- thatcontainFluorine?  
+        ginethat isable toautomatically identify materials,properties, 6. Can we find papers on optical glasses that have been
+        characterization methods, phase descriptors, synthesis manufacturedusingsolidstatesynthesis?
+        methods,andapplicationsfromagiventextthroughacustom-                       
+                                            Overall, the generic framework developed here allow highly
+        built named entity recognition (NER) system. These develop-                
+                                           specific exploration of scientific literature using the abstracts,
+        mentssuggestthatartificialintelligenceapproachesusingNLP                   
+                                           text,andimagecaptionsofpublications.    
+        canbeapromisingroutetocondenseandrepresentknowledge                        
+        in materials science leading to novel materials discovery and              
+        development.                       RESULTS                                 
+         Veryfewstudieshave,however,focusedonextractinginfor-                      
+        mationrelatedtoimagesandplotsinliterature.23,24Theadage, Topicmodeling     
+        ‘‘a picture is worth a thousand words,’’ is even more relevant Todemonstratetheproposedapproach,wedownloadedmore
+        toscientificliterature,asimagesholdthemostcrucialinforma- than600,000researcharticles,fulltexts,andimagesrelatedto
+        tionrelatedtoscientifichypothesisandtheories.25Tilldate,there the keyword ‘‘oxide glasses’’ and ‘‘materials science’’ using
+        hasbeennoframeworkthatallowsdirectsearchorcompilation the CrossRef metadata query API45 and the Elsevier Science
+        ofimagespresentedinscientificliterature.Further,theimagesof                
+                                           DirectAPI.46Followingthis,supervisedlearningwasperformed
+        amanuscriptshouldbereadinconjunctionwiththetexttoun- ontheabstractsofthemanuscriptstofilterthem(seeMethods
+        derstandthecontext.WhilemanyoftheapplicationsofNLPin fordetails).Abstractsarethemostinformation-denseorganof
+        materialsciencehavefocusedonextractionandprocessingof ascientificpaper,containinginformationonthematerialunder
+        textualinformation,noefforthasbeenmadethusfartoconnect study,propertybeingexplored,andcharacterization/synthesis
+        thistextualinformationwiththeimagesandplotstoallowknowl- methods being used in service of the investigation. As such,
+        edgedisseminationinaholisticmanner. theyareunlikelytocontainspuriousinformationorrefertomate-
+                                           rials or properties not mentioned in the text. This specificity
+         Here,wedemonstrateacomprehensiveNLPframeworkthat                          
+                                           makesanabstractthemostusefulpartofatext,anditisthere-
+        extractsinformationfromalargecorpusoftextandimagesto                       
+                                           forenotsurprisingthatmanyNLPstudiesonmaterialshaveonly
+        2 Patterns2,100290,July9,2021                                              
+                                                                                   
+                                                                                   
+                                                                                   
+                                                                                   
+                                                                     ll            
+       Article                                                    OPENACCESS       
+                                                                                   
+                                                                                   
+                    LDAClusterplotof94207Abstractswith15topics                     
+             A                               B                                     
+                                                                                   
+                                                                                   
+                                                                                   
+                                                                                   
+                                                  C   Topic   Label                
+                                                       1   Luminescencestudies     
+                                                       2   Dielectricproperties    
+                                                       3   Spectroscopicproperties 
+                                                       4    Irradiation studies    
+                                                       5     Thinfilms             
+                                                       6   Methodologicalstudies   
+                                                       7  Non-linearopticalproperties
+                                                       8    Bioactive glasses      
+                                                       9   Electricalproperties    
+                                                       10   Glassnanoparticles     
+                                                       11   Rareearthglasses       
+                                                       12  LEDsandPhosphors        
+                                                       13   Glassceramics          
+                                                       14  Chemicalproperties      
+                                                       15    Miscellaneous         
+       Figure1. LDAplotoftheabstracts                                              
+       (A)TheLDAplotpresentstheclustersofvectorizedabstractscoloredbasedontopicsidentifiedbyLDA.
+       (B)ThenumberofabstractsoneachtopicasidentifiedbyLDA.                        
+       (C)ThedescriptivelabelassignedtoLDAtopicsbyahumanexpert.                    
+       taken paper abstracts as the input.7 Based on the supervised Notethatthedescriptivelabelisassignedtothesetopicsbya
+       learning, approximately 100,000 research articles were classi- human expert that maps the automatically generated lexical
+       fied as relevant to the topic ‘‘glass,’’ with precision, accuracy, probabilitydistributiontoestablishedcategoriesinglasslitera-
+       and recall of 92%, 86%, and 67%, respectively, on the test ture. For example, the words with the highest probability of
+       set.Notethatthemodelwiththehighestrecallwasselectedto occurrence in Topic 11 are ‘‘er,’’ ‘‘yb,’’ ‘‘emission,’’ ‘‘doped,’’
+       include as many glass-related articles as possible. Although ‘‘luminescence,’’ ‘‘nd,’’ and ‘‘tm.’’ Analysis of these high-fre-
+       notanexhaustivelist,thetotalnumberofarticlesdownloaded quency words by human experts suggests that the topic is
+       areinthesamerangeasthenumberoftextsidentifiedinother related to the luminescence of glasses doped with rare earth
+       comprehensiveliteraturesurveysonglass.47,48 ions, and hence it is labeled as ‘‘Rare Earth glasses.’’ The
+        An unsupervised NLP algorithm called the latent distribution of abstracts into the identified topics is shown
+       Dirichlet allocation49 (LDA) was used to automatically classify schematicallyinthehistograminFigure1B.Thedescriptivela-
+       thecorpusinto15‘‘topics,’’whereeachtopicisdefinedbythe belsforalltheothertopicsaresimilarlyidentifiedandlistedin
+       setofwordsthathavethehighestprobabilityofoccurrencewithin Figure1C.         
+       thetopic.LDAallowsarapidandefficientorganizationofthetext AmerevisualinspectionconfirmsthatTopic5–thinfilms–isthe
+       corpuswithminimalhumansupervision—acapabilityprovidedby single largest group followed by topics 13 and 6. The most
+       nootherautomatedtoolavailabletoday.Thecategoriesgener- common set of articles related to ‘‘Thin films’’ includes both
+       atedbyLDAarevisualizedintheLDAplotinFigure1A.Eachab- the luminescence properties of oxides such as ZnO on glass
+       stractinthecorpusisvectorizedusingTermFrequency–Inverse substrates, as well as the studies of transparent glasses on a
+       DocumentFrequency50(TFIDF),whichmapseachdocumentin thinfilmgeometry.Thisisfollowedby‘‘glassceramics,’’‘‘meth-
+       thecorpustoauniquevectorinahigherdimensionalspace.T- odological studies’’ of glasses (including both theoretical and
+       distributed stochastic neighbor embedding (t-SNE) projects modelingstudies),and‘‘nonlinearopticalpropertiesofglasses.’’
+       these vectors to a 2-dimensional (2D) plane such that vectors Ingeneral,thelistisfoundtobecomprehensivecoveringallfac-
+       withthehighestcosinesimilaritygrouptogether.Thecolorofa ets of glass literature in terms of applications, properties, and
+       pixelisdeterminedbythetopicnumberassignedtoitbyLDA. ingredientsincludingbioactiveglasses,dielectricglasses,nano-
+        It is seen immediately from Figure 1A that the points with materials,andchemicalandelectromagneticproperties.Other
+       similarcoloraregroupedtogether.ThissuggeststhattheTFIDF categories, such as mechanical and failure studies of glasses,
+       vectorizationfollowedbyt-SNEclusteringisabletogroupthe areseentobesubsumedwithinthesebroadtopics.Notethat
+       abstracts with similar topics, as identified by LDA. The LDA amoredetailedclassificationcanbefurtherperformedtoobtain
+       plotisagraphicalrepresentationoftheentirefieldofglassliter- the subtopics by performing LDA recursively on each of the
+       atureandsuccinctlysummarizesthedetailsmentionedearlier. topicsseparately(seeFigureS1andTableS1).
+                                                          Patterns2,100290,July9,2021 3
+                                                                                   
+                                                                                   
+                                                                                   
+                                                                                   
+             ll                                                                    
+           OPENACCESS                                                Article       
+                                                                                   
+                                                                                   
+                                                                                   
+              A                                   B                                
+                                                                                   
+                                                                                   
+                                                                                   
+                                                                                   
+                                                                                   
+                                                                                   
+                                                                                   
+                                                  C                                
+                                                                                   
+                                                              Optical              
+                                                                                   
+                                                                                   
+                                                   Thermodynamic Mechanical        
+                                                                                   
+                                                              Microstructure       
+                                                                                   
+                                                                                   
+                                                                                   
+        Figure2. CCP                                                               
+        (A)TheCCPpresentstheclustersofvectorizedcaptionscoloredbypreselectedkeywords.
+        (B)Thelabelswiththehighestnumberofcountsinthecaptiondatabase.              
+        (C)Agrayscaleimageoftheplotshowingthefourontologicalaxes.                  
+        Captionclusterplots                found to group together organically, based on their semantic
+        Thecorpusalsocontainsacollectionof106,238figuresandtheir similarity. The CCP of Figure 2 immediately informs us the
+        captions.Itiswellknownthattheinformationcontentofscienti- answer to the first question raised in the introduction: ‘‘what
+        ficarticlesisexpressedmostlythroughgraphics.Theseimages arethemostcommoncharacterizationmethodsforglasses?’’
+        andtheircorrespondingcaptions,therefore,provideatechnical TheanswerisseentobeXRDandSEM.Also,mostofthelarger
+        summary of the documents that they belong to. The caption tags in the image are experimental methods, as opposed to
+        clusterplot25(CCP)showninFigure2Aisagraphicalrepresen- modelingtechniqueslikefiniteelementmethodsormolecular
+        tationoftheinformationcontainedinallthecaptions,groupedby dynamicsthataretoosmalltobeseenunaided.Thisinturn,in-
+        theirsemanticsimilarityusingNLP.Thecaptionsaretokenized formsthesecondquestion:mostofthepapersinglasslitera-
+        andvectorizedusingTFIDFandt-SNE,asexplainedearlierfor tureareclearlyexperimental.
+        theLDAplot.Thepixelsarecoloredbasedoncategoricalkey- Interestingly,theCCPisfoundtohavefourdistinctaxesthat
+        wordsidentifiedbyahumanexpertasexplainedinthemethods capture complementary information on glass literature. These
+        section.Finally,theselabelsarepositionedatthemedian(x,y) are the Optical, Mechanical, Microstructural and Thermody-
+        positionsofthecorrespondingpixels,withthesizeofthelabel namicaxes,asshowninFigure2C.Opticalaxisarerepresented
+        proportionaltothenumberofimagesinthatcategory. byimagesrelatedto‘‘emission,’’‘‘luminescence,’’and‘‘fluores-
+         Figure2Bshowsthedistributionofcaptionswithrespectto cence,’’ to name a few. Images that study mechanical
+        the topics for each image type identified in the CCP. We properties, such as ‘‘crack,’’ ‘‘stress-strain,’’ ‘‘strength,’’ and
+        observe that ‘‘Anneal,’’ ‘‘X-ray Diffraction’’ (XRD), ‘‘Crystal,’’ ‘‘compressibility’’arefoundclosesttotheMechanicalaxis,while
+        ‘‘Emission,’’and‘‘Crystallizationtemp’’(Tc)arethemostcom- thermodynamic properties, such as glass transition tempera-
+        montypesofimagesinglassliterature,underliningtheimpor- ture,activationenergy,specificheat,differentialscanningcalo-
+        tanceofthermalsynthesisroutines,microstructure,andoptical rimetry,anddifferentialthermalanalysis(DTA),tonameafew,lie
+        characterizationmethodsinglassscience.Captionsrepresent- along the Thermodynamic axis. Finally, the images related to
+        ing similar types of images are found to cluster next to each ‘‘XRD,’’ ‘‘EDX,’’ ‘‘anneal,’’ and ‘‘Crystal’’ fall along the Micro-
+        other. For example, microstructure measurements such as structuralaxis.Thisobservationcanbeformalizedbycomputing
+        scanningelectronmicroscopy(SEM),XRD,atomicforcemicro- theEuclideandistancebetweencaptionlabelsandthefouraxes.
+        scopy(AFM),energydispersiveX-rayspectroscopy(EDX),and The thermodynamic properties are closest to the Thermody-
+        transmissionelectronmicroscopy(TEM)allclusteratthelower namicaxis, while the optical properties are mostproximate to
+        halfoftheCCPwhileopticalproperties,suchasemission,ab- Opticalaxis,etc.Thisobservationisadirectresultofusingthe
+        sorption,fluorescence,andluminescence,arefoundatthevery t-SNEalgorithmbasedonthecosinesimilarityofcaptionvec-
+        top. The use of TFIDF as the vectorization algorithm ensures tors,whichensuresthattheEuclideandistancebetweenpixels
+        that labels, and hence the captions representing images, are isameasureofthesemanticsimilarityoftheunderlyingcaptions.
+        4 Patterns2,100290,July9,2021                                              
+                                                                                   
+                                                                                   
+                                                                                   
+                                                                                   
+                                                                                   
+                                                                                   
+                                                                                   
+                                                                                   
+                                                                                   
+                                                                                   
+                                                                                   
+                                                                                   
+                                                                                   
+                                                                                   
+                                                                                   
+                                                                                   
+                                                                                   
+                                                                                   
+                                                                                   
+                                                                                   
+                                                                                   
+                                                                                   
+                                                                                   
+                                                                                   
+                                                                                   
+                                                                                   
+                                                                                   
+                                                                                   
+                                                                                   
+                                                                                   
+                                                                                   
+                                                                                   
+                                                                                   
+        Certain captions do not belong to any of the axes but are stracts. The chemicals that occur with the highest frequency
+       found to be equally spaced from two or more of them. For inthedatabaseareshowninFigureS2.Thechemicalnames
+       example, ‘‘Fracture’’ and ‘‘Interface’’ are located at nearly andsymbolswerestandardizedfollowingwhichchemicalele-
+       equaldistancesfromtheMechanicalaxisandMicrostructural ments present in each compound were separately identified.
+       axis. These terms represent microstructural features that are Thiscreatesabinarymarkerforeachelementsuchthatifthe
+       critical determiners of mechanical properties. The captions element is mentioned in the abstract, the marker assumes
+       likelycontaintermsthatrelateequallytobothaxescategories, the value 1 and 0 otherwise. The LDA plot is redrawn such
+       justifyingtheirpositionintheCCP.Thepositionofclusterlabels thatonlyiftheabstractcontainsthemarkerforanelementis
+       is an indicator of their relative co-occurrence frequency, thecorrespondingpixelcolored.Similarly,ifacaptionisdrawn
+       therebyshowingthat‘‘anneal’’isstronglyrelatedto‘‘Crystal’’ fromatextwhereintheelementiscontainedintheabstract,the
+       (and variations thereof including ‘‘crystalline’’ and ‘‘crystal pixel is marked with a color in the CCP. The results are the
+       structure’’), while ‘‘PLE’’ is morerelatedto‘‘absorption’’ than elemental maps given in Figure 3, where the images at the
+       to‘‘emission.’’Atthesametime, theproximityof‘‘bioactive’’ top are elements mapped to the CCP and the images at the
+       to the Mechanical axis suggests that many experiments on bottomaremapsofLDA.Theelementalmapsprovideadirect
+       bioactive materials pertain to the measurement of strength visual representation of the distribution of elements in glass
+       and hardness thereby bringing the captions into semantic literature. The juxtaposition of these maps with the caption
+       convergence. Overall, we observe that the CCP provides plot and the LDA provides a highly specific graphic tool to
+       invaluable insights into the contents of these figures, which analyze the intersection of selected chemistries with a topic
+       whencombinedwithapredefinedontologysolvemanyofthe in glass science or a specific property/characterization
+       problemsstatedearlier.Inparticular,theanalysisofcaptions technique.         
+       through CCP provides a visual tool that rapidly summarizes Asavalidationofthisconcept,itisseeneasilyfromFigures3A
+       the entire field of glass literature, allowing a user to quickly and 3B that silicon isabundantly distributed among all topics,
+       comprehendthetrends,themes,andcommoncharacterization properties, and characterization methods in glass literature. A
+       methodsinthecommunity.             similarresultcanbeseenforoxygen(seeFiguresS20andS21
+                                          ofsupplementalinformation).Thisishardlyasurprise,assilicate
+       Elementalmaps                      glassesareoneofthemostcommonfamilyofinorganicglasses.
+       Next, the Python library, ChemDataExtractor, was used to ThemapforcalciumanderbiuminFigures3Cand3Dismore
+       automatically extract chemical species—including names of illustrative. Calcium is found to be less uniformly distributed
+       compounds, chemical formulae, and symbols—from the ab- than silicon, with high concentration in the clusters identified
+            tolpretsulcnoitpaC                                                     
+             tolpretsulcADL                                                        
+                                                                     ll            
+       Article                                                    OPENACCESS       
+                      Silicon       Calcium & Erbium  Indium&Americium             
+               A                 C                  E                              
+                                               Erbium             Americium        
+               B             Silicon D          Calcium F         Indium           
+       Figure3. Elementalmaps                                                      
+       Theelementalmapsof(A)Si,(C)CaandEr,and(E)InandAmsuperimposedontheCCPshowingthepresenceoftherespectiveelementsintheabstractsofthe
+       manuscriptsfromwhichtheimagesaretaken.Theelementalmapsof(B)Si,(D)CaandEr,and(F)InandAmsuperimposedontheLDAplotshowingtheabstracts
+       wheretheelementshavebeenidentifiedtobepresent.                              
+                                                          Patterns2,100290,July9,2021 5
+                                                                                   
+                                                                                   
+                                                                                   
+                                                                                   
+             ll                                                                    
+           OPENACCESS                                                Article       
+                                                                                   
+                                                                                   
+                 LDAClusterplotof94207Abstractswith15topics [viii]                 
+                A                        C                                         
+                                          [i]                                      
+                                                                                   
+                                                              [vii]                
+                                                                                   
+                                  [ii]                                             
+                                                                                   
+                                                                                   
+                B  BioactiveabstractswithF andCl [iii]                             
+                                                                                   
+               Property                                       [vi]                 
+             ChemicalSpecies                                                       
+                                 Characterization                                  
+                                                                                   
+                                  Bioactive glasses                                
+                                  FandClcontaining [iv]                            
+                                  abstracts             [v]                        
+                                                                                   
+        Figure4. KnowledgeextractioncombiningCCP,LDA,andelementalmaps              
+        (A)ThebioactiveglassclusterisidentifiedfromtheLDAplot.                     
+        (B)TheabstractsthatcontainFandClaremarkedontheplotinred.TheareaofoverlapareabstractsonbioactiveglassesthatcontainFandCl.
+        (C)TheSEM,EDX,XRD,andPLEimagesfromjournalarticlesbelongingonlytothisparameterspacearemarkedbycoloredpixelsintheCCP.Insetimages(i–viii)
+        arearbitrarilyselectedexamplesoftheseimagesasidentifiedbytheplot.32,39,51–55
+        asbioactivebyLDA.Thisisarepresentationofthefactthatcal- DISCUSSION         
+        ciumisoneofthemajorconstituentsofbioactiveglasses.The                      
+        overlapping data for erbium in Figures 3C and 3D show that TheLDAandCCPsprovideahighlyspecific,detailed,andsuc-
+        this element is mostly present in the LDA topic ‘‘rare earth cinctgraphicalsummaryoftheavailablecorpusofglasslitera-
+        glasses’’andinthecaptionclusters‘‘emission,’’‘‘PLE,’’‘‘band ture.Theknowledgeextractionpipelineforobtainingtheseplots
+        structure,’’and‘‘energydiagrams.’’Theelementalmap,there- has been shown in Figure 6 (see Methods). They provide an-
+        fore, provides a visual diagram of the presence of an element swers to some of the questions raised in the introduction. For
+        inglassliterature.Rareearthelementssuchaserbium,dyspro- example,theCCPvisuallyconveysthefactthatthemoststudied
+        sium,andytterbiumareusedlargelyforLEDsandlaserapplica- aspectsofglassesinliteraturerelatetotheirannealingbehavior
+        tions, which is confirmed by the region of the LDA plot that is and microstructure, and that studies on optical emission are
+        highlighted by these elements (‘‘Rare earth glasses’’ and slightly more common than that of absorption. The database
+        ‘‘LEDs and Phosphors’’), as well as by the image categories generatedthroughtheCCPprovidesausefulsourceofspecial-
+        wheretheypredominate.              izedimages—saySEMmicrostructuralimagesorAFMimagesof
+         The third question in the introduction ‘‘Where is americium glasses—which can then be used for learning images through
+        usedinglasses’’isansweredinFigures3Eand3F.Only25arti- artificial intelligence and ML algorithms such as convolutional
+        cleswerefoundwithamericiummentionedintheabstract.They neural networks. These can be used to answer some of the
+        are seen to fall over regions identified as ‘‘glass ceramic’’ and pressing problems in the field today such as identifying the
+        ‘‘glassirradiationstudies’’fromtheLDAplot.Uponinspection, causesoffractureordissolutionbylinkingtootherstructure—
+        itisindeedfoundthatmostoftheseabstractsrelatetostudies processingparameters.
+        of nuclear exposure and radiation on glass ceramics, demon- Similarly,theLDAplotprovidesinsightsonthebroadthemes
+        strating a practical use of the concepts developed so far in within glass ontology into which the text is divided. It is seen
+        answering a question that is otherwise not reachable through immediately through visual inspectionthat the amountof work
+        any other approach today. Similarly, indium is found to be doneonbioactiveglassesislessthanthatonglassceramicsor
+        distributedinFigures3Eand3Fmostlyinthesectionidentified thatirradiationstudiesonglassesoccupythebottomofglasshi-
+        as‘‘Thinfilms’’relatingtothelargebodyofworkthathasbeen erarchyintermsofthesheernumberofpublications.TheLDAplot
+        carriedoutonthetransparentconductingindiumtinoxideelec- is a topological map of glass literature, where each text is as-
+        trodes on glass substrates and glass ceramics. The elemental signed a unique position next to other works of similar nature,
+        mapsforallthe120knownelementsoverlappingwiththeLDA content,andtheme.Thisprovidesawaytoefficientlysearchfor
+        andCCPsarepresentedinsection2ofsupplementalinforma- publicationsthataresimilartoagivenpaper—oncetheposition
+        tion(seeFiguresS6–S225).           ofthepublicationinthevectorspaceisdetermined,thenearest
+        6 Patterns2,100290,July9,2021                                              
+                                                                                   
+                                                                                   
+                                                                                   
+                                                                                   
+                                                                     ll            
+       Article                                                    OPENACCESS       
+                                                                                   
+                                                                                   
+                           B   OpticalGlasses C     OpticalGlasses+Solidstatesynthesis
+                                                                                   
+                                                                                   
+                                            Synthesismethod                        
+                     Application                                                   
+        A                                                                          
+                                                                                   
+                                                                                   
+                                                                    Opticalglasses 
+                                                                    SolidState     
+                                                                    Synthesis      
+                           D    LEDAbstracts  E   LEDAbstractswithEu,Ce,Sm         
+                                                                                   
+                                                                                   
+                                            ChemicalSpecies                        
+                    Application                                                    
+                                                                                   
+                                                                     LEDAbstracts  
+                                                                     Europium      
+                                                                     Cerium        
+                                                                     Samarium      
+       Figure5. Knowledgeextractionframework                                       
+       (A)TheLDAplot.                                                              
+       (B)Abstractswith‘‘opticalglasses’’inthetext.                                
+       (C)Abstractswith‘‘solidstatesynthesis’’inthetextoverlappingwithopticalglasses.
+       (D)Abstractswith‘‘LED’’inthetext.                                           
+       (E)Abstractswithrareearths.                                                 
+       neighborsarebydefaulttheonesthatarethemostsemantically property image from this parameter space. For example, Fig-
+       similar.Therearecurrentlynoothertools,eveninestablishedsci- ure4CshowstheSEM,EDX,XRD,andPLEcaptionsoffigures
+       entific databases and search engines, that allow the detailed from abstracts that contain F and Cl on the topic of bioactive
+       exploration, analysis, and easy visual analysis offered by the glasses. Arbitrarily selected images from thisparameter space
+       CCPsandtheLDAplots.Atthesametime,combiningthecaption aredisplayedforreferenceintheinsetofFigure4C(i–viii).The
+       cluster,LDA,andelementalplotsresultsinthecreationofatool captionsoftheseimagesconfirmthatthefiguresdocorrespond
+       thatcanquery,explore,andanalyzetheinformationcontentin to the selected imagetype, while their abstractsspan a broad
+       glassliteraturewithunprecedenteddetailandspecificity. topic range include appetites, glass microparticles, meso-
+        Anexampletowardsuchanattemptforknowledgeextraction spheres,andbioactivescaffolds—allofwhichrelatebroadlyto
+       anddisseminationcombiningCCP,LDA,andelementalmapis the subset of bioactive glasses under consideration. This, in
+       presented in Figure 4. The LDA plot identifies abstracts in the turn,answersthefifthquestion:yesindeed,therearephotolumi-
+       database that belong to the category of ‘‘bioactive glasses.’’ nescencestudiesofbioactiveglassesthatcontainfluorine.Thus,
+       Theelementalmapsallowtheselectionofonlythoseabstracts thismethodallowstherapidexplorationofscientificdatatoac-
+       amongthesethathavebeenmarkedwiththepresenceoffluo- cess extremely nuanced and specific information sets. Such a
+       rineandchlorine.ThisisshowninFigure4Bwheretheredpixels methodmightbeveryusefulforaresearcherwhowishestoac-
+       correspondingtotheFandClcontainingabstractsarefoundto cess the microstructure of chloride or fluoride glasses without
+       overlap with the green pixels corresponding to abstracts on conducting an extensive literature survey—the only alternative
+       bioactiveglasses.Theregionofthegreatestoverlapisseento availabletoday.Elementaltaggingaddsachemicalmarkertoim-
+       bethethreeislandsontheLDAplotthataremarkedasbioactive agesforcomputervisiontasks,asinthetrainingofpredictiveal-
+       glasses, thereby confirming that among all fields of glass sci- gorithmsthatlinkmicrostructureorpropertytocomposition.
+       ence,FandClmostcommonlyfindtheirapplicationwithinthis Themethodsofsystematicscientificexplorationofliterature
+       topic.Thisinitselfisaremarkablecapability—theidentification thathavebeendevelopedsofarcanbegeneralizedbyquerying
+       of only those scientific publications subject to the dual con- theabstractdatabaseforarbitrarysearchterms.Figure5pre-
+       straints of topical category and chemistry. It bears repeating sentsanexamplewheretheapplicationstrings‘‘opticalglass’’
+       thatthereisnoothermethodcurrentlyavailablethatcandothis. and ‘‘LED,’’ as well as the synthesis string ‘‘solid state’’ has
+        AddingtheCCPtothisinformationallowsevendeeperexplora- been used to identify all the abstracts in the document space
+       tionofliteraturebyextractingaprocessing,characterization,or thatcontaintherespectivestrings.Thisallowsustocategorize
+                                                          Patterns2,100290,July9,2021 7
+                                                                                   
+                                                                                   
+                                                                                   
+                                                                                   
+             ll                                                                    
+           OPENACCESS                                                Article       
+                                                                                   
+                                                                                   
+                                                      Figure 6. Knowledge extraction pipeline
+         glass                                        summary                      
+                                                      First,wesearchtheCrossRefdatabaseforasearch
+                                                      query, followed by downloading the papers from
+          Keywordsearch     Downloadpapers   Classification ElsevierScienceDirectdatabase.Toobtainrelevant
+                              usingAPI        usingML researchpapers,asupervisedclassificationalgo-
+                                              algorithm rithm is used. After obtaining the articles, we do
+                                                      topic modeling and make CCPs followed by
+                                                      elementalmaps.               
+                             Topicmodelling                                        
+                               usingLDA                                            
+                                                      ically,andinlinkingtogetherpartsofthein-
+          Elemental                                   formationspaceinawaythathassofarnot
+           maps                                       beenpossible.                
+                                                       When used together,textvectorization,
+                             Captioncluster                                        
+                                                      LDA, and elemental maps solve many of
+                                plot                                               
+                                                      the challenging questions impeding the
+                                                      accelerateddiscoveryofglasses,someof
+                                                      which are stated in the introduction. We
+                                                      demonstrate thisin thepaper through six
+                                                      questionsthatwereraisedintheintroduc-
+        the abstracts based on specific applications, synthesis tionandsubsequentlysolvedintheresultsanddiscussionsec-
+        methods,characterizations,orproperties.TheFigure5Ashows tions.NLPtoolscombinedwithcuratedglassdatabasesaccu-
+        the LDA plot. In Figure 5B, all the abstracts relating to optical rately show that most of the published work explored in the
+        glassesareidentifiedfromcorpusandarevisuallyrepresented analysis is experimental rather than theoretical and that XRD,
+        asgreenpixelsintheLDAplot,wheretheyareseentooverlap SEM, etc. are the most common characterization methods for
+        withthetopicsidentifiedas‘‘LEDsandPhosphors,’’‘‘spectro- glasses. They also provide solutions to highlyspecific queries,
+        scopicstudies,’’and‘‘rareearthglasses.’’Thesolutionforthe suchasidentifyingpapersonopticalglassesthataremanufac-
+        final question in the introduction is seen in Figure 5C, which tured using solid state sintering, glass compositions that are
+        showsalltheabstractsthatcontainthesearchstring‘‘solidstate both bioactive and fluorine-containing, chemicals used in LED
+        synthesis,’’ which is a common method for fabricating oxides glasses, etc. Many of these questions currently have no other
+        andoxideglasses.Theoverlapofthetwosetsofcomplementary means of being answered, as demonstrated by identifying all
+        information arethesetof abstractsonoptical glassessynthe- theglassesthatcontainamericium.
+        sizedthroughsolidstatesynthesis.Thisanalysiscanbecarried The techniques and tools developed in this article can be
+        further by combining these data with the CCP, through which easily extended to other topics. We illustrate this with two
+        specificimagetypessuchastheDTAorXRDofopticalglasses topical examples: metallic glasses and magnesium alloys
+        madethroughsolidstatesynthesiscanbeextracted.Whilethe (seeFiguresS4andS5).Therelevantliteratureforeachtopic
+        levelofspecificityofferedbythisapproachisinitselfusefulto is identified and the NLP pipeline is applied to extract the
+        aresearcherwhowishestolearnmoreaboutthesolidstatesyn- CCP, LDA plots, and elemental maps for both topics. The
+        thesisofopticalglasses,themethodallowstheuseofanynum- CCPformagnesiumalloysshowthat‘‘dissolution’’isamajor
+        berofsearchstrings—allowing foradetailedmultidimensional topicofstudyinthefield,underscoringtheinterestofthesci-
+        extractionofinformationfromliterature. entificcommunityinassessingthechemicalstabilityofthese
+         Similarly, the green points in Figure 5D represent abstracts alloys.Similarly,theelementalmapsformetallicglassespro-
+        with the string ‘‘LED’’ in it. By mapping these data to the videaquantitiesmeasureoftheimportanceofvariousmetals
+        elementalmaps,thepresenceofabstractswithspecificchemi- inglassforming.Bycomparingthemapsofcopperandiron,
+        cal compositions can be marked, such as in Figure 5E, which forexample,weareabletoseethattheyareusedtogetherin
+        highlightstheelementseuropium,cerium,andsamarium.These many applications, while iron is preferable over copper for
+        are therefore LEDs that contain any of these elements or any otherapplications.
+        combinationofthem;this,inturn,answersthefourthquestion However,themajorcontributionofthepresentstudyisthatit
+        raised in the introduction. This data allow the user to read opensawaytoaskdeeperandbroaderquestionsoftopicalliter-
+        through these abstracts, and only these abstracts, to learn ature,thatcanultimatelyenrichthefieldbysolvingoutstanding
+        more about the subject. The user is then able to look through problems–oldandnew.Thus,ourstudyestablishesthebaseline
+        microstructural,luminescence,orthermodynamicdatathatare forextractingimagesfromscientificliteraturerelatedtospecific
+        linkedtothisdatasetthroughtheCCP.  keywordsandtopics.Further,wehavedevelopedaweb-based
+         Altogether, we demonstrate that the application of NLP to platformmakingtheknowledgeaccessibletowidercommunity
+        glassliteratureenablesthecurationandselectionofdatasour- throughPyGGiPictionaryaspartofthePythonforGlassGenomics
+        cessortedbyspecificapplications,properties,characterization Package(PyGGi,see:https://pyggi.iitd.ac.in/toolkits/pictionary).
+        methods,andchemistries.Inturn,thisallowsforcustomcompo- Atthispoint,itisworthmentioningsomeofthelimitationsin
+        sition–processing–propertydatabasestobecompiledautomat- thepresentapproach.
+        8 Patterns2,100290,July9,2021                                              
+                                                                                   
+                                                                                   
+                                                                                   
+                                                                                   
+                                                                     ll            
+       Article                                                    OPENACCESS       
+                                                                                   
+                                                                                   
+         1. Classification of abstracts as glass and nonglass has a proceedings.TheuseofLDAisthusdemonstratedtogreatlyaidthecuration
+           relativelylowrecall.Thisleadstothemissingofseveralab- oftopic-specifictextdatabases,anontrivialeffortbyanyothermeans.
+           stractsbelongingtothetopicinthefinalclassifiedset. TheremainingdatabasewasfurtherrefinedbytheuseofaMLclassifiermodel
+                                          thatperformedabinaryclassificationofthearticleabstractsinto‘‘relevant’’and
+         2. ThenumberoftopicsthatcanbeidentifiedusingLDAis                         
+                                          ‘‘nonrelevant.’’ For this, 3,060 randomly selected abstracts were manually
+           quitesmallatpresent.Further,LDAbeinganunsupervised                      
+                                          taggedasbeing‘‘glass’’and‘‘not-glass.’’UsingthePythonSciKitlibrary,alogis-
+           approachrequiresanexperttounderstandthetopicfrom ticregressionclassifiermodelwasfoundtohaveanaccuracyof86%anda
+           thekeywordsandmanuallylabelthem. recallof67%onthetestsetforclassificationtask.Thismodelwasfoundto
+         3. ThekeywordlistassociatedwiththeCCPisdevelopedby outperformothertextclassificationalgorithmssuchasnaiveBayesandRandom
+           domainexperts.                 Forests.Thedetailsofthemodelperformancearegiveninthesupplementalin-
+                                          formation(TablesS2–S4).Finally,thebinaryclassifiercategorized94,207arti-
+        Theseproblemscanbetackledbyalgorithmsthatcouldpossibly clesasbeingrelevanttothematerialsciencestudyofglasses.Thislistcontained
+                                          articlespublishedfrom1August1997to10June2020.Allfurthernaturallan-
+       identifyalargernumberofcategoriesandautomaticallylabelthem.                 
+                                          guage processing–driven analysesweredone onlyonthistextcorpus.The
+       In particular, the development of a glass-specific ontology, a              
+                                          searchqueryandthecorrespondingDOIsaresharedintheGitHubrepository:
+       curatedimagerepository,andanNERtooltailoredforthiscommu-                    
+                                           https://github.com/m3rg-repo/machine_learning_glass/tree/master/
+       nitycangoalongwayinenhancingthemethodsdemonstratedfor Looking_through_glass.
+       thefirsttimeinthispaper.Further,bycombiningthesetoolswitha                  
+       naturallanguagemodel,suchasa‘‘GlassBert,’’canopenthefield Captionclusterplot
+       tomanymoreadvancesinartificialintelligenceandMLbymaking Thefinalcorpuscontainsatotalof106,238figuresandtheircaptions.Withthe
+       available rapid, efficient, and tailored composition–processing– helpoftheStanfordNLTK56package,thecaptiontextsweretokenizedafter
+                                          removalofpunctuations,numerals,andstopwords.Thesetokens,whichinclude
+       propertydatabases.Thescalablemethodsdemonstratedinthis                      
+                                          wordsoftheEnglishlanguage,chemicalsymbols,andabbreviations,formthe
+       studyarebroadlyapplicabletoanyscientificfieldandconsequently                
+                                          corpusdictionaryofsize(N)whichdeterminesthenumberofdimensionsofthe
+       isofuniversalrelevanceinacceleratingthescientificenquiry.                   
+                                          vectorspaceforthecaptionclusterplot.Eachcaptionismappedtoauniquevec-
+                                          torinthisvectorspacebycalculatingtheTFIDFofeverywordinthecaption.
+                                          TFIDFisastatisticalcountthatreflectstherelevanceofawordinadocument
+       EXPERIMENTALPROCEDURES                                                      
+                                          andisacommonvectorizationtechniquefortextminingandinformationretrieval.
+                                          Foraterm‘‘t’’appearingin‘‘d’’documentswithinacollectionD:
+       Resourceavailability                                                        
+       Leadcontact                               TFIDF= tfidfðt;d;DÞ=tfðt;dÞ3idfðt;DÞ
+       Furtherinformationandrequestsrelatedtothisstudyshouldbedirectedto           
+       andwillbefulfilledbytheleadcontact,N.M.AnoopKrishnan(krishnan@ where        
+       iitd.ac.in).                                     (cid:1)                    
+       M Tha iste sr tuia dl ys da iv da nil oa tb gil eit ny                      
+                 erateanynewuniquematerials.                                       
+                                                    tfðt;dÞ= 1 0; ;i of tt hi es rwpr ise esentinD
+       Dataandcodeavailability                                                     
+       Allthedataandcodesusedinthepresentworkareavailableat:https://github. idfðt;DÞ=log N
+       com/m3rg-repo/machine_learning_glass/tree/master/                           
+                                                          jfd˛D:t˛dgj              
+       Looking_through_glass.                                                      
+                                           Thecosinedistanceofallthecaptionsfromeachotheriscalculatedand
+                                          usedasthemetricfort-SNE,whichprojectsthevectorsintoa2Dplaneso
+       Methods                            thatvectorswiththehighestcosinesimilaritiesgrouptogether.Finally,each
+       TheworkflowforinformationextractionissummarizedinFigure6.TheCross- captionisassignedauniquelabelcorrespondingtothetypeofimageitrepre-
+       RefmetadataAPIwasusedtoqueryexistingliteraturedatabasesusingkey- sents,suchasSEM,XRD,TEM,Luminescence,Fracture,etc.,throughrule-
+       wordsspecifictotheglasscommunity.Theseinclude(1)descriptiveapplica- basedstringsearch.Thecolorofthepixelinthet-SNEplotisdeterminedby
+       tionidentifiers,suchas‘‘chalcogenideglasses,’’‘‘bioactiveglasses,’’‘‘laser itslabel.TheTFIDFvectorizationandthecosinemetricensurethatthegeo-
+       glasses,’’‘‘opticalglasses,’’etc.;(2)property/processingterms,suchas‘‘glass metricdistancebetweenpixelsonthe2Dplotcorrelatewiththesemanticsim-
+       transitiontemperature,’’‘‘oxideglasses,’’‘‘opticalluminescence,’’etc.;and(3) ilarityofcaptions,andthereforethatidenticalimagesclustertogether.
+       conjugatedkeywordssuchas‘‘glassmechanicalproperties,’’‘‘glass-dissolu-      
+       tion,’’‘‘glassANDfracture,’’etc.Thisqueryreturnedaninitiallistofmorethan6   
+                                          LatentDirichletAllocation                
+       millionDOIsoutofwhichthefulltextsof600,000articlesweredownloadedus- LDA49isoneofthemostcommonlyusedunsupervisedtopicmodelingap-
+       ingtheElsevierScienceDirectAPI.AcustomXMLparserwaswrittentoextract          
+                                          proaches.LDAclassifies the documentspresentin acorpusintodifferent
+       specificsectionsofthearticleincludingthemetadata,abstract,images,image      
+                                          topicsbasedonthefrequencydistributionofthewordsoccurringinthedocu-
+       captions,andindividualsectionsidentifiedbytheirheadings.                    
+                                          ment.ThespecificstepsintheLDAalgorithmareasfollows:
+        Tounderstandthedistributionoftopicsinthedownloadeddatabase,an              
+       NLPalgorithm,theLDA,wasusedtoidentifythenumberofdistinct‘‘topics’’ 1. Assumetherearearticlesbelongingtoktopicsintheglasscorpus.
+       inthecorpuswhereatopicisdefinedasthesetofwordswiththehighestprob- 2. Randomlyassignatopickitoeachwordwiinallthedocuments.
+       abilityofoccurrenceinadocumentbelongingtothetopic.TheLDAplotfora 3. Computetheprobabilitiesofawordwibelongingtotopickiindocu-
+       givensub-topicispresentedinthesupplementalinformation(seeFigureS3 mentdiasp(ki|di)andprobabilityofadocumentbelongingtotopicki
+       andTableS5).Itisseenthatwhilesometopicsarerelevanttothescientific duetothewordwiasp(wi|ti).
+       literatureonglass,manyarefromtheintersectionofglasseswithperipheral 4. Updatethep(wi|ti)asp(ti|di)3p(wi|ti).
+       topicssuchaswomen’shealth,economy,andenvironment.Infact,onetopic 5. Repeatsteps1to4.
+       onlyincludesnon-EnglisharticlesidentifiedbytheFrenchvowels‘‘un,’’‘‘es,’’    
+       ‘‘le,’’etc.Notethatthepresentworkfocusesonlyonthearticlespresentedin The94,207abstractsarefurthercategorizedusingLDA.Theoptimumnumber
+       theEnglishlanguage.However,asimilarapproachcanbeextendedtoother oftopicswasfoundbythecoherenceplot,whichwasfoundtoconvergeafter15
+       languageliteratureaswell.Thefulltextsofarticlesbelongingtotopicsoflittle topics.After500passes,theLDAalgorithmidentifiedthetopicslistedinFig-
+       relevancetothematerialsscienceliteratureonglasseswereremoved,along ure1C.SimilartotheCCP,eachabstractwastokenized,vectorized,andplotted
+       witheditorialnotes,commentaries,bookreviews,retractions,andconference in2Dusingt-SNE.Thecoloringofthepixelsisbasedonthetopicnumber
+                                                          Patterns2,100290,July9,2021 9
+                                                                                   
+                                                                                   
+                                                                                   
+                                                                                   
+             ll                                                                    
+           OPENACCESS                                                Article       
+                                                                                   
+                                                                                   
+        identifiedbytheLDA.Onceagain,thepixelsareseentoclusterstronglybasedon biomedical text mining. Bioinformatics 36, 1234–1240. https://doi.org/
+        color,indicatingthatabstractswithsimilarlexicalcontenthavebeengrouped 10.1093/bioinformatics/btz682.
+        togetherbythealgorithm.Allthehyperparametersfort-SNE,TFIDF,andLDA 5.Yandell,M.D.,andMajoros,W.H.(2002).Genomicsandnaturallanguage
+        areprovidedinsection1ofthesupplementalinformation. processing.Nat.Rev.Genet.3,601–610.https://doi.org/10.1038/nrg861.
+                                           6.Kim, E., Huang, K., Kononova, O., Ceder, G., and Olivetti, E. (2019).
+        Extractionofchemicalspecies                                                
+                                             Distillingamaterialssynthesisontology.Matter1,8–12.https://doi.org/
+        ChemDataExtractorwasusedtoidentifyandextracttheindividualchemical          
+                                             10.1016/j.matt.2019.05.011.           
+        speciesfromeveryabstract.Thisincludesindividualchemicalelementsand         
+        compounds identified by their symbols, names, and chemical formulae. A 7.Tshitoyan,V.,Dagdelen,J.,Weston,L.,Dunn,A.,Rong,Z.,Kononova,O.,
+        custom Python script is used to extract the individual chemical elements Persson,K.A.,Ceder,G.,andJain,A.(2019).Unsupervisedwordembed-
+        fromthemostfrequentofthesecompounds. dingscapturelatentknowledgefrommaterialsscienceliterature.Nature
+                                             571,95–98.https://doi.org/10.1038/s41586-019-1335-8.
+        Elementalmaps                      8.Venugopal,V.,Bishnoi,S.,Singh,S.,Zaki,M.,Grover,H.S.,Bauchy,M.,
+        IfanelementXisidentifiedasbeingpresentinanabstract,thepixelcorre- Agarwal,M.,andKrishnan,N.M.A.(2021).Artificialintelligenceandma-
+        spondingtotheabstractintheLDAplotisgivenadifferentcolor.Thisallows chine learning in glass science and technology: 21 challenges for the
+        themappingofelementalcompositionsasidentifiedinthestepabovetothe 21(st)century.Int.J.Appl.GlassSci.https://doi.org/10.1111/ijag.15881.
+        informationcontentpresentintheLDAplot.Similarly,theelementalinforma- 9.Weston, L., Tshitoyan, V., Dagdelen, J., Kononova, O., Trewartha, A.,
+        tionandcaptionsarecorrelatedbymergingtheCCPandtheLDAplot.A Persson,K.A.,Ceder,G.,andJain,A.(2019).Namedentityrecognition
+        captionpixelisgivenadifferentcoloriftheabstractofthetextthatthecaption andnormalizationappliedtolarge-scaleinformationextractionfromthe
+        belongstocontainstheelement.         materialsscienceliterature.J.Chem.Inf.Model.59,3692–3702.https://
+                                             doi.org/10.1021/acs.jcim.9b00470.     
+        SUPPLEMENTALINFORMATION            10.Kim,E.,Jensen,Z.,vanGrootel,A.,Huang,K.,Staib,M.,Mysore,S.,
+                                             Chang, H.S., Strubell, E., McCallum, A., Jegelka, S., and Olivetti, E.
+        Supplemental information can be found online at https://doi.org/10.1016/j. (2020).Inorganicmaterialssynthesisplanningwithliterature-trainedneu-
+        patter.2021.100290.                  ral networks. J. Chem. Inf. Model. 60, 1194–1201. https://doi.org/10.
+                                             1021/acs.jcim.9b00995.                
+        ACKNOWLEDGMENTS                                                            
+                                           11.Huang,S.,andCole,J.M.(2020).Adatabaseofbatterymaterialsauto-
+                                             generated using ChemDataExtractor. Sci. Data 7, 260. https://doi.org/
+        N.M.A.K.acknowledgesthefinancialsupportforthisresearchprovidedbythe        
+                                             10.1038/s41597-020-00602-2.           
+        Department of Science and Technology, India under the INSPIRE faculty      
+        scheme(DST/INSPIRE/04/2016/002774)andDSTSERBEarlyCareerAward 12.Beard,E.J.,andCole,J.M.(2020).ChemSchematicResolver:atoolkitto
+        (ECR/2018/002228).TheauthorsthanktheIITDelhiHPCfacilityforproviding decode2DchemicaldiagramswithlabelsandR-groupsintoannotated
+        thecomputationalandstorageresources. chemicalnamed entities. J.Chem.Inf.Model. 60,2059–2072.https://
+                                             doi.org/10.1021/acs.jcim.0c00042.     
+        AUTHORCONTRIBUTIONS                13.Cole,J.M.(2020).Adesign-to-devicepipelinefordata-drivenmaterials
+                                             discovery.Acc.Chem.Res.53,599–610.https://doi.org/10.1021/acs.ac-
+        N.M.A.K.andV.V.conceivedthework.V.V.andM.Z.carriedoutthedata counts.9b00470.
+        download,andM.A.managedthecomputingcluster.V.V.,S.S.,andM.Z.car-           
+                                           14.Court,C.J.,Yildirim,B.,Jain,A.,andCole,J.M.(2020).3-Dinorganiccrystal
+        riedoutthedataannotation.V.V.performedthemodeltraining.V.V.didthe          
+                                             structure generation and property prediction via representation learning.
+        analysis of the paper, with contributions from all the authors. V.V. and   
+                                             J. Chem. Inf. Model. 60, 4518–4535. https://doi.org/10.1021/acs.jcim.
+        N.M.A.K.wrotethemanuscriptwithinputfromalltheauthors.                      
+                                             0c00464.                              
+                                           15.Court,C.J.,andCole,J.M.(2018).Auto-generatedmaterialsdatabaseof
+        DECLARATIONOFINTERESTS                                                     
+                                             CurieandNe´eltemperaturesviasemi-supervisedrelationshipextraction.
+        Theauthorsdeclarenocompetinginterests. Sci.Data5,180111.https://doi.org/10.1038/sdata.2018.111.
+                                           16.Swain,M.C.,andCole,J.M.(2016).ChemDataExtractor:atoolkitforauto-
+        Received:January26,2021              mated extraction of chemical information from the scientific literature.
+        Revised:May10,2021                   J. Chem. Inf. Model. 56, 1894–1904. https://doi.org/10.1021/acs.jcim.
+        Accepted:May24,2021                  6b00207.                              
+        Published:June24,2021                                                      
+                                           17.Court,C.J.,andCole,J.M.(2020).Magneticandsuperconductingphase
+                                             diagramsandtransitiontemperaturespredictedusingtextminingandma-
+        REFERENCES                                                                 
+                                             chinelearning.NpjComput.Mater.6,18.https://doi.org/10.1038/s41524-
+                                             020-0287-8.                           
+         1. DeGuire,E.,Bartolo,L.,Brindle,R.,Devanathan,R.,Dickey,E.C.,Fessler,    
+          J., French, R.H., Fotheringham, U., Harmer, M., Lara-Curzio, E., et al. 18.Mahbub,R.,Huang,K.,Jensen,Z.,Hood,Z.D.,Rupp,J.L.M.,andOlivetti,
+          (2019). Data-driven glass/ceramic science research: insights from the E.A.(2020).Textminingforprocessingconditionsofsolid-statebattery
+          glass and ceramic and data science/informatics communities. J. Am. electrolyte. Electrochem. Commun. 121, 106860. https://doi.org/10.
+          Ceram.Soc.102,6385–6406.https://doi.org/10.1111/jace.16677. 1016/j.elecom.2020.106860.
+         2. Rajan,K.(2015).Materialsinformatics:thematerials‘‘gene’’andbigdata. 19.Kim,E.,Huang,K.,Jegelka,S.,andOlivetti,E.(2017).Virtualscreeningof
+          Annu. Rev. Mater. Res. 45, 153–169. https://doi.org/10.1146/annurev- inorganic materials synthesis parameters with deep learning. NPJ
+          matsci-070214-021132.              Comput.Mater.3,53.https://doi.org/10.1038/s41524-017-0055-6.
+         3. Friedman,C.,Kra,P.,Yu,H.,Krauthammer,M.,andRzhetsky,A.(2001). 20.Kim,E.,Huang,K.,Tomala,A.,Matthews,S.,Strubell,E.,Saunders,A.,
+          GENIES:anatural-languageprocessingsystemfortheextractionofmo- McCallum,A.,andOlivetti,E.(2017).Machine-learnedandcodifiedsyn-
+          lecular pathways from journal articles. Bioinformatics 17, S74–S82. thesis parameters of oxide materials. Sci. Data 4, 170127. https://doi.
+          https://doi.org/10.1093/bioinformatics/17.suppl_1.S74. org/10.1038/sdata.2017.127.
+         4. Lee,J.,Yoon,W.,Kim,S.,Kim,D.,Kim,S.,So,C.H.,andKang,J.(2020). 21.Jensen,Z.,Kim,E.,Kwon,S.,Gani,T.Z.H.,Roman-Leshkov,Y.,Moliner,
+          BioBERT: a pre-trained biomedical language representation model for M.,Corma,A.,andOlivetti,E.(2019).Amachinelearningapproachto
+        10 Patterns2,100290,July9,2021                                             
+                                                                                   
+                                                                                   
+                                                                                   
+                                                                                   
+                                                                     ll            
+       Article                                                    OPENACCESS       
+                                                                                   
+                                                                                   
+         zeolite synthesis enabled by automatic literature data extraction. ACS 38.Yang, K., Xu, X., Yang, B., Cook, B., Ramos, H., Krishnan, N.M.A.,
+         Cent.Sci.5,892–899.https://doi.org/10.1021/acscentsci.9b00193. Smedskjaer, M.M., Hoover, C., and Bauchy, M. (2019). Predicting the
+       22.Traynor,B.,Uvegi,H.,Olivetti,E.,Lothenbach,B.,andMyers,R.J.(2020). young’smodulusofsilicateglassesusinghigh-throughputmoleculardy-
+         MethodologyforpHmeasurementinhighalkalicementitioussystems.Cem. namicssimulationsandmachinelearning.Sci.Rep.9,8739.https://doi.
+         Concr.Res.135,106122.https://doi.org/10.1016/j.cemconres.2020.106122. org/10.1038/s41598-019-45344-3.
+       23.Mukaddem, K.T., Beard, E.J., Yildirim, B., and Cole, J.M. (2020). 39.Nabian,N.,Jahanshahi,M.,andRabiee,S.M.(2011).Synthesisofnano-
+         ImageDataExtractor:atooltoextractandquantifydatafrommicroscopy bioactiveglass–ceramicpowdersanditsinvitrobioactivitystudyinbovine
+         images.J.Chem.Inf.Model.60,2492–2509.https://doi.org/10.1021/acs. serum albumin protein. J. Mol. Struct. 998, 37–41. https://doi.org/10.
+         jcim.9b00734.                      1016/j.molstruc.2011.05.002.           
+                                          40.Ravinder,R.(2020).PythonforGlassGenomics(PyGGi).https://pyggi.iitd.
+       24.Tatum, W.K., Torrejon, D., O’Neil, P., Onorato, J.W., Resing, A.B.,      
+                                            ac.in.                                 
+         Holliday, S., Flagg, L.Q., Ginger, D.S., and Luscombe, C.K. (2020).       
+         Generalizableframeworkforalgorithmicinterpretationofthinfilmmor- 41.Priven,A.I.,andMazurin,O.V.(2008).Glasspropertydatabases:theirhis-
+         phologies in scanning probe images. J. Chem. Inf. Model. 60, 3387– tory,presentstate,andprospectsforfurtherdevelopment.Adv.Mat.Res.
+         3397.https://doi.org/10.1021/acs.jcim.0c00308. 39-40,147–152.10.4028/www.scientific.net/AMR.39-40.147.
+       25.Venugopal,V.,Broderick,S.R.,andRajan,K.(2019).Apictureiswortha 42.Anderson,P.W.(1995).Throughtheglasslightly.Science267,1609–1618.
+         thousandwords:applyingnaturallanguageprocessingtoolsforcreating https://doi.org/10.1126/science.267.5204.1615-e.
+         a quantum materials database map. MRS Commun. 9, 1134–1141. 43.Kasimuthumaniyan,S.,Reddy,A.A.,Krishnan,N.M.A.,andGosvami,N.N.
+         https://doi.org/10.1557/mrc.2019.136. (2020).Understandingtheroleofpost-indentationrecoveryonthehard-
+       26.Bhaskar, P., Kumar, R., Maurya, Y., Ravinder, R., Allu, A.R., Das, S., nessofglasses:caseofsilica,borate,andborosilicateglasses.J.Non-
+         Gosvami,N.N.,Youngman,R.E.,Bødker,M.S.,Mascaraque,N.,etal. cryst. Sol. 534, 119955. https://doi.org/10.1016/j.jnoncrysol.2020.
+         (2020).Coolingrateeffectsonthestructureof45S5bioglass:insights 119955.    
+         from experiments and simulations. J. Non-cryst. Sol. 534, 119952. 44.Li,X.,Song,W.,Yang,K.,Krishnan,N.M.A.,Wang,B.,Smedskjaer,M.M.,
+         https://doi.org/10.1016/j.jnoncrysol.2020.119952. Mauro,J.C.,Sant,G.,Balonis,M.,andBauchy,M.(2017).Coolingrateef-
+       27.Varsheneya, A., and Mauro, J.C. (2019). Fundamentals of Inorganic fectsinsodiumsilicateglasses:bridgingthegapbetweenmoleculardy-
+         Glasses,ThirdEdition(Elsevier).    namics simulations and experiments. J. Chem. Phys. 147, 074501.
+                                            https://doi.org/10.1063/1.4998611.     
+       28.Alcobac¸a,E.,Mastelini,S.M.,Botari,T.,Pimentel,B.A.,Cassar,D.R.,de       
+         Carvalho,A.C.P.,andZanotto,E.D.(2020).Explainablemachinelearning 45.Metadataretrieval-Crossref.(2020).https://www.crossref.org/education/
+         algorithmsforpredictingglasstransitiontemperatures.ActaMater.188, retrieve-metadata/.
+         92–100.https://doi.org/10.1016/j.actamat.2020.01.047. 46.ElsevierDeveloperPortal.(2020).https://dev.elsevier.com/.
+       29.Anoop Krishnan, N.M., Mangalathu, S.,Smedskjaer,M.M.,Tandia, A., 47.Mauro, J.C., Philip, C.S., Vaughn, D.J., and Pambianchi, M.S. (2014).
+         Burton,H.,andBauchy,M.(2018).Predictingthedissolutionkineticsofsil- GlassscienceintheUnitedStates:currentstatusandfuturedirections.
+         icate glasses using machine learning. J. Non-cryst. Sol. 487, 37–45. Int.J.Appl.GlassSci.5,2–15.https://doi.org/10.1111/ijag.12058.
+         https://doi.org/10.1016/j.jnoncrysol.2018.02.023. 48.Mauro,J.C.,andZanotto,E.D.(2014).Twocenturiesofglassresearch:
+       30.Bishnoi, S., Ravinder, R., Grover, H.S., Kodamana, H., and Krishnan, historicaltrends,currentstatus,andgrandchallengesforthefuture.Int.
+         N.M.A.(2021).ScalableGaussianprocessesforpredictingtheoptical, J.Appl.GlassSci.5,313–327.https://doi.org/10.1111/ijag.12087.
+         physical,thermal,andmechanicalproperties ofinorganicglasseswith 49.Blei, D.M., Ng, A.Y., and Jordan, M.I.(2003). Latentdirichlet allocation.
+         largedatasets.Mater.Adv.https://doi.org/10.1039/D0MA00764A. J.Mach.Learn.Res.3,993–1022.https://doi.org/10.5555/944919.944937.
+       31.Cassar,D.R.,deCarvalho,A.C.P.,andZanotto,E.D.(2018).Predicting 50.Jones,K.S.(1972).AStatisticalInterpretationofTermSpecificityandits
+         glass transition temperatures using neural networks. Acta Mater. 159, ApplicationinRetrieval(MCBUPLtd).https://doi.org/10.1108/eb026526.
+         249–256.https://doi.org/10.1016/j.actamat.2018.08.022.                    
+                                          51.Arau´jo,M.,Miola,M.,Bertone,E.,Baldi,G.,Perez,J.,andVerne´,E.(2015).
+       32.Covarrubias, C., Agu€ero, A., Maureira, M., Morelli, E., Escobar, G., Onthemechanismofapatite-inducedprecipitationon45S5glasspellets
+         Cuadra,F.,Pen˜afiel,C.,andVonMarttens,A.(2019).Insitupreparation coated with a natural-derived polymer. Appl. Surf. Sci. 353, 137–149.
+         and osteogenic properties of bionanocomposite scaffolds based on https://doi.org/10.1016/j.apsusc.2015.06.088.
+         aliphatic polyurethane and bioactive glass nanoparticles. Mater. Sci.     
+                                          52.Ibrahim,N.F.,Mohamad,H.,MohdNoor,S.N.F.,andAhmad,N.(2017).
+         Eng.C96,642–653.https://doi.org/10.1016/j.msec.2018.11.085.               
+                                            Apatite formation on melt-derived bioactive glass powder based on
+       33.Han, T., Stone-Weiss, N., Huang, J., Goel, A., and Kumar, A. (2020). SiO2-CaO-Na2O-P2O5 system. Ceram. Int. 43, 11676–11685. https://
+         Machinelearningasatooltodesignglasseswithcontrolleddissolution doi.org/10.1016/j.ceramint.2017.05.356.
+         for healthcare applications. Acta Biomater. 107, 286–298. https://doi.    
+                                          53.Miao,G.,Li,Z.,Meng,Y.,Wu,J.,Li,Y.,Hu,Q.,Chen,X.,Yang,X.,and
+         org/10.1016/j.actbio.2020.02.037.                                         
+                                            Chen,X.(2019).Preparation,characterization,invitrobioactivityandpro-
+       34.Mauro,J.C.,Tandia,A.,Vargheese,K.D.,Mauro,Y.Z.,andSmedskjaer, teinloading/releasepropertyofmesoporousbioactiveglassmicrospheres
+         M.M. (2016). Accelerating the design of functional glasses through withdifferentcompositions.Adv.PowderTechnol.30,1848–1857.https://
+         modeling. Chem. Mater. 28, 4267–4277. https://doi.org/10.1021/acs. doi.org/10.1016/j.apt.2019.06.002.
+         chemmater.6b01054.                                                        
+                                          54.Yao,F.,LeGeros,J.P.,andLeGeros,R.Z.(2009).Simultaneousincorpora-
+       35.Montazerian, M., Zanotto, E.D., and Mauro, J.C. (2020). Model-driven tionofcarbonateandfluorideinsyntheticapatites:effectoncrystallo-
+         designofbioactiveglasses:frommoleculardynamicsthroughmachine graphicandphysico-chemicalproperties.ActaBiomater.5,2169–2177.
+         learning. Int. Mater. Rev. 65, 297–321. https://doi.org/10.1080/ https://doi.org/10.1016/j.actbio.2009.02.007.
+         09506608.2019.1694779.           55.Zhou,H.,Nabiyouni,M.,Lin,B.,andBhaduri,S.B.(2013).Fabricationof
+       36.Ravinder, R., Sridhara, K.H., Bishnoi, S., Grover, H.S., Bauchy, M., novel poly(lactic acid)/amorphous magnesium phosphate bio-
+         Jayadeva, Kodamana, H., and Krishnan, N.M.A. (2020). Deep learning nanocompositefibersfortissueengineeringapplicationsviaelectrospin-
+         aided rational design of oxide glasses. Mater. Horiz. 7, 1819–1827. ning.Mater.Sci.Eng.C33,2302–2310.https://doi.org/10.1016/j.msec.
+         https://doi.org/10.1039/D0MH00162G. 2013.01.058.                          
+       37.Tandia,A.,Onbasli,M.C.,andMauro,J.C.(2019).Machinelearningfor 56.Bird,S.,Klein,E.,andLoper,E.(2009).NaturalLanguageProcessingwith
+         glass modeling. In Springer Handbook of Glass, J.D.M.J.H.L. Calvez, Python: Analyzing Text with the Natural Language Toolkit (O’Reilly
+         ed.(Springer),pp.1157–1192.        Media,Inc.).                           
+                                                         Patterns2,100290,July9,2021 11

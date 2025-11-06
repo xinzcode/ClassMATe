@@ -1,0 +1,1082 @@
+MatSciRE: Leveraging Pointer Networks to Automate Entity and Relation Extraction for
+                      Material Science Knowledge-base Construction                
+                                                                                  
+                                                                                  
+      AnkanMullicka,∗,AkashGhosha,∗,GSaiChaitanyaa,SamirGhuia,TapasNayakb,Seung-CheolLeec,SatadeepBhattacharjeec,
+                                     PawanGoyala                                  
+                                aIndianInstituteofTechnology,Kharagpur            
+                                 bTCSResearchLab,Kolkata,India                    
+                                 cIndo-KoreaScienceandTechnology                  
+                                                                                  
+                                                                                  
+                                                                                  
+     Abstract                                                                     
+     Materialscienceliteratureisarichsourceoffactualinformationaboutvariouscategoriesofentities(likematerialsandcompositions)
+     andvariousrelationsbetweentheseentities,suchasconductivity,voltage,etc. Automaticallyextractingthisinformationtogenerate
+     amaterialscienceknowledgebaseisachallengingtask. Inthispaper,weproposeMatSciRE(MaterialScienceRelationExtractor),a
+     PointerNetwork-basedencoder-decoderframework,tojointlyextractentitiesandrelationsfrommaterialsciencearticlesasatriplet
+     (entity1,relation,entity2).Specifically,wetargetthebatterymaterialsandidentifyfiverelationstoworkon-conductivity,coulombic
+     efficiency,capacity,voltage,andenergy. OurproposedapproachachievedamuchbetterF1-score(0.771)thanapreviousattempt
+     usingChemDataExtractor(0.716). TheoverallgraphicalframeworkofMatSciREisshowninFig1. Thematerialinformationis
+     extractedfrommaterialscienceliteratureintheformofentity-relationtripletsusingMatSciRE.
+                                                                                  
+                                                                                  
+                                          toimproveordiscoverthelatestmaterials. Currentbigdataand
+                                          machine learning-based approaches can help bridge the gap
+                                          betweentheoreticalconceptsandcurrentmaterialinfrastructure
+                                          limitations. Peoplehaveworkedondifferentaspectsofmaterial
+                                          scienceliteratureinthelastdecade.Oneofthecriticaldirections
+                                          of material science research is the battery database which is
+                                          essentialinthemodernenergysystem.       
+                                            Batteriesaremadeupofcomplexmaterialsystems[1].Proper
+                                          analysisofthebatterydatabasewouldleadustodiscovernew
+                                          materials. The battery is a crucial element of any electrical
+                                          devicewithvariousutilisations. Researchersfocusonbuilding
+                                          high-capacity, efficient, safe batteries with various industrial
+                                          applications. Relations must be retrieved from unorganized
+                                          data sources to build a concrete battery knowledge database.
+                                          Researchpapersdescribingbatterymaterialscanbeapotential
+                                          sourcefromwhichtheserelationscanbeobtained. Hence,an
+                                          automated relation extraction method from material science
+        Figure1:MatSciRE:MaterialScienceRelationExtractionTool research articles would be a great leap towards overcoming
+                                          presentconstraintsandachievingdesiredoutcomes.
+                                            Forexample,Table1showstwoentities(‘Na0.35MnO2’and
+     1. Introduction                      ‘42.6Whkg1’)andcorrespondingrelation(‘Energy’)extraction
+                                          fromaninputsentence“TheenergydensitybasedonACand
+       Thematerialsciencedomainpossessesnumerousinformation.                      
+                                          nanowireNa0.35MnO2is42.6Whkg1atapowerdensityof
+     Thisknowledgemustbeextractedfrommaterialsciencedatasets                      
+                                          129.8Wkg1.” ofaresearcharticle.         
+                                            RecentNaturalLanguageProcessing(NLP)andDeepNeural
+       ∗Authorscontributedequallytothiswork.                                      
+                                          Networks (DNN) techniques can facilitate relation extraction
+       Emailaddresses:ankanm@kgpian.iitkgp.ac.in(AnkanMullick),                   
+                                          andautomaticallybuildthebatterydatabase. Thesemethodscan
+     akashkgp@kgpian.iitkgp.ac.in(AkashGhosh),                                    
+     gajulasai@iitkgp.ac.in(GSaiChaitanya), detectvariousentitiesintheresearcharticlesdiscussingbattery
+     samirghui@iitkgp.ac.in(SamirGhui),tnk02.05@gmail.com materialsandpredictrelationsbetweentwoentities.
+     (TapasNayak),seungcheol.lee@ikst.res.in(Seung-CheolLee),                     
+                                            TousetheseNLPandDLtechniques,wefirstobtainanan-
+     s.bhattacharjee@ikst.res.in(SatadeepBhattacharjee),                          
+     pawang@cse.iitkgp.ac.in(PawanGoyal)  notateddatasetcontainingthesentencesandthecorresponding
+     PreprintsubmittedtoComputationalMaterialsScience                January19,2024
+  4202                                                                            
+  naJ                                                                             
+  81                                                                              
+  ]LC.sc[                                                                         
+  1v93890.1042:viXra                                                              
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                               Table1:BatteryDatabaseEntityandRelation            
+                                                                                  
+                          Sentence              Entity1   Entity2 Relation        
+           TheenergydensitybasedonACandnanowireNa0.35MnO2 Na0.35MnO2 42.6Whkg1 Energy
+              is42.6Whkg1atapowerdensityof129.8Wkg1.                              
+                                                                                  
+     entity-relationtriplets1. Weuseadistantsupervisionapproach classificationforentityextractionfrommaterialscience. Luan
+     on top of the battery dataset released by Huang and Cole [2] etal.[13]retrieveentitiesandrelationsbetweenmultipleentities
+     todevelopapseudo-labeleddataset. Humancuratorsannotate ontheSCIERCdataset. Fivehundredscientificarticlesfrom
+     arandomsamplefromthisdatasettoprepareagoldstandard variousdomainsareprocessed,andabstractsareusedtocreate
+     datasetforevaluation. Wetrainapointer-networkmodel(PNM), theSCIERCdataset. Beltagyetal.[14]whichpretrainsaBERT
+     adaptedfromNayakandNg[3]withMatBERTembeddings[4] modelonscientificarticlesofbiomedicaldocumentstoimprove
+     forextractingentity-relationtriplesfrommaterialsciencepapers. theeffectivenessofdifferentscientificNLPtasks. Researchers
+     WhileevaluatingthesametestsetasusedbyChemDataExtrac- alsobuiltBERTbaseddomainspecificpre-trainedmodelson
+     tor,wefindthatMatSciREoutperformsChemDataExtractorby materialscience(MatBERT [4]andMatSciBERT[15])andbat-
+     6%(F1-score).                        terymaterials(BatteryBERT[16]). Weusebothofthemodels
+                                          asbaselines.                            
+     2. RelatedWork                                                               
+                                          2.2. RelationandEntityExtraction:       
+       Togiveabroadoverviewoftheexistingworksinthisdomain, The relation extraction task has been well explored in the
+     wecategorizevariousearlierworksintotwocategories-Ma- field of NLP. Mintz et al. [17] explored distant supervision
+     terialScienceInformationExtractionandRelationExtraction based relation extraction task using Freebase [18], avoiding
+     frameworks.                          the domain dependence of automatic content extraction task.
+                                          Riedeletal.[19]proposeadistantsupervision-basedrelation
+     2.1. MaterialScienceInformationExtraction: extraction task to extract various entities without using train-
+       Tshitoyanetal.[5]traintheskip-gramvariantofword2vec[6] ing annotation data. Hoffmann et al. [20] work on a weakly
+     modeloveralargecorpusofmaterialscienceresearchpapers supervisedmethodtodevelopmulti-instancelearningtoretrieve
+     anddemonstratethatthetrainedembeddingscapturecomplex overlappingrelations.Zengetal.[21]applydeepneuralnetwork
+     material science concepts like the structure-property relation- modelstoextractlexicalandsentencelevelfeaturesforrelation
+     shipsinmaterials.                    classificationandproposeCNN(convolutionalneuralnetwork)
+       Wikipediaholdsmuchinformationonvarioussubjectsand baseddistantsupervisiontechniqueforrelationextraction. Shen
+     domains in the form of unstructured text, images, and tables. andHuang[22]buildanovelattention-basedCNNframework
+     DBPedia[7]isacommunityeffortthataimstoextractstructured forrelationclassification. Jatetal.[23]suggestcombiningbi-
+     datafromtheunstructuredWikipediaandmaketheextracted directional word-based and entity-centric attention models to
+     dataavailabletotheweb. DBPediaalsoallowsotherexternal improvedistantsupervision-basedrelationextractiontask. RE-
+     datasetstobeconnectedtoitsdatasets. ThishelpsDBPediato SIDE[24]isaDistantly-supervisedRelationExtraction(RE)
+     expanditsknowledgebeyondjustwikipedia-baseddatasets.The methodthatemploysGraphConvolutionNetworkstoencode
+     tripletsthatconstituteDBPedia’sdatasetsareavailablepublicly. text. YeandLing[25]developadistantlysupervisedrelation
+     SomestudiesaimatconstructingknowledgegraphsusingDBPe- extractionmethodthatcanhandlenoisydata. Guoetal.[26]
+     diadumpsandotherstructureddatasetsforthematerialscience proposeattention-basedgraphconvolutionalnetworksthatcan
+     domain. Zhangetal.[8]designasystemtorecommendmetal extract various relations from the full dependency tree as in-
+     materialstomaterialscientistsbasedonthetripletsmadeavail- put. [27, 28, 29, 30, 31] work on intent and entity extraction.
+     ablebyDBPediausingsemanticdistancemeasurement. Zhang [32, 33, 34, 35, 36, 37] aim at opinion-fact entity extraction.
+     etal.[9]proposeanapproachtobuildaKnowledgeGraphfor NayakandNg[3]jointlyextractentitiesandclassifyrelations
+     metallicmaterialsusingDBpediaandWikipedia. betweenentitiesusingapointernetwork-basedmodel. Huang
+       Westonetal.[10]trainaNamedEntityRecognition(NER) and Cole [2] generate a set of data records from a corpus of
+     modeltoidentifysummary-levelinformationfrommaterialssci- materials science research papers. Unlike others, the authors
+     encedocumentssuchasthenameofinorganicmaterials,sample workdirectlywiththeunstructuredtextusingapopularNLP
+     descriptors, etc. The authors train a BiLSTM-CRF model to toolkitcalled‘ChemDataExtractor’. Authors,however,modify
+     classify tokens. Guha et al. [11] present MatSciIE, a tool for ChemDataExtractor1.5toperformbetteronthespecificdomain
+     materialsscienceinformationextractionlike-thenameofmate- ofbatterymaterials. ChemDataExtractoristhenusedtoextract
+     rials,code,parameters,etc. TheybuildaBi-LSTM-CRF-Elmo adatasetof292,313recordsfromacorpusconsistingof229,061
+     modelforentityretrieval.Mullicketal.[12]buildsentencelevel researchpapers. Eachextracteddatarecordcontainsanentity
+                                          (usuallythechemicalformulaofamaterial),avaluewithaunit,
+                                          and a relation relating the entity with the value, among other
+       1Atripletconsistsoftwoentitiesconnectedwitharelation. things(Weusethisapproachasabaseline).
+                                         2                                        
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+       Agroupofresearchersalsofocusedonthejointextractionof Thedetailedstepsofthedatasetcreationprocessarediscussed
+     entitiesandthecorrespondingrelationsamongthem. CoType next.                  
+     [38],MiwaandBansal[39],Bekoulisetal.[40],noveltagging                        
+     scheme by Zheng et al. [41] and BiLSTM-CRF-based model 3.1. SetofTriplets    
+     byNguyenandVerspoor[42]areend-to-endmodelstojointly Thefirststeptowardscreatingthedatasetistoobtainasetof
+     extractrelationandentitiestogether. KatiyarandCardie[43] tripletsgeneratedovermaterialsciencedomain. Whilenotmany
+     investigatejointlyextractopinionatedentitiesandtherelation contributionshavebeenmadeinthisdirectioninthematerials
+     betweentwoentities.                  sciencedomaintothebestofourknowledge,wefoundthework
+       However, in our particular problem, there can be multiple of Huang and Cole [2] to be relevant. The authors generate
+     tripletsinthesamesentence,andtheentitieswithinthetriplets adatabaseofrecordsforthebatterymaterialsdomainusinga
+     mayalsooverlap. Thiscreatesabottleneckforneuralsequence largecorpusofmaterialsscienceresearchpapers.Asampleentry
+     tagging-basedjointentityextractionmodels[41]. fromtheJSONdumpisshownintheSupplementaryMaterial.
+       Weuseanencoder-decoderframeworktoaddresstheissue Eachinstanceconsistsof"Property","Name","Value"and
+     of relation extraction. Encoder-decoder framework has been "Unit"amongotherfields. "Raw_value"and"Raw_unit"store
+     utilizedinvariousnaturallanguageprocessingproblemslike- thesimplifiedvalueandunit,respectively,whichisusefulfor
+     knowledgebasecreationusingn-gramattentionmechanism[44], textprocessing."Extracted_name"storesthematerialcompound
+     textgenerationfromstructureddata[45],crosslingualinforma- details. Therestofthefieldsconsistmainlyofthepaperdetails.
+     tionextraction[46],openinformationextraction[47],machine                     
+                                          3.2. ExtractingTriplets                 
+     translation [48, 49], pointer networks [50] based relation ex-               
+     traction[3],questionanswering[51],etc. Ourencoder-decoder Every record in the battery database has numerous fields.
+     frameworkisapointernetwork-basedarchitecturetoovercome However,forourtask,weconfineourselvestojustfourofthese,
+     earlierlimitationswhichretrievesentitiesandthecorrespond- namely,Property-Name,Entity-Names,Value,andUnit. Inthe
+     ingrelationsintheformoftripletsfromsentencesinmaterial database,thefieldEntity-Namesgenerallycontainsachemical
+     scienceliterature.                   compound. Property-Namecantakeupanyofthefivepermis-
+                                          siblevalues‘Voltage’,‘CoulombicEfficiency’,‘Conductivity’,
+                                          ‘Capacity’, and ‘Energy’. The Value and Unit parts contain
+     3. Dataset                           the value of the Property found for the Name and its unit, re-
+                                          spectively. Wegenerateonetripletfromeachjsonentityofthe
+       HuangandCole[2]developthedatabaseofbatterymateri- batterydatabase. Traditionally,atripletconsistsoftwoentities
+     alswithentitiesandcorrespondingrelationsusingarule-based andarelationbetweenthem. Followingthesame,Nameofthe
+     phrase parsing method, resulting in a database consisting of jsonentitybecomesthefirstentityinourtriplet. ValueandUnit
+     292,313datarecordsfrom229,061academicpapers. Theysug- arecombinedtoformthesecondentity,andPropertybecomes
+     gest17,354uniquechemicalsanduptofivematerialproperties: therelationconnectingthetwoentities. Thedatabaseoriginally
+     capacity,voltage,conductivity,Coulombicefficiencyandenergy. consistsofnearly292,000entities. However,whenwegenerate
+     Therule-basedapproachtospecificentitieshelpstoidentifythe triplets,wefindthatmanyofthemareduplicates,soweperform
+     relations. This database only contains relations and entities de-duplication,andtheresultantsetiswhatwerefertoasthe
+     withoutanysentence-levelmapping.     “setoftriplets"fromnowon.               
+       However, trainingasystemtoextractentitiesandrelations                      
+                                          3.3. CollectingArticles                 
+     fromanarticlealsorequirescorrespondingsentenceinforma-                       
+     tion. Therefore,totrainanend-to-endframeworkforextracting Sincethesetoftripletsisbasedonsub-domainofbatteryma-
+     entities and relations from material science articles, we need terials,werequirematerialsciencecorpustomapthesetriplets
+     adatasetwheresentencesofanarticleareannotatedwiththe totheirprobablesourcetext. Eachdatarecordalsocontainsa
+     tripletinformation. So,atfirst,ontopofthedatasetbyHuang “DOI"fieldthatdenotesthearticlethatisusedtogeneratetheen-
+     andCole[2],weusethedistantsupervisiontechniquebyMintz try. WeextracttheDOIsfromallrecordsinthebatterydatabase.
+     etal.[17]tobuildtheentity-relationtripletpairsandcorrespond- EachDOIinthislistthuscontributesatleastonerecordinthe
+     ingsentencesfrommaterialsciencearticles. Thetripletisofthe batterydatabase. Thelistconsistsofmorethan42,000DOIs.
+     form(entity1,relation,entity2). Forexample,inthemanuscript WefindmostofthemonElsevier2,Arxiv3 andSpringer4. We
+     byYuetal.[52],theextractedtripletfromthesentence,“The usepubliclyavailableAPIsofdifferentpublishinghousestoget
+     lowvoltageprofiles(averageofaround2.2V)ofLi–Sbatteries themostofthearticles. Wecrawlveryfewarticleswhichare
+     arewellcompensatedbytheirhighenergydensities”is(Li-S, publiclyavailableandfree. Thus,weendupwithacorpusof
+     voltage,2.2V).Later,wealsomanuallyannotatearandomsam-                        
+                                          ∼40,000articlesinpdfform5.              
+     pleofthisdatasettocreateagoldstandarddatasetforevaluation.                   
+     Weusealargepartofthedistantlysuperviseddatasettotrainthe 2https://www.elsevier.com/solutions/sciencedirect/
+     model,anotherpartofthedataisutilizedtotunevariousmodel librarian-resource-center/api
+                                            3https://info.arxiv.org/help/api/index.html
+     parametersandhyper-parameters,andtherestofthedatasetis                       
+                                            4https://www.springeropen.com/get-published/
+     consideredasblindtestdatatoevaluatethemodelperformance.                      
+                                          indexing-archiving-and-access-to-data/api
+     Wecallthisthedistantlysuperviseddataset. 5Weshallreleaseonlysentenceswithtriplets,notthePDFarticles.
+                                         3                                        
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                Figure2:PDFParsingandTextExtraction.              
+                                                                                  
+                                                                                  
+     3.4. PDFParsingandPre-processing     Wedonotstrictlymatchtheentiresequencebutcheckforall
+       ToextractthecontentsofthePDFfile,weuse‘Science-Parse’ possiblecombinationsinstead.
+     6whichparsesscientificpapers(inPDFform)andretrievesthe Aftermakingtheabovechanges,wesuccessfullygeneratea
+     informationinastructuredform. ItextractstheTitle,Authors, set of ∼11,000 sentence-tripletpairs overa corpus consisting
+     Abstract,Sections,Bibliography,Mentions,etc.,inajsonformat. of ∼3,812 research papers. These ∼11,000 pairs were gener-
+     Moreover, ‘Science-Parse’ is an open-source, accessible, fast atedoveraset∼6,000uniquesentences. Thisisthe‘distantly
+     toolthatextractstexttomakethemodelmachinereadable. It supervised dataset’. A sample entry in the dataset is shown
+     helpstoconverteachdocumentinourcorpusfrompdftojson below: From the sentence - “Nevertheless, the pure LiCoO2
+     format. After extracting the sentences from json documents, showedahigherworkingvoltage(3.96V)thanthemixturecon-
+     wetokenizeusingthepythonNLTKlibrary. Thedetailedpdf tainingLiNi0.8Co0.17Al0.03O2andLiCoO2”-thetripletis:
+     parsingandsentence(textformat)extractionstepsareshownin [‘LiCoO2’,‘Voltage’,‘3.96V’].
+     Fig. 2.                                                                      
+                                          3.6. GroundTruthDatasetAnnotation       
+                                            To verify the correctness of the distant supervision based
+     3.5. UsingDistantSupervision                                                 
+                                          datasetgenerationandourjointrelation-entityextractionmodel,
+       AftercollectionoftripletsandthecontentsfromthePDFfiles,                    
+                                          werandomlyselect114papersfromthesetof3,812papersand
+     themappingisdonebetweenatripletandthecorrespondingsen-                       
+                                          providethem(usingtool[53])totwodifferentmaterialscience
+     tenceinthePDFfile. Weuseadistantsupervisionapproachto                        
+                                          knowledge experts along with a good working proficiency in
+     dothis. Theideaofdistantsupervisionisthatifboththeentities                   
+                                          Englishtomanuallyidentifythetripletswiththefiverelations
+     ofatripletarepresentinasentence,weassumethatthesentence                      
+                                          (Conductivity, Coulombic Efficiency, Capacity, Voltage, and
+     representssomerelationbetweentheentities. Inourcase,ifa                      
+                                          Energy). Thetotalnumberofsentencesannotatedbytheexperts
+     sentencecontainsbothentitiesofatripletandtherelation,itis                    
+                                          for these articles is 1,255. We select three annotators after
+     assumed that the sentence reinforces the same relation as the                
+                                          severaldiscussionsandconditionsoffulfillingmanycriterias
+     onepresentinthetriplet. However,thisassumptionmakesthe                       
+                                          likeannotatorsshouldhavedomainknowledgeexpertisealong
+     resultsofdistantsupervisionnoisyandoftenrequiresahuman                       
+                                          with a good working proficiency in English. Annotators are
+     tojudgetheoutput’squalitymanually.                                           
+                                          experiencedinsimilartasksearlieralso(withearlierpublications
+       DistantSupervisionhelpsidentifywhichtripletisapositive                     
+                                          anddatasetsarepublic)sotheannotatorsarereliableinthese
+     exampleforagivensentence. Thefirstentityofourtripletisa                      
+                                          annotationtasks. Initiallabelingisdonebytwoannotatorsand
+     chemicalcompound,whilethesecondentityisacombination                          
+                                          anyannotationdiscrepancyischeckedandresolvedbythethird
+     ofavalueandaunitusedtoexpresstherelationspecifiedinthe                       
+                                          annotatorafterdiscussingwithtwoothers.So,thefinaljudgment
+     triplet.                                                                     
+                                          isbasedonthreeannotators’discussion. Onecommonconflict
+       Weuseaverystrictversionofdistantsupervisionthatrequires                    
+                                          arisesregardingtheinclusionofthematerialname.Forexample,
+     bothentityparts(firstandsecondentities)andtherelationpart                    
+                                          inthefollowingsentence-“Tinphosphide(Sn4P3)hasbeen
+     of the triplet to be present in the sentence. Since the second               
+                                          a promising anode material for SIBs owing to its theoretical
+     entityconsistsofscientificunitslikeAmperesandVolts,articles                  
+                                          capacityof1132mAhg1andhighelectricalconductivityof
+     couldexpressthesameunitindifferentnotationsorforms. It                       
+                                          30.7Scm1"-Oneannotationcontains"Tinphosphide(Sn4P3
+     is essential to also look for alternate representations of these             
+                                          )"andanothercontainsonly"Sn4P3". Finally,"TinPhosphide"
+     units. For example, if the second part of the entity contains                
+                                          isnotincluded. Theinter-annotatoragreementCohenκbetween
+     ‘ampere’,thenwemustlookforitsalternaterepresentationslike                    
+                                          twoannotatorsis0.82includingthesetypesofconflicts-which
+     ‘A’, ‘amps’, ‘amperes’, ‘ampere’, ‘amp’, etc. in the sentence.               
+                                          isalmostperfectκscoreasdescribedinLandisandKoch[54].
+     Theprocessisthusmodifiedtocheckforalternaterepresentation                    
+                                          Thestatisticsofthefiverelationsareshownbelow,whichexhibit
+     forallunitsappearinginthesecondentityacrossalltriplets.                      
+                                          acountofdifferentrelationsamongentitypairs.
+       Sincethesecondentityalwaysconsistsofmultipletokens,itis                    
+     essentialtomonitorthesequenceinwhichtheindividualtokens • Conductivity: 122  
+     constitutethetriplet’ssecondentity. Forexample,considerthe • CoulombicEfficiency: 553
+     secondentitypartofatripletas‘150.7mAh/g’,thenitcouldbe                       
+                                            • Capacity: 378                       
+     expressedas‘mAhg(-1)’or‘g(-1)mAh’or‘mA(1)g(-1)h(1)’.                         
+                                            • Voltage: 637                        
+                                            • Energy: 103                         
+       6https://github.com/allenai/science-parse                                  
+                                         4                                        
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                   Figure3:OverallFramework                       
+                                                                                  
+     4. ProblemDefinitionandProposedSolution thepossiblerelationbetweentheabovetwoentities. p and p
+                                                                        1   2     
+                                          denotethetwopointernetworkmodels.       
+       Toformallydefinetheproblemsetting,ourgoalistopredict Forthesameentitieswithmultiplerelations,wecreatesep-
+     therelationbetweentwoentitiesinamaterialsciencearticleand aratetriplets. Webuildanencoder-decoderarchitecturewhere
+     extracttheseintheformofatriplet-(entity1,relation,entity2). sequencegenerationoccursfromaninputsentence. Relation
+     Asdiscussedearlier,wefirstcreateacorpuswiththesentences tuples can be retrieved with the help of a separator token. In
+     and corresponding triplets and annotate a part of the dataset. theencoder-decodermodel,firstly,thesentenceencodingvec-
+     Then, we train a relation extraction model using this corpus, torsaregenerated. Then,withthehelpofindicatorwordsfor
+     which can predict triplets given a new research article in this identifyingrelationsinasentence,thedecodermodelidentifies
+     domain. OuroverallsystemframeworkisshowninFig3where thestartandendofarelationtoextracttherelationandentities.
+     atthefirststep,weusedistantsupervisiontocreateacorpusof SimilartoNayakandNg[3],weexperimentwithdifferenten-
+     sentenceswithtripletsanduseasubsetofthisdatasetforgold codinganddecoding-basedmodelstoextractthetriplets. For
+     standardannotation. Wethentrainthepointernetworkmodel decodingthetriplets,wemainlyusetwoapproaches,whichare
+     (PNM)andpredicttheentitiesandcorrespondingrelationsfrom (i)word-leveldecodingand(ii)position-baseddecoding. The
+     agivensentence. Annotateddataisusedtoevaluatethealgo- encoder modules for these two approaches are the same. We
+     rithmagainstgoldstandarddata. Wedescribeourmodelinthe describethedifferentcomponentsofthesemodelsbelow.
+     nextsection.                                                                 
+       Earlierworkscannothandleoverlappingentityextractionand 4.1. Encoder        
+     mostlyfocusonsinglerelationretrievalatatime,sotheywould                      
+                                            One sentence can contain one or multiple relations among
+     needseparatesequencelabelmodelsforeachrelation,increasing                    
+                                          differententitiesinthatsentence,buttheassociationofarelation
+     thetimecomplexityofthemodel. Toovercomethesesetbacks,                        
+                                          betweentwospecificentitiesishighlycontextual. Hence,we
+     weproposeusingpointernetwork-basedencoder-decodermodel,                      
+                                          exploreLSTM-based(Bi-LSTM)andtransformer-basedmodels
+     whichhasthefollowingadvantages: itisajointmodelforentity                     
+                                          tocapturethehiddencontextualrepresentation.
+     extractionandrelationclassification. Itcandetectanynumber                    
+     oftripletsinasentence,evenifthereisanoverlapbetweenthe We use seven different embeddings in the pointer network
+     entities. Ourmodeltakesasentenceasinputandreturnsasetof encoder: a) Word2Vec+Bi-LSTM model, b) BERT model, c)
+     tripletspresentinthesentenceastheoutput. Onetripletconsists RoBERTamodel,d)SciBERTe)BatteryBERT,f)MatSciBERT
+     oftwoentitiesandthecorrespondingrelationshipbetweenthese model and g) MatBERT model. Word2Vec embeddings are
+     two. The triplet form is (entity1|relation|entity2). ‘|’ is the utilizedwiththeBi-LSTMlayer. DifferentvariantsofBERT
+     separatortokenforeachcomponentofthetriplet. Thepointer replace Word2Vec+Bi-LSTM for encoding the sentences and
+     network based framework is shown in Fig 4 where the input obtainingtherepresentation.
+     sentenceS ={w ,w ,...,w }containsnwords. Themodelaims Word2Vec+Bi-LSTM:Trainingaword-embeddingmodelis
+           i  1 2   n                                                             
+     toextractasetofentity-relationtripletsasoutput, required to obtain the word representation matrix. skip-gram
+                                          approachisneededtobuildthewordembeddingmodel. The
+          Op={op|op =[(bp1,ep1),Z,(bp2,ep2)]}|T| (1) Skip-gram architecture uses the distributional hypothesis as-
+                i i  i  i i  i i i=1                                              
+                                          sumption, which states that similar words tend to appear in
+     where op denotes the ith triplet and |Op| denotes the size of similar contexts. Given a word, it learns the context of that
+           i                                                                      
+     thetripletset. bp1 andbp2 representsthebeginningpositionof wordwithrespecttosurroundingwords. Weobtaintheword
+              i   i                                                               
+     entity 1 and entity 2 respectively for the ith triplet. Similarly, representation vector using the skip-gram architecture based
+     ep1 andep2 denotestheendpositionofentity1andentity2for word2vecmodelasdiscussedbyMikolovetal.[6]. Withthe
+      i   i                                                                       
+     the ith triplet. So (bp1 and ep1) marks the entity 1 for the ith helpofWord2Vec,weextractthewordvectorsofinputsentence
+                 i   i                                                            
+     triplet. Similarly,(bp2 andep2)markstheentity2. Z represents tokensandvariousrelationnamesfromrelationsetR,different
+                i   i             i                                               
+                                         5                                        
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                    Z = E(argmax(rel)) rel                        
+                              Decoder                                             
+                                    i  i     i   i       op                       
+                                                           i                      
+                                                           = Eni                  
+                                                              1                   
+                                                                || Z              
+                                                                 i                
+                                                                  || Eni          
+                                                                     2            
+                                        FFN-based Relation Extractor              
+                               Block                                              
+                                        tup = (Eni || Eni )                       
+              words                       i   1  2                                
+             w1w2 ...wn                                                           
+          ens Sn                                                                  
+                     T                                                            
+                               En 1 Pointer Network En2                           
+          nce                                                                     
+          tok        Mat-BER  b1En1bnEn1e1En1enEn1 b1En2bnEn2e1En2enEn2           
+                                                     TrL ipS lT eM                
+                                                       t                          
+                                                        D-b ea cs oe dd           
+                                                           e r                    
+          te                                                                      
+          nS2        M /       FFN FFN   FFN FFN                                  
+          e                                                                       
+          se         LST                                                          
+          ourc                                                                    
+            S1                                                                    
+                     Bi-                                                          
+                                Bi-LSTM   Bi-LSTM                                 
+          s                                                                       
+              Encoder Block                                                       
+                                                      Attention                   
+                          Figure4:ProposedEncoder-DecoderBasedPointerNetworkModel 
+     separatortokens(like‘|’),andusingall,wegenerateonecom- textbasedonBERT.Theytraintheirmodelonvariousscientific
+     mon vocabulary (V). We also add special tokens like - begin domaindatasetswithdifferentsizes.
+     of the token sequence (BOT), the end of the token sequence BatteryBERT [16] : BatteryBERT is a pre-trained language
+     (EOT), and the unknown token (UNK) to V. We use a word model on Battery data. This model is trained on a corpus of
+     embeddinglayer(Emb                                                           
+                  w                                                               
+                   ∈R|V|×Dwv andacharacterembedding batteryresearchpapers.        
+     layer Emb                                                                    
+           c                                                                      
+            ∈ R|N|×Dch, where D                                                   
+                        wv                                                        
+                         is the dimension of word MatSciBERT [15] : MatSciBERT is a pre-trained language
+     vectors, N is the number of alphabet characters of the source modelpre-trainedonalargenumberofmaterialsciencepubli-
+     sentence,andD isthedimensionofthecharacterembedding cations.                 
+              ch                                                                  
+     vectors. Weconcatenatethecharacterembedding-basedvectors MatBERT [4] : A large text corpus of a similar domain is
+     withpre-trainedwordvectorstoobtainthevectorformofthe requiredtobuildandtrainthemodel. Weapplyapre-trained
+     sourcesentencetokens. ABi-LSTMlayerprocessestheinput versionofMatBERTasourdatasetneedstobemoreextensive
+     embeddingstogetthecontextualrepresentation. forbuildingapre-trainmodel. Itisamaterialsciencedomain-
+     BERT [55] : BERT stands for ‘Bidirectional Encoder Rep- specificpre-trainedmodelsimilartoBERT.
+     resentations from Transformers’. It uses Masked Language TheBERTmodelsusepre-trainedBERTembeddings. For
+     Modelling(MLM)astheobjectiveforpre-training. MLMran- differentBERTmodels,thepre-trainingwasdoneondifferent
+     domlymasks15%oftheinputtexttokens,anditpredictsthe datasets. Forexample,MatBERTismorerelevanttomaterial
+     maskedtokenusingthebi-directionalcontextoftheoriginaltext. sciencedatasets,andtokenizationtakescareofthis. Thetokens
+     Thus,itpretrainsadeepbidirectionaltransformer. Italsojointly consist of material names, for example, Li2O, which are dif-
+     pretrains the next sentence prediction task. For pre-training, ferentfromordinarywordsastheyconsistofsmallandlarge
+     variouscorporalikeBooksCorpus(800Mwords)[56],English letterswithnumbersinbetween.InthecaseofBERT,thetokens
+     Wikipedia(2,500Mwords),andWordBenchmark[57]areused. arerepresentedasasequenceofcharacters. Let, S betheith
+                                                                       i          
+     We use BERT-base uncased model with (L = 12, H = 768, sentencecontainingw ,w ... w words. Afterthesentenceen-
+                                                       1 2  n                     
+     A=12,TotalParameters=110M).          coding,theencodergeneratesavector(VE)fromtheithsentence
+                                                                i                 
+     RoBERTa [58] : RoBERTa is an updated version of BERT, S . Itisshowninthe‘EncoderBlock’inFig4.
+                                           i                                      
+     whichovercomesseverallimitationsoftheBERTmodelbytun-                         
+     inghyper-parameterswithseveralupdates,usingbiggerbatch 4.2. Decoder          
+     size, longertrainingtimewithmoredata, andusingdifferent We employ two different models for the decoder - a word
+     maskingpatternsdynamically. Forpretraining,acorporacon- decodingmodelandapointernetdecodingmodel.
+     tainingfiveEnglishdatasetswithvarioussizesareused,which                      
+     are-BooksCorpus(800Mwords)withWikipediahaving16GB 4.2.1. WordDecodingModel(WDM)
+     size [56], CC-News by Sebastian Nagel in 20167 with 76GB Inthis,weuseanLSTMdecoderforword-leveldecoding.Let
+     size, Open Web Text [59] having 38GB size and Stories [60] Tbeatargettokensequencethatisformedbywordembedding
+     with31GBsize.                        vectors of its word tokens - tup , tup ,....,tup where tup ∈
+                                                            0   1   m      i      
+     SciBERT[14]: Itisapre-trainedlanguagemodelforscientific RDwv istheembeddingvectorofthei-thtoken,misthelengthof
+                                          thetargetsequence,andD isthedimensionofwordvectors.
+                                                         wv                       
+       7http://web.archive.org/save/http://commoncrawl.org/2016/10/newsdataset- Twospecialtokens-BOT(BeginofToken)andEOT(Endof
+     available.                           Token) are denoted by tup and tup . At a time, the LSTM
+                                                         0     m                  
+                                         6                                        
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+     decoderproducesasingletokenandhaltsbyEOTtoken. Attth pointernetworks(tup     
+                                                        =(cid:80)t−1              
+                                                            tup )andhiddenvectors(HD )
+                                                      t−1 j=0 j            t−1    
+     timestep,‘tup’denotescurrenttoken’sembeddingvectorand asinputtogeneratethehiddenrepresentationofcurrenttoken
+             t                                                                    
+                                                  →−                              
+     (A tE)usesourcesentenceencoding.Utilizingthesourcesentence (H tD ∈RDh). (0)todenotethedummytupletup 0. TheLSTM
+     encoding(A tE),theprevioustargetwordembedding(tup t−1),and outcomeisasfollows:
+     theprevioushiddenvector(HD ),theLSTMsequencegenerator                        
+                     t−1                                                          
+     producesanewhiddenrepresentationofcurrenttoken(HD ∈ (cid:88)t−1              
+     RDh).RDh representhiddenstatedimension.Weuseanattentt ion tup t = tup j, H tD =LSTM(A tE∥tup t−1,H tD −1)
+     mechanism to encode the sentences and generate a sentence                    
+                                                  j=0                             
+     vector.                                                                      
+                                            PointerNetwork: ABi-LSTMlayerwithhiddendimension
+       Weusegold-labelannotatedtokensduringtraining,butthe                        
+                                          D  ,followedbytwoFFN(FeedForwardNetworks),consti-
+                                           BH                                     
+     decodermaygenerateout-of-vocabularytokensatinferencetime.                    
+                                          tutes a pointer network. Here we use two-pointer networks
+     Tohandlethis,amaskingtechniqueisintroducedalongwitha                         
+                                          for extracting the two entities. We concatenate HD and VE
+     specialtoken-UNK.Allwordsofvocabularycanbemasked                  t    i     
+                                          (obtainedfromtheencodinglayer)toprovidetheinputofaBi-
+     except - the current tokens of the input sentence, the relation              
+                                          LSTMmodel(forwardandbackwardLSTM),whichprovides
+     tokens,otherseparatortokens(‘;’,‘|’),UNK,andEOTtokens. ahiddenrepresentation(Hm ∈R2DBH)tobefedtoFFNmodels.
+     WhenthedecodergeneratesanUNKtoken,itisreplacedwith  i                        
+                                          Two FFNs with softmax provide scores between 0 and 1, the
+     thecorrespondingsourcewordwiththehighestattentionscore.                      
+                                          begin(b)andend(e)indexofoneentity.      
+     Once the decoding process is over, in the inference stage, all               
+     tuplesareextractedafterremovingtheduplicates. Weconsider bˆ1 =W1hm+bias1, eˆ1 =W1hm+bias1
+                                                 i  b i   b  i   e i   e          
+     thismodelastheWordDecodingModel(WDM).                                        
+                                                b1 =softmax(bˆ1), e1 =softmax(eˆ1)
+     4.2.2. PointerNetwork-basedDecoding                                          
+                                          whereW1 ∈R1×2DBH,W1 ∈R1×2DBH aretheweightparameters
+       WeemployaPointerNetwork-basedapproachtodetecttwo b e                       
+                                          of FFN. bias1 and bias1 are the bias parameters of the feed-
+     entitiesandpredicttherelationbetweenthem. First,wedetect b e                 
+                                          forwardlayers(FFN).b1ande1arenormalizedprobabilitiesof
+     the entities using their begin and end positions and remove i i              
+                                          theithsourceword. b1ande1denotesthebeginandendtoken
+     specialtokens(asdiscussedinthepreviousWordnetDecoding i i                    
+                                          ofthefirstentityoftheithpredictedtuple,respectively.
+     Model)andrelationnamesfromthevocabulary. Inthedecoder                        
+                                            Then,thesecondpointernetworkmodelextractsthesecond
+     part of the pointer network architecture, we create a relation               
+     matrix, E r ∈ R|R|×Drel. R is the set of relations and D rel is the wen it ti hty t. riA plf et ter dec co on dc ea rte on ua tt pin ug t(t Hhe Dfi )r as nt dB si e-L ntS eT ncM eeo nu ctp ou dt inv gec (t Vor E)( ,H wm i e)
+     dimension of relation vectors. Similar to the earlier WDM t          i       
+                                          feedthemtothesecondpointernetworktoobtaintheposition
+     model,aspecialrelationtokenEOTispresentintherelationset                      
+                                          ofthebeginandendtokensofthesecondentity. Together,these
+     R. Itdenotestheendofthetokensequence. Relationtuplesare                      
+     representedasasequenceT =Z ,Z ,....,Z ,whereZ isatuple twopointernetworksproducethefeaturevectorstup tcontaining
+                       0 1  m     t       entity1(Ent)andentity2(Ent).            
+     consisting of four position information in the input sentence 1 2            
+                                            RelationExtraction: Wepasstup andHDtotheFFN-based
+     markingthebeginningandendingindexesofthetwoentities      t   t               
+                                          RelationExtractionmodel, aclassifierwithsoftmaxfunction
+     and the relation between them (rel). Z is a dummy tuple                      
+                         t  0                                                     
+                                          toproducenormalizedprobability,rel attimestept. Theexis-
+     for starting, and Z (for m sequence) denotes the end of the t                
+                m                                                                 
+                                          tenceofarelationinasentenceisgenerallynotdependenton
+     sequence by EOT token. The decoder consists of an LSTM-                      
+                                          the occurrence of a specific word but rather on a set of clues
+     basedtripletsequencegeneratorthatproducestheintermediate                     
+                                          in entities that the model must learn. The classifier identifies
+     hiddenrepresentationofthecurrenttuple(HD)attimestampt.                       
+                              t           theinteractionsbetweentwoentitiesandpredictstherelation.
+     Twopointernetworks, eachconsistingofBi-LSTMandFFN                            
+                                          Thefinalrelationisobtainedusingargmaxonrel andrelation
+     (FeedForwardNetworks),areutilizedtoretrievethetwoentities.       t           
+                                          extractor(E ).                          
+     Thereafter, a feed forward relation extractor operates on two r              
+                                                      Z = E (argmax(rel))  (2)    
+     entitiesandexplorestheirfeatureinter-dependenciestopredict i r t             
+     therelationthatexistsbetweenthem. Theoverallarchitecture andthefinaltripletoutputisrepresentedas,
+     of the pointer network-based decoder is shown in Fig 4. We                   
+     discussdifferentblocksbelow.                     op =(Ent||Z||Ent)    (3)    
+                                                        t   1 i 2                 
+       Attention Modeling: We use the attention algorithm pro-                    
+     posedbyBahdanauetal.[48]whichtakesprevioustuple(tup ) Once the dataset is created, for all the files containing the
+                                      t−1                                         
+     andhiddenvector(HD )asinputattimestampttoproducethe train,test,andvalidationsentences,twofiles,.sentand.pointer,
+                 t−1                                                              
+     attentionweightedcontextvector(AE)forthecurrentinputsen- aregenerated.The.pointerfilestoresthepositionofthematerial
+                         t                                                        
+     tence.                               name, value, and relation. For a sentence, this file stores the
+       TripletSequenceGenerator: Thetripletsequencegenerator beginningandendingindicesofthematerialname,thebeginning
+     structureisbasedonanLSTMlayerwithhiddendimensionD andendinglocationsofthevalue,andtheninthemiddle,the
+                                       h                                          
+     toproduceasequenceoftuples(twoentities)thatlaterformthe corresponding relation name. Table 2 shows an example of
+     triplets. Attimestampt,ittakesthesourcesentenceencoding pointer-network-baseddecodingofthesourcesentence(from
+     usingattentionlayer(AE),theprevioustupledescriptionusing themanuscriptofYangetal.[61]).
+                  t                                                               
+                                         7                                        
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                           Table2:Relationtuplerepresentationofpointer-networkmodel
+                                                                                  
+              SourceSentence       However,atthesameC-rate,theCu0.02Ti0.94Nb2.04O7
+                                   sampleexhibitsalargerfirst-cycleCoulombicefficiency
+                                 (91.0%)thanthatoftheTiNb2O7sample(81.6%)probably 
+                                    duetothesmallerparticlesizeandlarger(electronic
+                                  andionic)conductivityofCu0.02Ti0.94Nb2.04O7[6,38].
+          Pointer-network-baseddecoding <881718Coulombic_Efficiency>|<24242728Coulombic_Efficiency>
+                                                                                  
+       Theoutputshowsthegenerationoftwotripletsoftheform 5. ExperimentalResults   
+     entity1-relation-entity2fromthesentence.Entity1isthematerial                 
+     name. For both the triplets, the start and end position of the To validate the proposed model, we first compare the pro-
+     entity1names(Cu0.02Ti0.94Nb2.04O7andTiNb2O7)canbe posedPointerNetDecodingModel(PNM)whiletakingvarious
+     confirmedas8and24,respectively. Similarly,thestartandend embeddingsasinput: Word2Vec,BERT,SciBERT,MatBERT,
+     positionsofentity2(91.0%and81.6%)are17and18forthe RoBERTa,MatSciBERT,andBatteryBERTonboththedistantly
+     first triplet and 27 and 28 for the second triplet, respectively. supervisedcorpusandthegroundtruthannotateddataset. We
+     Finally,therelationname,coulombicefficiency,isstored. thencomparetheproposedmodelwiththeChemDataExtractor
+       Afterrunningthemodel,theoutputshouldbeasfollowsfor modelonamanuallyannotatedsubsetofthebatterydataset[2].
+     twodifferententity-relationtriplets: After that, we experimented with the MatBERT model while
+                                          varying the training data size to understand how much train-
+       • Prediction 1: Cu0.02Ti0.94Nb2.04O7, Coulombic Effi- ingdataisrequiredfordecentperformance. Wealsoperform
+        ciency,91.0%                      few-shotexperimentstochecktheapproach’susefulnessinthe
+                                          presenceofminimaldata.                  
+       • Prediction2: TiNb2O7,CoulombicEfficiency,81.6%                           
+                                            Next,wedescribetheevaluationmetricsused.
+     4.3. OtherBaselines:                 5.0.1. EvaluationMetrics                
+     A) DyGIE++ (Wadden et al. [62]): It is a multi-task frame- Thissectiondescribesthespecificmetricsweusetomeasure
+     workdesignedfor: namedentityrecognition,relationextraction performance.Relationidentificationcanbethoughtofasamulti-
+     and event extraction. It is implemented by constructing text classclassificationtask. Weapplysimilarevaluationmetrics-
+     spanrepresentationsandscoringthesametocapturelocaland Precision(Pr),Recall(Re),andF1-Score(F1)asinNayakand
+     globalcontext. Foranentity-relationframework,aspangraph Ng[3]. Precision(Pr)correspondingtoaparticularrelationcan
+     isgeneratedfromtheentity-relationtriplesfromthesentence. beexpressedas       
+     B)MatKG(Venugopaletal.[63]):MatKGisalargeknowledge                           
+                                                           |tr∩p|                 
+     graphofmaterialscienceconcepts. Itconsistsofmorethan2 Pr=             (4)    
+                                                            | p|                  
+     millionuniquerelationshiptriplets(entity-relation-entity)which               
+     arederivedfrom80,000entities.          wheretrrepresentsthesetoftripletsthatactuallybelongto
+       We compare performances of DyGIE++ and MatKG with therelation,and prepresentsthesetoftripletsthatarepredicted
+     differentmodelsonourdatasetsandevaluationsareinTable3. tocorrespondtothegivenrelationbyourmodel.Itmustbenoted
+       C)ChemDataExtractor[2]: Wealsoshowcomparisonwith thatthenumeratoroftheaboveexpressionwouldcontainatriplet
+     ChemDataExtractorinTable8.           ifandonlyifbothentitiesandtherelationarepredictedcorrectly
+                           DistantlySupervisedDataset AnnotatedGroundTruthDataset 
+                          Pr,sd   Re,sd   F1,sd   Pr,sd   Re,sd   F1,sd           
+               WDM      0.808,0.009 0.615,0.005 0.698,0.016 0.469,0.013 0.410,0.006 0.439,0.008
+              DyGIE++   0.865,0.008 0.909,0.007 0.886,0.007 0.869,0.006 0.910,0.005 0.889,0.006
+               MatKG    0.892,0.007 0.903,0.008 0.897,0.007 0.898,0.009 0.906,0.007 0.901,0.008
+            PNM(Word2Vec) 0.884,0.028 0.848,0.013 0.866,0.005 0.856,0.007 0.680,0.030 0.758,0.009
+            PNM(RoBERTa) 0.821,0.022 0.782,0.007 0.801,0.003 0.837,0.007 0.765,0.018 0.798,0.007
+            PNM(SciBERT) 0.905,0.010 0.874,0.006 0.890,0.019 0.894,0.003 0.880,0.015 0.885,0.009
+             PNM(BERT)  0.921,0.024 0.883,0.003 0.902,0.014 0.926,0.003 0.860,0.015 0.908,0.006
+           PNM(BatteryBERT) 0.905,0.011 0.878,0.006 0.891,0.009 0.886,0.006 0.894,0.007 0.890,0.009
+           PNM(MatSciBERT) 0.916,0.009 0.881,0.010 0.898,0.008 0.904,0.007 0.873,0.012 0.889,0.008
+            PNM(MatBERT) 0.920,0.008 0.907,0.004 0.913,0.002 0.919,0.005 0.911,0.004 0.915,0.006
+     Table3:WeightedAveragescoresofPrecision(Pr),Recall(Re),F1-Score(F1)andtheirrespectivestandarddeviations(sd)ofdifferentmodelsondistantlysupervised
+     datasetandannotatedgroundtruthdataset                                        
+                                         8                                        
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                            Distantlysuperviseddataset Annotatedgroundtruthdataset
+                          Pr,sd   Re,sd   F1,sd   Pr,sd   Re,sd   F1,sd           
+               Voltage  0.918,0.006 0.893,0.005 0.906,0.005 0.922,0.003 0.898,0.013 0.912,0.008
+               Capacity 0.914,0.029 0.901,0.004 0.907,0.015 0.885,0.008 0.901,0.002 0.893,0.012
+              Conductivity 0.875,0.007 0.859,0.009 0.866,0.002 0.868,0.034 0.868,0.007 0.868,0.004
+           CoulombicEfficiency 0.925,0.008 0.919,0.003 0.921,0.006 0.933,0.006 0.922,0.003 0.927,0.005
+               Energy   0.905,0.006 0.942,0.012 0.923,0.009 0.911,0.015 0.953,0.006 0.932,0.008
+              macroscore 0.920,0.008 0.907,0.004 0.913,0.002 0.919,0.005 0.911,0.004 0.915,0.007
+     Table4:Precision(Pr),Recall(Re),F1-Score(F1)andtheirrespectivestandarddeviations(sd)ofPNM(MatBERT)ondistantlysuperviseddatasetandannotated
+     groundtruthdataset                                                           
+                                                                                  
+                                                                                  
+     bythemodel. Recall(Re)canbedefinedbythenotation- superviseddatasetandtheannotatedgroundtruthdataset. Seven
+                                          differentembeddingsareutilizedinthepointernetworkencoder:
+                      |tr∩p|                                                      
+                   Re=                (5) a)Word2Vec+Bi-LSTMmodel,b)BERTmodel,c)RoBERTa
+                       |tr|                                                       
+                                          model,d)SciBERTe)BatteryBERT,f)MatSciBERTmodeland
+                                          g)MatBERTmodel. Results(weightedaverageandstandard
+       F1-scoreisdefinedbytheharmonicmeanofprecisionand                           
+                                          deviation)areshownforfiverelations-voltage,capacity,con-
+     recall,i.e.,                                                                 
+                      2Pr∗Re              ductivity,coulombicefficiency,andenergy. PointerNetModel
+                  F1=                 (6)                                         
+                      Pr+Re               with MatBERT [PNM (MatBERT)] provides the best macro
+                                          F1-score,followedbyPNM(BERT)model. PNM(MatBERT)
+       AhigherF1-Scoreisdesirableforamodel.                                       
+                                          produced0.913and0.915macroF1scoresforthedistantlysu-
+                  (cid:118)(cid:117)(cid:116)                                     
+                                          pervisedandannotatedgroundtruthdatasets. PNM(MatBERT)
+                     1                                                            
+                       (cid:88)N                                                  
+               sd =      (X −X¯)2     (7) achieves 0.920 precision and 0.907 recall for distantly super-
+                    N−1   i                                                       
+                                          viseddataand0.919precisionand0.911recallforannotated
+                       i=1                                                        
+                                          groundtruthdataset. PNM(MatBERT)alsohastheleaststan-
+       Inourexperiments,wecalculatetheweightedaveragepreci-                       
+                                          darddeviationforaveragemacroprecision,recall,andF1score.
+     sion(Pr),recall(Re),andF1-score(F1)alongwiththeirrespec-                     
+                                          DyGIE++ achieves F1-score of 0.886 and 0.889 for distantly
+     tive standard deviations (sd) where standard deviation values                
+                                          supervisedandannotateddatasetwhereasMatKGprovidesF1-
+     arecalculatedasperEquation7.                                                 
+                                          scoreof0.897and0.901fordistantlysupervisedandannotated
+                                          dataset. PointerNetworkModel(PNM)outperformsWordDe-
+     5.1. Results                                                                 
+                                          codingModel(WDM)forallembeddingsandPNM(MatBERT)
+       Theresultsareshownforboththedistantlysupervisedcorpus                      
+                                          producesbetteroutcomesthanDyGIE++andMatKG-itshows
+     andannotatedgroundtruthdataset. Wedivideboththedatasets                      
+                                          the superiority of the PNM model. The distantly supervised
+     intotrain,dev,andtest. Werandomlysample70%samplesto                          
+                                          datasetalsoachievessimilarperformancecomparedtotheanno-
+     trainthemodel. A10%sampleisusedforthemodelparameter                          
+                                          tatedgroundtruthdatasetusingthePNMmodel-whichshows
+     andhyper-parametertuning. Theremaining20%datasetisused                       
+                                          theutilityofadistantsupervisedapproachtogenerateadataset
+     asablindtestsetformodelevaluation. Weperformtheexperi-                       
+                                          withlessannotationcost.                 
+     mentsfivedifferenttimeswithdifferentnon-overlappingblind                     
+                                            Thedetailedrelation-specificprecision,recall,F1,alongwith
+     testsetsandreporttheweightedaverageprecision(Pr),recall                      
+                                          their standard deviations (sd) for the best model [PNM (Mat-
+     (Re), and F1-score (F1) along with their respective standard                 
+                                          BERT)]isshowninTable4. TheresultssuggestthatthePNM
+     deviations(sd)foreachofthefivedifferentrelations.                            
+                                          (MatBERT)modelcanextractentitiesandpredictrelationswith
+       Table 3 shows weighted average precision, recall, and F1-                  
+                                          goodprecision,recall,andmacroF1-score. ThesameforPNM
+     score and respective standard deviations for Word Decoding                   
+                                          (BERT)modelisshownintheSupplementaryInformation.
+     Model(WDM),DyGIE++,MatKGandPointerNetDecoding                                
+     Model(PNM)usingdifferentembeddingsonboththedistantly Thedifferentparametersandhyper-parametersofthePNM
+                           10%         30%          50%         70%               
+                        Pr  Re  F1  Pr  Re  F1  Pr  Re  F1   Pr  Re  F1           
+               Voltage 0.874 0.777 0.823 0.913 0.855 0.883 0.904 0.869 0.886 0.904 0.879 0.892
+              Capacity 0.848 0.806 0.827 0.878 0.856 0.867 0.896 0.838 0.866 0.909 0.881 0.895
+             Conductivity 0.778 0.396 0.525 0.755 0.755 0.755 0.812 0.736 0.772 0.83 0.736 0.78
+           CoulombicEfficiency 0.814 0.826 0.82 0.839 0.877 0.858 0.869 0.898 0.883 0.891 0.88 0.885
+               Energy  0.704 0.581 0.637 0.948 0.849 0.896 0.975 0.919 0.946 0.953 0.942 0.947
+             macroscore 0.857 0.781 0.817 0.897 0.863 0.879 0.902 0.874 0.888 0.907 0.887 0.897
+     Table5:Precision(Pr),Recall(Re),F1-Score(F1)forPNM(MatBERT)for10%,30%,50%,and70%ofusagetrainingsamplesduringtrainingphasefordistantly
+     superviseddataset                                                            
+                                         9                                        
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                           10%         30%          50%         70%               
+                        Pr  Re  F1  Pr  Re  F1  Pr  Re  F1   Pr  Re  F1           
+               Voltage 0.791 0.682 0.729 0.838 0.802 0.820 0.867 0.831 0.848 0.852 0.840 0.846
+              Capacity 0.755 0.781 0.767 0.803 0.762 0.782 0.837 0.853 0.844 0.841 0.881 0.861
+             Conductivity 0.654 0.289 0.416 0.708 0.591 0.643 0.785 0.703 0.742 0.802 0.736 0.770
+           CoulombicEfficiency 0.765 0.808 0.786 0.758 0.831 0.792 0.814 0.833 0.823 0.845 0.829 0.837
+               Energy  0.719 0.525 0.598 0.749 0.601 0.664 0.895 0.654 0.735 0.827 0.712 0.764
+             macroscore 0.737 0.617 0.659 0.770 0.717 0.740 0.839 0.775 0.798 0.833 0.799 0.816
+     Table6:Precision(Pr),Recall(Re),F1-Score(F1)forPNM(MatBERT)for10%,30%,50%,and70%ofusagetrainingsamplesduringtrainingphaseforground
+     truthannotateddataset                                                        
+                                                                                  
+                 ChemDataExtractor PNM(MatBERT) thePNM(MatBert)model-taking10%,30%,50%,and70%of
+                  Pr  Re F1  Pr  Re F1                                            
+                                          theinitialtrainingdata,andtrainthePNM(MatBERT)model
+          Voltage 0.829 0.687 0.751 0.79 0.81 0.8                                 
+                                          withsameparameterandhyper-parametersettings. Theresults
+         Capacity 0.793 0.574 0.666 0.826 0.771 0.797                             
+         Conductivity 0.759 0.526 0.621 0.684 0.754 0.717 fordifferenttrainingsizesonthedistantlysuperviseddataset
+       CoulombicEfficiency 0.793 0.68 0.732 0.812 0.725 0.766 andgroundtruthannotateddatasetareshowninTables5and6
+          Energy 0.755 0.729 0.742 0.721 0.808 0.762                              
+                                          respectively. Theannotatedgroundtruthdatasethaslowerpreci-
+         macroscore 0.803 0.646 0.716 0.768 0.774 0.771                           
+                                          sion,recall,andF1-scorevaluesasthetrainingdataisverysmall.
+       Table8:Precision(Pr),Recall(Re),F1-Score(F1)ofPNM(MatBert) We see that with increasing the dataset size, the performance
+           andChemDataExtractormodelonBatteryDatabase ofPNM(MatBERT)improvesintermsofprecision(Pr),recall
+                                          (Re),andF1-score(F1). Evenat30%ofthedataset,themodel
+                                          is able to achieve a very good performance - macro F1-score
+     (MatBERT) which perform the best are - "learning_rate" =                     
+                                          of0.879comparedto0.915fortheentiredistantlysupervised
+     "0.001", "optimizer" = "Adam", "dropout" = "0.5", "hid-                      
+                                          trainingdataset(0.897precisionand0.863recall). For10%of
+     den_dim"="300",num_epochs="50","batch_size"="32".                            
+                                          thedataset,themodelalsoaccomplishesdecentprecision,recall,
+       Weshowexperimentaloutcomesondistantlysupervisedcor-                        
+                                          andmacroF1-score. ItshowstheeffectivenessofthePointer
+     pusandgroundtruthannotationdataearlier. Tocomparewith                        
+                                          Networkmodel[PNM(MatBERT)].             
+     other similar approaches, we evaluate the PNM (MatBERT)                      
+     modelandChemDataExtractoronbatterymaterialdatabase[2].                       
+     TheBatteryDatabaseusedforthiscomparisonconsistsof51pa- 5.1.2. FewShotExperiments
+     pers8.Theclassdistributionisasfollows:795capacityrelations, Modellearningcanbeveryefficientindata-intensiveappli-
+     51conductivityrelations,69coulombicefficiencyrelations,489 cations but is often hampered when the data set is small. In
+     voltagerelations,and75energyrelations,whichformsatotal thisscenario,Few-ShotLearning(FSL)methodisveryuseful
+     of 1479 entity-relation triplets. The model outputs are com- totacklethisproblem. TheideaofFSListoexploretheprior
+     paredwiththegroundtruthoutputsfromthepapers. Table8 knowledgeusingonlyafewsampleswithsupervisedinforma-
+     shows the comparison of ChemDataExtractor [2] with PNM tion and thereafter rapidly generalize to the original problem.
+     (MatBERT), where the latter outperforms the former in over- We review the utility of PNM (MatBERT) model in few shot
+     allF1-Score. ChemDataExtractorhasbetterprecisionbutpoor settings. Foranexample,k-shotisanFSLsettingswhereonly
+     recall,downgradingtheoverallF1score. k samples are available for each category to train the model.
+                                          WeinvestigateFSLincaseofk-shotsettingswherek =5and
+     5.1.1. VaryingTrainingDataSize       10andtheperformanceof5-shotand10-shotapproachesfor
+       Tounderstandtheeffectoftrainingdatasizeontheperfor- PNM(MatBERT)modelonbothdistantlysuperviseddataand
+     mance,wevarythedistantlysupervisedtrainingdatasizefor groundtruthannotateddataareshowninTable7. Itshowsthat
+                                          evenwithverylittleamountofdata(25tripletsfor5-shotand50
+                                          tripletsfor10-shot)themodelcanalsodetecttherelations.PNM
+       8asmentionedinthepaperHuangandCole[2]-datasetlink (MatBERT)shows0.583macroF1-score(0.625precision,0.547
+                           Distantlysuperviseddataset Groundtruthannotateddataset 
+                           5shot       10shot       5shot       10shot            
+                        Pr  Re  F1  Pr  Re  F1  Pr  Re  F1   Pr  Re  F1           
+               Voltage 0.668 0.464 0.548 0.78 0.637 0.701 0.631 0.488 0.547 0.815 0.624 0.712
+              Capacity 0.702 0.694 0.698 0.848 0.82 0.834 0.713 0.677 0.695 0.823 0.805 0.814
+             Conductivity 0.212 0.679 0.323 0.784 0.755 0.769 0.307 0.524 0.359 0.698 0.759 0.728
+           CoulombicEfficiency 0.69 0.655 0.672 0.79 0.736 0.762 0.614 0.597 0.605 0.824 0.745 0.784
+               Energy  0.378 0.686 0.488 0.701 0.791 0.743 0.341 0.609 0.426 0.682 0.766 0.719
+             macroscore 0.625 0.547 0.583 0.793 0.695 0.741 0.58 0.562 0.571 0.802 0.687 0.738
+     Table7:Precision(Pr),Recall(Re),F1-Score(F1)forPNM(MatBert)for5-shotand10-shotforbothdistantlysuperviseddatasetandgroundtruthannotateddataset
+                                        10                                        
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+     recall)for5-shotondistantlysuperviseddataset,0.571macro 7. ModelOutputAnalysisandDiscussions
+     F1-score(0.58precision,0.562recall)forthesameonground                        
+     truthannotateddataset. For10-shotapproach,PNM(MatBERT) WeanalyzetheactualoutcomesoftheMatSciREframework,
+     shows0.741macroF1-score(0.793precisionand0.695recall) consistingofthePNM(MatBERT)model.Foraninputsentence
+     on distantly supervised dataset, 0.692 macro F1-score (0.733 fromtheannotateddataset,wecomparethegroundtruthoutput
+     precision, 0.65recall)ongroundtruthannotateddataset. For withtheoutputgeneratedbythemodel. Thefollowingexample
+     10-shotsettingthemodelcanpredictrelationtripletswithdecent fromYangetal.[61](referencedpreviouslyinTable1)shows
+     accuracy,whichisquitepromising.      theentitiesandcorrespondingrelationspredictedbyPNM(Mat-
+                                          BERT)fromthesentence,comparedwiththeexpected(ground
+                                          truth)output. Moreexamplesconsistingofotherrelationsare
+     6. DataandSoftwareAvailability       providedintheSupplementaryInformation.  
+                                            However,atthesameC-rate,theCu0.02Ti0.94Nb2.04O7sam-
+       We experiment on NVIDIA Tesla K40m GPU with 12GB ple exhibits a larger first-cycle Coulombic efficiency (91.0%)
+     RAM,6Gbpsclockcycle,andGDDR5memory. Allmethods thanthatoftheTiNb2O7sample(81.6%)probablyduetothe
+     tooklessthan4GPUhoursfortraining. ForrunningtheBERT smallerparticlesizeandlarger(electronicandionic)conductiv-
+     models,weuseCUDAversionV11.1.105. Weuseopensource ityofCu0.02Ti0.94Nb2.04O7[6,38].
+     softwarelanguageslike‘Python,’andpackageslike‘Pytorch’ Groundtruth:          
+     (pytorch-transformers-1.2.0),‘recordclass’(recordclass-0.17.2), <Cu0.02Ti0.94Nb2.04O7,Coulombicefficiency,91.0%>
+     etc. for implementation. 9. Different Python libraries like - <TiNb2O7,Coulombicefficiency,81.6%>
+     ‘numpy’,‘pandas’,‘pickle’etc.,arealsoutilized. Weprovide MatBERT(PNM)modeloutput:
+     ourcode, dataandcurationdetailsofoursysteminthesame <TiNb2O7,Coulombicefficiency,91.0%>
+     GitHubpage10.                          It is observed that in relations where multiple entities
+                                          (‘Cu0.02Ti0.94Nb2.04O7’and‘TiNb2O7’)arepresent,thesys-
+                                          tem sometimes fails to capture all the entities and make the
+     6.1. Demonstrationoutputs                                                    
+                                          incorrectassociationsbetweentheentitiesandtherelations.
+       We built a sample web application using Python streamlit Asetofexamplesisshownintables 9and 10whichcompare
+     library deployed on Huggingface Spaces to demonstrate our theexpectedgroundtruthoutputwiththeoutputpredictedby
+     approach. Thedemoappcanbefoundinthegithubwebpage. thePNM(MatBERT)model. Weobservethatdifferencesoccur
+     Usingourapproach,theappextractstherelationtriples,where iscasesofsamesentencehavingmultiplerelationtriplets.
+     amaterialsciencepapercanbeuploadedinPDFformat. Table 9 compares the entity-relation triplets for a single
+       Figure5showstheoutputsforthepaper"High-performance manuscript (Yu et al. [52]) from the annotated dataset where
+     hybrid supercapacitors enabled by protected lithium negative the system is able to extract multiple relations and the corre-
+     electrodeand’water-in-salt’electrolyte". Thesentences,along spondingentitiescorrectlyinmostofthecases. Table10com-
+     withthetriplets,arecorrectlyextracted. parestheentity-relationtripletsforallthefiverelations(voltage,
+                                          conductivity,coulombicefficiency,capacity,energy).
+                                            Onelimitationofourapproachisthepresenceoferrorsinthe
+       9The details of open source softwares in our system are in distantlysupervisedtrainingdata. Butgenerallysomeamount
+     https://github.com/MatSciRE/Material_Science_                                
+                                          ofnoiseisacceptableinanydistantlysuperviseddataset[17]
+     Relation_Extraction                                                          
+      10https://github.com/MatSciRE/Material_Science_ asitsaveslotoftimeandcostovermanuallyannotatinglarge
+     Relation_Extraction                  trainingset-whichisalsooneoftheprimaryaimsofthiswork.
+                      Table9:ThegroundtruthandpredictionoutputareshownforthepaperbyYuetal.[52]
+       Relation                Sentence                  Groundtruth PredictionOutput
+       Capacity WithahighSloadingof59wt%,theNG/Selectrodewith20TiO2cyclecoatingdelivered NG/S,1070mAhg-1 NG/S,1070mAhg-1
+             ahighspecificcapacityof1070mAhg1intheinitialcycleat1Canditremainedat918mAhg1after
+            500cycles,demonstratingitsexcellentelectrochemicalperformanceasacathodematerialforLi–Sbatteries
+       Capacity    Aftermorethan70cyclesatvariouscurrentdensities,theNG/S–20TiO2 NG/S–20TiO2, NG/S–20TiO2,
+                electrodestillhasareversiblecapacityof1237mAhg1whenfurthercycledat0.1C. ,1237mAhg-1 1237mAhg-1
+       Capacity After500charge–dischargecycles,theNG/S–20electrodemaintainsahighdischargecapacity NG/S–20TiO2, NG/S–20,
+                      of918.3mAhg1,withahighcapacityretentionof86%. 918.3mAhg-1 918.3mAhg-1
+       Energy AssumingthecompletereactionofmetallicLiandelementalStoformLi2S,ahightheoretical Li2S|||2600Whkg-1 Li2S|||2600Whkg-1
+              energydensity(over2600Whkg1)couldbedelivered,3–5timeshigherthanthosereportedfor
+                          conventionallithiuminsertionhosts.                      
+       Energy Theresultsrevealedthatthebindingenergyofthesulfurcontainingspeciestotheanatase-TiO2 anatase-TiO2(101),2.30eV anatase-TiO2(101),2.18eV
+               (101)surfacewasabout2.30eV,alittlebitlowerfortherutile-TiO2(110)surface(2.18eV). rutile-TiO2(110),2.18eV rutile-TiO2(110),2.18eV
+       Energy    TheresultsrevealthatthebindingenergyoftheScontainingspeciestoZnOcould ZnO,5.40eV ZnO,5.40eV
+                   beashighas5.40eV,whichwassubstantiallylargerthanthatofTiO2.    
+       Voltage    Thecomparativelylowvoltageprofile(averageofaround2.2V)ofLi–S Li–S,2.2V Li–S,2.2V
+                    batteriescanbewellcompensatedbytheirhighenergydensity.        
+      Conductivity FortheNG/S–40TiO2electrodeshowingslightlyinferiorperformance,thereasoncouldbethat TiO2,10−12Scm−1 TiO2,10−12Scm−1
+                 TiO2hasintrinsicallylowLi-iondiffusivity(10−12to10−9Scm−1)andelectronic TiO2,10−9Scm−1 TiO2,10−9Scm−1
+                  conductivity(10−12to10−7Scm−1),whichcouldoffsetthepositiveeffect. TiO2,10−7Scm−1 TiO2,10−7Scm−1
+                                        11                                        
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                          Table10:Groundtruthandpredictionoutputfordifferentrelations
+       Relation               Sentence                  Groundtruth Predictionoutput
+       Capacity TheNiS–CNTnanocompositeelectrodedeliversaninitialdischargespecificcapacityof NiS–CNT, NiS–CNT,
+              908.7mAhg1withacoulombicefficiencyof62.5%intheall-solid-statelithiumbatteries. 908.7mAhg1 908.7mAhg1
+      Coulombic However,atthesameC-rate,theCu0.02Ti0.94Nb2.04O7sampleexhibitsalargerfirst-cycle Cu0.02Ti0.94Nb2.04O7, TiNb2O7,
+      Efficiency Coulombicefficiency(91.0%)thanthatoftheTiNb2O7sample(81.6%)probablyduetothe 91.0% 91.0%
+            smallerparticlesizeandlarger(electronicandionic)conductivityofCu0.02Ti0.94Nb2.04O7[6,38].
+      Coulombic However,atthesameC-rate,theCu0.02Ti0.94Nb2.04O7sampleexhibitsalargerfirst-cycle TiNb2O7, TiNb2O7,
+      Efficiency Coulombicefficiency(91.0%)thanthatoftheTiNb2O7sample(81.6%)probablyduetothe 81.6% 91.0%
+            smallerparticlesizeandlarger(electronicandionic)conductivityofCu0.02Ti0.94Nb2.04O7[6,38].
+       Voltage    Inaddition,thedischargecapacityofLiNi0.6Co0.2Mn0.2O2canbe LiNi0.6Co0.2Mn0.2O2, LiNi0.6Co0.2Mn0,
+                   furtherincreasedwhenthechargecutoffvoltageincreasesto4.5V. 4.5V 4.5V
+      Conductivity Tinphosphide(Sn4P3)hasbeenapromisinganodematerialforSIBsowingtoitstheoretical Sn4P3,30.7Scm1 Sn4P3,30.7Scm1
+                 capacityof1132mAhg1andhighelectricalconductivityof30.7Scm1.      
+       Energy       TheenergydensitybasedonACandnanowireNa0.35MnO2 Na0.35MnO2,42.6Whkg1 Na0.35MnO2,42.6Whkg1
+                      is42.6Whkg1atapowerdensityof129.8Wkg1.                      
+     Since,ourtestdataismanuallyannotatedsosucherrorswon’t                        
+     bethereinthetestsetandevaluationresults.                                     
+     8. Conclusions                                                               
+       Inthiswork,wefocusonextractingdifferententitiesandcor-                     
+     respondingrelationsbetweentwoentitiesintheformoftriplet                      
+     (entity1,relation,entity2)frommaterialscienceresearchpub-                    
+     lications. Whilefocusingonthebatterymaterials,weapplya                       
+     distantsupervisionapproachtocreateadatasetusingabattery                      
+     datasetpreviouslyreleasedwiththehelpofChemDataExtractor                      
+     [2]. Weapplyapointernetwork-basedencoder-decodermodel                        
+     todetectentitiesandrelationsintheformofatriplet. Wealso                      
+     curateagoldstandardannotateddatasetforcomparison. The                        
+     extensiveevaluationsshowthatourproposedMatSciRE(Ma-                          
+     terialScienceRelationExtractor)performsthebestintermsof                      
+     F1-scoretodetectthetriplet,outperformingChemDataExtractor                    
+     by 6%.Ourcodeanddatasetarepubliclyavailable,andwehave                        
+     deployedaweb-basedAPIwhereuserscanextractthetriplets                         
+     easilybyuploadingamanuscript.                                                
+     References                                                                   
+      [1] N.Nitta,F.Wu,J.T.Lee,G.Yushin,Li-ionbatterymaterials:presentand         
+        future,MaterialstodayEnergy(Mater.TodayEnergy)18(2015)252–264.            
+      [2] S.Huang,J.M.Cole,Adatabaseofbatterymaterialsauto-generatedusing         
+        chemdataextractor,ScientificData(Sci.Data)7(2020)1–13.                    
+      [3] T.Nayak,H.T.Ng,Effectivemodelingofencoder-decoderarchitecture           
+        forjointentityandrelationextraction, in: ProceedingsoftheAAAI             
+        conferenceonartificialintelligence,volume34,2020,pp.8528–8535.            
+      [4] N.Walker,A.Trewartha,H.Huo,S.Lee,K.Cruse,J.Dagdelen,A.Dunn,             
+        K.Persson,G.Ceder,A.Jain,Theimpactofdomain-specificpre-training           
+        onnamedentityrecognitiontasksinmaterialsscience,AvailableatSSRN           
+        3950755(2021)1–43.                                                        
+      [5] V.Tshitoyan,J.Dagdelen,L.Weston,A.Dunn,Z.Rong,O.Kononova,               
+        K.A.Persson,G.Ceder,A.Jain,Unsupervisedwordembeddingscapture              
+        latentknowledgefrommaterialsscienceliterature, Nature571(2019)            
+        95–98.                                                                    
+      [6] T.Mikolov,K.Chen,G.Corrado,J.Dean, Efficientestimationofword            
+        representationsinvectorspace,arXivpreprintarXiv:1301.3781(2013).          
+      [7] S.Auer,C.Bizer,G.Kobilarov,J.Lehmann,R.Cyganiak,Z.Ives, Db-             
+        pedia: Anucleusforawebofopendata, TheSemanticWeb(2007)                    
+        722–735.                                                                  
+      [8] X.Zhang, X.Li, Y.Zhao, Knowledgeextractionandapplicationfor             
+        metalmaterialsbasedondbpedia,201410thInternationalConferenceon            
+        Semantics,KnowledgeandGrids(2014)150–153.                                 
+      [9] X.Zhang,X.Li,Y.Zhao,X.Liu,D.Pan,Mmkg:Anapproachtogenerate               
+        metallicmaterialsknowledgegraphbasedondbpediaandwikipedia,Com-            
+                                               Figure5:Applicationdemonstratingrelationextraction
+        puterPhysicsCommunications(Comput.Phys.Commun.)211(2017)                  
+        98–112.                                                                   
+                                        12                                        
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+     [10] L.Weston,V.Tshitoyan,J.Dagdelen,O.Kononova,A.Trewartha,K.A. (studentabstract),arXive-prints(2023)arXiv–2304.
+        Persson,G.Ceder,A.Jain,Namedentityrecognitionandnormalization [31] A.Mullick, Exploringmultilingualintentdynamicsandapplications,
+        appliedtolarge-scaleinformationextractionfromthematerialsscience IJCAIDoctoralConsortium(2023).
+        literature, Journalofchemicalinformationandmodeling(J.Chem.Inf. [32] A.Mullick,S.Maheshwari,P.Goyal,N.Ganguly,Agenericopinion-fact
+        Model.)59(2019)3692–3702.            classifierwithapplicationinunderstandingopinionatednessinvarious
+     [11] S.Guha,A.Mullick,J.Agrawal,S.Ram,S.Ghui,S.-C.Lee,S.Bhat- newssection, in: Proceedingsofthe26thInternationalConferenceon
+        tacharjee,P.Goyal, Matscie: Anautomatedtoolforthegenerationof WorldWideWebCompanion,2017,pp.827–828.
+        databasesofmethodsandparametersusedinthecomputationalmaterials [33] A.Mullick,P.Goyal,N.Ganguly,Agraphicalframeworktodetectand
+        scienceliterature,ComputationalMaterialsScience(Comput.Mater.Sci.) categorizediverseopinionsfromonlinenews, in: Proceedingsofthe
+        192(2021)110325.                     WorkshoponComputationalModelingofPeople’sOpinions,Personality,
+     [12] A.Mullick,S.Pal,T.Nayak,S.-C.Lee,S.Bhattacharjee,P.Goyal,Using andEmotionsinSocialMedia(PEOPLES),2016,pp.40–49.
+        sentence-levelclassificationhelpsentityextractionfrommaterialscience [34] A.Mullick,S.GhoshD,S.Maheswari,S.Sahoo,S.K.Maity,P.Goyal,
+        literature, in: ProceedingsoftheThirteenthLanguageResourcesand Identifyingopinionandfactsubcategoriesfromthesocialweb, in:Pro-
+        EvaluationConference,2022,pp.4540–4545. ceedingsofthe2018ACMInternationalConferenceonSupportingGroup
+     [13] Y.Luan,L.He,M.Ostendorf,H.Hajishirzi,Multi-taskidentificationof Work,2018,pp.145–149.
+        entities,relations,andcoreferenceforscientificknowledgegraphconstruc- [35] A.Mullick, P.Goyal, N.Ganguly, M.Gupta, Harnessingtwitterfor
+        tion,arXivpreprintarXiv:1808.09602(2018). answeringopinionlistqueries, IEEETransactionsonComputational
+     [14] I.Beltagy,K.Lo,A.Cohan, Scibert: Apretrainedlanguagemodelfor SocialSystems5(2018)1083–1095.
+        scientifictext,arXivpreprintarXiv:1903.10676(2019). [36] A.Mullick, S.Pal, P.Chanda, A.Panigrahy, A.Bharadwaj, S.Singh,
+     [15] T.Gupta,M.Zaki,N.Krishnan,etal., Matscibert:Amaterialsdomain T.Dam,D-fj:Deepneuralnetworkbasedfactualityjudgment,Technology
+        languagemodelfortextminingandinformationextraction,npjComputa- 50(2019)173.
+        tionalMaterials8(2022)1–11.       [37] A.Mullick,P.Goyal,N.Ganguly,M.Gupta,Extractingsociallistsfrom
+     [16] S.Huang,J.M.Cole,Batterybert:Apretrainedlanguagemodelforbattery twitter,in:Proceedingsofthe2017IEEE/ACMInternationalConference
+        databaseenhancement, JournalofChemicalInformationandModeling onAdvancesinSocialNetworksAnalysisandMining2017,2017,pp.
+        (2022).                              391–394.                             
+     [17] M.Mintz,S.Bills,R.Snow,D.Jurafsky,Distantsupervisionforrelation [38] X.Ren,Z.Wu,W.He,M.Qu,C.R.Voss,H.Ji,T.F.Abdelzaher,J.Han,
+        extractionwithoutlabeleddata,in:ProceedingsoftheJointConference Cotype:Jointextractionoftypedentitiesandrelationswithknowledge
+        ofthe47thAnnualMeetingoftheACLandthe4thInternationalJoint bases, in: Proceedingsofthe26thInternationalConferenceonWorld
+        ConferenceonNaturalLanguageProcessingoftheAFNLP,2009,pp. WideWeb,2017,pp.1015–1024.
+        1003–1011.                        [39] M. Miwa, M. Bansal, End-to-end relation extraction using lstms on
+     [18] K.Bollacker, C.Evans, P.Paritosh, T.Sturge, J.Taylor, Freebase: a sequencesandtreestructures,arXivpreprintarXiv:1601.00770(2016).
+        collaborativelycreatedgraphdatabaseforstructuringhumanknowledge, [40] G.Bekoulis,J.Deleu,T.Demeester,C.Develder,Jointentityrecognition
+        in:Proceedingsofthe2008ACMSIGMODinternationalconferenceon andrelationextractionasamulti-headselectionproblem,ExpertSystems
+        Managementofdata,2008,pp.1247–1250.  withApplications114(2018)34–45.      
+     [19] S.Riedel,L.Yao,A.McCallum,Modelingrelationsandtheirmentions [41] S.Zheng,F.Wang,H.Bao,Y.Hao,P.Zhou,B.Xu, Jointextractionof
+        withoutlabeledtext,in:JointEuropeanConferenceonMachineLearning entitiesandrelationsbasedonanoveltaggingscheme, arXivpreprint
+        andKnowledgeDiscoveryinDatabases,Springer,2010,pp.148–163. arXiv:1706.05075(2017).
+     [20] R.Hoffmann,C.Zhang,X.Ling,L.Zettlemoyer,D.S.Weld,Knowledge- [42] D.Q.Nguyen,K.Verspoor,End-to-endneuralrelationextractionusing
+        basedweaksupervisionforinformationextractionofoverlappingrelations, deepbiaffineattention,in:EuropeanConferenceonInformationRetrieval,
+        in:Proceedingsofthe49thannualmeetingoftheassociationforcomputa- Springer,2019,pp.729–738.
+        tionallinguistics:humanlanguagetechnologies,2011,pp.541–550. [43] A.Katiyar,C.Cardie,Investigatinglstmsforjointextractionofopinion
+     [21] D. Zeng, K. Liu, Y. Chen, J. Zhao, Distant supervision for relation entitiesandrelations,in:Proceedingsofthe54thAnnualMeetingofthe
+        extractionviapiecewiseconvolutionalneuralnetworks,in:Proceedingsof AssociationforComputationalLinguistics(Volume1:LongPapers),2016,
+        the2015conferenceonempiricalmethodsinnaturallanguageprocessing, pp.919–929.
+        2015,pp.1753–1762.                [44] B.Distiawan,J.Qi,R.Zhang,W.Wang, Gtr-lstm:Atripleencoderfor
+     [22] Y.Shen,X.-J.Huang,Attention-basedconvolutionalneuralnetworkfor sentencegenerationfromrdfdata, in: Proceedingsofthe56thAnnual
+        semanticrelationextraction,in:ProceedingsofCOLING2016,the26th MeetingoftheAssociationforComputationalLinguistics(Volume1:
+        InternationalConferenceonComputationalLinguistics:TechnicalPapers, LongPapers),2018,pp.1627–1637.
+        2016,pp.2526–2536.                [45] D.Marcheggiani,L.Perez-Beltrachini,Deepgraphconvolutionalencoders
+     [23] S.Jat,S.Khandelwal,P.Talukdar, Improvingdistantlysupervisedre- forstructureddatatotextgeneration, arXivpreprintarXiv:1810.09995
+        lationextractionusingwordandentitybasedattention, arXivpreprint (2018).   
+        arXiv:1804.06987(2018).           [46] S.Zhang,K.Duh,B.VanDurme,Mt/ie:Cross-lingualopeninformation
+     [24] S.Vashishth,R.Joshi,S.S.Prayaga,C.Bhattacharyya,P.Talukdar,Re- extractionwithneuralsequence-to-sequencemodels, in: Proceedings
+        side:Improvingdistantly-supervisedneuralrelationextractionusingside ofthe15thConferenceoftheEuropeanChapteroftheAssociationfor
+        information,arXivpreprintarXiv:1812.04361(2018). ComputationalLinguistics:Volume2,ShortPapers,2017,pp.64–70.
+     [25] Z.-X.Ye,Z.-H.Ling,Distantsupervisionrelationextractionwithintra-bag [47] L.Cui,F.Wei,M.Zhou, Neuralopeninformationextraction, arXiv
+        andinter-bagattentions,arXivpreprintarXiv:1904.00143(2019). preprintarXiv:1805.04270(2018).
+     [26] Z.Guo,Y.Zhang,W.Lu,Attentionguidedgraphconvolutionalnetworks [48] D.Bahdanau,K.Cho,Y.Bengio, Neuralmachinetranslationbyjointly
+        forrelationextraction,arXivpreprintarXiv:1906.07510(2019). learningtoalignandtranslate,arXivpreprintarXiv:1409.0473(2014).
+     [27] A.Mullick,S.Purkayastha,P.Goyal,N.Ganguly,Aframeworktogenerate [49] M.-T.Luong,H.Pham,C.D.Manning,Effectiveapproachestoattention-
+        high-qualitydatapointsformultiplenovelintentdetection,in:Findingsof basedneuralmachinetranslation,arXivpreprintarXiv:1508.04025(2015).
+        theAssociationforComputationalLinguistics:NAACL2022,2022,pp. [50] O.Vinyals,M.Fortunato,N.Jaitly,Pointernetworks,Advancesinneural
+        282–292.                             informationprocessingsystems28(2015).
+     [28] A.Mullick,I.Mondal,S.Ray,R.Raghav,G.Chaitanya,P.Goyal,Intent [51] S.Kundu,H.T.Ng,Aquestion-focusedmulti-factorattentionnetworkfor
+        identificationandentityextractionforhealthcarequeriesinindiclanguages, questionanswering,in:ProceedingsoftheAAAIConferenceonArtificial
+        in:FindingsoftheAssociationforComputationalLinguistics:EACL2023, Intelligence,volume32,2018,pp.5828–5835.
+        2023,pp.1825–1836.                [52] M.Yu,J.Ma,H.Song,A.Wang,F.Tian,Y.Wang,H.Qiu,R.Wang,
+     [29] A.Mullick,A.Nandy,M.N.Kapadnis,S.Patnaik,R.Raghav, Fine- Atomiclayerdepositedtio2onanitrogen-dopedgraphene/sulfurelectrode
+        grained intent classification in the legal domain, arXiv preprint forhighperformancelithium–sulfurbatteries,Energy&Environmental
+        arXiv:2205.03509(2022).              Science(EnergyEnviron.Sci.)9(2016)1495–1503.
+     [30] A.Mullick,Novelintentdetectionandactivelearningbasedclassification [53] A.Mullick,A.Bera,T.Nayak,Rte:Atoolforannotatingrelationtriplets
+                                        13                                        
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+        fromtext,arXivpreprintarXiv:2108.08184(2021).                             
+     [54] J.R.Landis,G.G.Koch, Themeasurementofobserveragreementfor               
+        categoricaldata,biometrics(1977)159–174.                                  
+     [55] J.Devlin,M.-W.Chang,K.Lee,K.Toutanova,Bert:Pre-trainingofdeep           
+        bidirectionaltransformersforlanguageunderstanding,in:Proceedingsof        
+        the2019ConferenceoftheNorthAmericanChapteroftheAssociation                
+        forComputationalLinguistics:HumanLanguageTechnologies,Volume1             
+        (LongandShortPapers),AssociationforComputationalLinguistics,2019,         
+        pp.4171–4186.                                                             
+     [56] Y.Zhu,R.Kiros,R.Zemel,R.Salakhutdinov,R.Urtasun,A.Torralba,             
+        S.Fidler,Aligningbooksandmovies:Towardsstory-likevisualexplana-           
+        tionsbywatchingmoviesandreadingbooks,in:ProceedingsoftheIEEE              
+        internationalconferenceoncomputervision,2015,pp.19–27.                    
+     [57] C.Chelba,T.Mikolov,M.Schuster,Q.Ge,T.Brants,P.Koehn,T.Robin-            
+        son, Onebillionwordbenchmarkformeasuringprogressinstatistical             
+        languagemodeling,arXivpreprintarXiv:1312.3005(2013).                      
+     [58] Y.Liu,M.Ott,N.Goyal,J.Du,M.Joshi,D.Chen,O.Levy,M.Lewis,                 
+        L.Zettlemoyer,V.Stoyanov,Roberta:Arobustlyoptimizedbertpretrain-          
+        ingapproach,ArXivabs/1907.11692(2019).                                    
+     [59] A. Gokaslan, V. Cohen, Openwebtext corpus.                              
+        http://skylion007.github.io/openwebtextcorpus(2019).                      
+     [60] T.H.Trinh,Q.V.Le,Asimplemethodforcommonsensereasoning,arXiv             
+        preprintarXiv:1806.02847(2018).                                           
+     [61] C.Yang,C.Lin,S.Lin,Y.Chen,J.Li, Cu0.02ti0.94nb2.04o7: an                
+        advanced anode material for lithium-ion batteries of electric vehicles,   
+        JournalofPowerSources(J.PowerSources)328(2016)336–344.                    
+     [62] D.Wadden,U.Wennberg,Y.Luan,H.Hajishirzi, Entity,relation,and            
+        eventextractionwithcontextualizedspanrepresentations,arXivpreprint        
+        arXiv:1909.03546(2019).                                                   
+     [63] V.Venugopal,S.Pai,E.Olivetti, Matkg: Thelargestknowledgegraph           
+        inmaterialsscience–entities,relations,andlinkpredictionthroughgraph       
+        representationlearning,arXivpreprintarXiv:2210.17340(2022).               
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                        14

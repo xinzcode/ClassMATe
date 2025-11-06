@@ -1,0 +1,237 @@
+The Materials Science Procedural Text Corpus: Annotating Materials Synthesis Procedures with Shallow Semantic Structures
+
+2.2 Structures Annotated
+An annotated graph consists of nodes denoting the
+participants of synthesis steps and edges denoting
+relationships between the participants in the synthesis. Operation nodes define the main structure
+of the graph and the arguments for each operation
+include different materials, conditions and apparatus. For annotating the text describing a synthesis
+procedure, we define a set of span-level labels that
+identify the operations and typed arguments in the
+text, i.e. the nodes of the graph. We also define a
+set of relationships between text spans, which label
+the edges of the synthesis graph. We detail these
+two kinds of labels next.
+Span-level Labels: Each span is a sequence of
+tokens or characters which form one entity mention (for example. “quartz tube furnace”). Entity
+mentions are associated with entity types which
+specify a category/kind for the entity mention. Our
+dataset defines a total of 21 entity types, with the
+least frequent entity type occuring 32 times. The 10
+most frequent entity types defined for our dataset
+are listed in Table 1a. We describe a notable subset
+of the entity types in more detail below alongside
+examples of their occurrence in text. In examples,
+the text underlined is the span to be annotated.
+Material: Materials that are used in the synthesis of the target. For example: Cr2O3
+,
+Strontium carbonate, BaTiO3
+, Li2CO3
+, Water,
+Ethanol.
+Nonrecipe-Material: Chemically specified
+materials that are not used in the synthesis of
+the synthesis target. For example: “BaTiO3
+powder (Ba/Ti=0.999)”, “Li2CO3 was used as
+the Li source”, “Si/Al ratio was 5”.
+Operation: Discrete actions physically performed by the researcher or discrete process
+steps taken to synthesize the target.
+Material-Descriptor: Describes a material’s structure, shape, form, type, role, etc.
+and must be directly or nearly adjacent to
+the material it describes. Does not include
+amounts, concentrations, or purities of materials. For example: CaCu3Ti4O12 compound,
+Copper ion, GaAs nanowires, Anatase TiO2
+,
+Deionized water.
+Meta: A canonical name to specify a particular overall synthesis method used
+for synthesis. For example: “Graphite
+oxide was prepared by oxidation of
+graphite powder according to the modified
+Hummers’ method”. “Bi2S3 nanorods with
+orthorhombic structure were prepared through
+the hydrothermal method”. “Graphene oxide
+(GO) was prepared from graphite powder by
+the Staudenmaier method.”
+Amount-Unit: These describe absolute
+amounts, concentrations, purities, ratios, flow
+rates and so on. For example: mg, mL, M, %.
+Condition-Unit: These describe the units of
+measurement for intangible conditions under
+which operations are performed. For ex: °C,
+K, sec, RPM, mW.
+Condition-Misc: Qualitative descriptions of
+conditions. For example: Room temperature,
+Dropwise, Naturally, Vacuum.
+Synthesis-Apparatus: Equipment used to
+perform an operation involved in the synthesis.
+Characterization-Apparatus: Equipment used to characterize a materials prop-
+erties.
+Relation Labels: We define a set of relationships between entity mentions, which label the
+edges of the synthesis graph. A subset of these
+relations describe direct relationships between operations and their arguments, others describe relationships between argument mentions, and the
+Next-Operation relation describes relationships between operations so as to step towards annotating
+full recipe graphs. The different relation labels we
+define are tabulated in Table 1b, a subset of these
+are defined below:
+Recipe-target: Indicates a material assigned to an
+operation which is the target of the synthesis
+procedure.
+Participant-material: A material that is part of a
+particular synthesis step.
+Recipe-precursor: Indicates a material which is
+the source of an element for the target material
+used in a specific synthesis operation.
+Apparatus-of : Denotes an apparatus to be used in
+a synthesis operation.
+Condition-of : Denotes a reaction condition for a
+synthesis operation.
+Coref-of : Intended to capture coreferent mentions
+of entities presented by abbreviations, text in
+parenthesis and so on. For example: “Air
+(O2
+/N2 mixture gases)” and “He were supplied to the porous support side . . . ”. “Air” is
+coreferent with O2
+and N2
+.
+Amount-of : Links a number entity to the corresponding unit of measurement.
+Next-operation: A relation intended to denote the
+true synthesis order of the synthesis steps; the
+relation is also intended to implicitly denote
+the flow of intermediate materials in the synthesis. However, in this first release of the
+data, as a placeholder for future annotations,
+Next-Operation is used simply used to indicate the next operation in text order rather than
+in true synthesis order.
+We refer readers to our annotation guidelines for
+definitions of the complete set of entity type and
+relation labels in the dataset.
+
+2.4 Annotation Decisions
+Next we highlight specific points of contention in
+creating the current set of annotations.
+What constitutes an operation?: While our
+definition of the Operation entity type specifies only actions performed by a lab researcher to
+be valid operations, there are cases where our annotations diverge from this definition. This happens
+in the following cases:
+• Cases where an operation isn’t explicitly performed by the researcher. For example: “After
+this, the autoclave was cooled to room temperature naturally”.
+• Cases with nested verb structures. For
+example: “white precipitate which was
+harvested by centrifugation . . . ”.
+In the current set of annotations, we allow experts
+to decide when a particular candidate operation
+should be considered valid and when it can be
+omitted. As our inter-annotator agreements will
+demonstrate, experts tend to agree often on what
+should be considered an operation. The question
+of what constitutes an operation is analogous to the
+notion of what constitutes an “event” in the broader
+NLP literature as highlighted by Mostafazadeh et al.
+(2016).
+
+Argument state and argument re-use: Annotation of semantic structures often allow for argument spans to have multiple parents (Surdeanu
+et al., 2008; Banarescu et al., 2013; Oepen et al.,
+2015). For example in Figure 2, the material “Cu”
+could be considered an argument of the operations
+“placed” and “heated”. Allowing for arguments
+to have multiple parents however runs into complications when the operation causes the state of
+a material to change (incidentally, this is not the
+case in the example we highlight above). When a
+materials state changes due to a specific operation,
+considering the same text span to be the argument
+of a different operation would not be chemically
+valid. For example, in the sentence:
+After that, the mixed solution was aged
+at 60 degC for 48 h, followed by heating
+at 900 degC for 2 h with a heating rate
+of 5 degC min-1 in an N2 atmosphere.
+“solution” is labeled as Participant-material for
+“aged”, but it isnt considered a Participant-material
+to “heating” since aging caused it to be a different
+material. Similarly, in:
+1.6632 g lithium acetate was dissolved
+into 26 mL of ethanol-water mixture
+(12:1 in volume) and slowly dropped into
+the above suspension.
+“lithium acetate” is only labeled as Participantmaterial for “dissolved” and not for “dropped”
+whose sole argument is “suspension”. This clearly
+highlights an instance of a material entirely absent
+from the text being the true argument of an operation. Therefore the current set of annotations
+does not allow for arguments to have multiple parents. Further, the tracking of state itself is also
+complicated by the difficulty in being able to write
+down precise states at a meaningful level of granularity for all possible materials, this is further
+complicated by the ambiguity presented by underspecified materials in synthesis text, for example in
+the sentence:
+With the indraught of ozone,
+black solid appeared gradually and the
+clear solution turned into black slurry
+finally.
+Most of the entities, “black solid”, “clear solution”
+and “black slurry” are chemically under-specified,
+with precise specification even unnecessary for describing the synthesis procedure.
+Relations across sentences: Often, in synthesis procedures, a given synthesis step is described
+across multiple sentences. In these cases it would
+be meaningful to allow for relationships between
+operation-argument entities which are in different
+sentences. For the sake of simplicity and to stick
+more closely to a sentence level shallow semantic
+annotation, our current iteration of the annotations
+has avoided this annotation, however a very small
+number of instances of cross-sentence relations do
+exist (< 1% of all relations in the dataset). Examples of this type are as follows:
+First, sulfuric acid and nitric acid were
+mixed well by stirring 15 min in an
+ice bath, and then graphite powder was
+dispersed into the solution. After 15 min,
+potassium chlorate was added into the
+system - very slowly to prevent strong
+reaction during the oxidation process.
+Oxygen with 20 sccm flow rate and argon
+with 40 sccm flow rate were used as the
+sputtering gas. Growth temperature was
+400 degC and the RF power was 90 W.
+Here “min” and “dispersed” are related by a Condition Of relation. Similarly, “degC” and “W”,
+both are annotated with Condition Of relations to
+“used”. Annotations of this kind were created when
+annotators deemed such an annotation absolutely
+necessary. Synthesis procedures which required annotation primarily of cross-sentence relations were
+ignored.
+
+2.5 Inter-annotator Agreement
+Next we report a host of inter-annotator agreements
+for the different levels of semantic annotation in
+our dataset. The agreements we report are based on
+a collection of 5 synthesis procedures which were
+annotated separately by all three expert annotators.
+All the numbers we report are Fleiss’ Kappa scores
+for the 3 expert annotators.
+Span-level Labels: Agreements on span level
+labels correspond to the agreement on entity type
+labels assigned to individual tokens. We observe the overall agreement on the token level
+labels to be 0.861. A break down of this agreement by the entity type is presented in Table
+3a. As this indicates, there seems to be high
+agreement on labels which have clear definitions; namely. Number, Amount-Unit. Labels which by definition are a lot more ambiguous, however, have a lower agreement. The
+two entity types Material-Descriptor and
+Nonrecipe-Material see the lowest agreements. We believe these to be inherently
+more subjective entity types. In the case of
+Material-Descriptor it is often that some
+annotators may consider the descriptor and the adjacent material to be Material in its own right,
+for example: “Deionized Water” may be considered as a material in its own right or ”deionized”
+may be considered to be a descriptor. In the case
+of Nonrecipe-Material, a similarly harder
+decision needs to be made by the annotator, since
+these are materials which aren’t involved in the
+synthesis but are still mentioned in the text for
+completeness information. Often it is up to the
+interpretation of the annotator to decide whether a
+material is indeed involved in the synthesis leading
+to the low agreement on this entity type.
+Relation Labels: Agreement on relation labels
+were computed for the set of cases where a pair of
+annotators agreed on the token level annotations,
+this happens 66% of the time in our repeated annotations. For a pair of entities, if both annotators
+indicate the same relation type the annotators are
+considered to be in agreement. For relation labels
+we observe a agreement score of 0.941. Since we
+only consider cases where the token labels are in
+agreement, we believe that it is likely that when annotators agree on the token level annotations they
+also tend to agree on the relation level labels.

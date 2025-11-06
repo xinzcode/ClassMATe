@@ -1,0 +1,20 @@
+class Entity:
+	def __init__(self, name: str):
+		self.name = name
+
+class Relation:
+	def __init__(self, head_entity: Entity, tail_entity: Entity):
+		self.head_entity = head_entity
+		self.tail_entity = tail_entity
+
+# The following class describe the Relation Classes
+{% for class_def in class_defs %}
+{{ class_def }}
+{% endfor %}
+
+# This is a material science literature text
+text = "{{text}}"
+
+"""
+{{question_describe}}
+"""

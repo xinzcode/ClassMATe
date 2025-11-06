@@ -1,0 +1,444 @@
+SC-CoMIcs: A Superconductivity Corpus for Materials Informatics       
+                                                                                  
+                       KyosukeYamaguchi1,RyojiAsahi2,YutakaSasaki1                
+                                1ToyotaTechnologicalInstitute                     
+                          2-12-1Hisakata,Tenpaku-ku,Nagoya,468-8511Japan          
+                 2ToyotaCentralR&DLabs.,Inc.,41-1,Yokomichi,Nagakute,Aichi480-1192,Japan
+                     1{sd19453,yutaka.sasaki}@toyota-ti.ac.jp,2rasahi@mosk.tytlabs.co.jp
+                                                                                  
+                                      Abstract                                    
+       This paper describes a novel corpus tailored for the text mining of superconducting materials in Materials Informatics (MI), named
+       SuperConductivetyCorpusforMaterialsInformatics(SC-CoMIcs).Differentfrombiomedicalinformatics,thereexistveryfewcorpora
+       targeting Materials Science and Engineering (MSE). Especially, there is no sizable corpus which can be used to assist the search of
+       superconductingmaterials. Ateamofmaterialsscientistsandnaturallanguageprocessingexpertsjointlydesignedtheannotationand
+       constructedacorpusconsistingofmanually-annotated1,000MSEabstractsrelatedtosuperconductivity.Weconductedexperimentson
+       thecorpuswithaneuralNamedEntityRecognition(NER)tool. TheexperimentalresultsshowthatNERperformanceoverthecorpus
+       is around 77% in terms of micro-F1, which is comparable to human annotator agreement rates. Using the trained NER model, we
+       automaticallyannotated9,000abstractsandcreatedatermretrievaltoolbasedonthetermsimilarity.Thistoolcanfindsuperconductivity
+       termsrelevanttoaquerytermwithinaspecifiedNamedEntitycategory,whichdemonstratesthepowerofourSC-CoMIcs,efficiently
+       providingknowledgeforMaterialsInformaticsapplicationsfromrapidlyexpandingpublications.
+       Keywords:MaterialsInformatics,SuperconductivityCorpus,NamedEntityRecognition,MaterialsTextMining
+                                                                                  
+                 1. Introduction          thesearchofnewsuperconductingmaterials. 
+       Recently, Materials Informatics (MI) is a hot topic in the 2. AnnotationDesign
+       fieldofMaterialScienceandEngineering(MSE).Therea-                          
+                                          A team of materials scientists and natural language pro-
+       son behind this surge of interests is that a lot of materi-                
+                                          cessing experts jointly designed annotations. Term cate-
+       als scientists are trying to use machine learning to accel-                
+                                          gories are carefully considered to match the requirements
+       erate the search of new materials. To find new materials,                  
+                                          from the domain experts. As a preparation for annota-
+       scientists need to select base materials, adequate doping,                 
+                                          tions,weinitiallyreferredtoakeywordlist1 ofletterjour-
+       andprocessconditionstosynthesizethematerials. Thisis                       
+                                          nal scripta materialia, and the domain experts updated it
+       a very costly, time-consuming process. Traditionally, the                  
+                                          for enrichment. The original keyword list has five cat-
+       experience and intuition of researchers often led to unex-                 
+                                          egories: Synthesis/Processing, Characterization, Material
+       pected discovery of new useful materials. MI is studied                    
+                                          Type,Property/Phenomena,andTheory/ComputerSimula-
+       with a great expectation to change the paradigm in such a                  
+                                          tion/Modeling.Wemodifiedthiscategorizationanddefined
+       longprocessofmaterialsdiscovery. Therehasbeen,how-                         
+                                          thefollowingsevencategoriesassummarizedinTable1:
+       ever, abottleneck, i.e., existenceoffewdatasetsforMIto                     
+       workeffectively(Ramprasadetal.,2017). Characterization: The Characterization
+       The search of superconducting materials is one of the categoryliststhetermsofcharacterizationmethodssuchas
+       mostchallengingissuesinMSE.Evenafterhistoricaldis- X-raydiffraction(XRD)andscanningelectronmicroscope
+       covery of high-Tc cuprate superconductors (Bednorz and (SEM). The information is useful in MSE in relation to
+       Mu¨ller, 1986), materials with a higher transition tempera-                
+                                          ElementandProperty.                     
+       ture, higher current flow, and higher processability are re- Process: The Process category lists the terms of
+       quiredforpracticalapplications(Malozemoffetal., 2005; Synthesis/Processing such as the sol-gel method for film
+       Foltynetal.,2007). Inmaterialsexploration,expertsoften samples,calcinationforbulksamples,andAC/DCsputter-
+       consultthousandsofpublishedandnewarticlesforgetting ing for thin-film preparation. This information is hardly
+       knowledgetodecidearesearchdirection. Thiscanbeone obtainedfromtheoreticalsimulationssuchasdensityfunc-
+       of the factors that hinder the efficient search of supercon- tionaltheory,thusprovidinguniquedatabaseusefulforma-
+       ductingmaterials.                  terialsscientists.                      
+       In this paper, we propose a new corpus named Property: The Property category lists the terms
+       SuperConductivety Corpus for Materials Informatics (SC-                    
+                                          of Property/Phenomena and their Theoretical representa-
+       CoMIcs)tailaoredforthesuperconductivitydomain,evalu-                       
+                                          tions such as electrical conductivity, mechanical hardness,
+       atethecorpususingstate-of-the-artNaturalLanguagePro-                       
+                                          electron-phononcoupling,andFermisurface.Propertyand
+       cessing(NLP),andintroduceatermsearchtoolwhicheffi-                         
+                                          Theory including Simulation and Modeling can belong to
+       cientlyprovidesknowledgehiddeninalargeamountoflit-                         
+                                          eachdifferentcategory. Inthiswork,weunifiedtheminto
+       erature.Tothisend,wehereparticularlyfocusonconstruc-                       
+                                          thePropertycategorybecausetheyaresometimesdiffi-
+       tion of Named Entity Recognition (NER) model based on                      
+                                          culttobedistinguished.                  
+       manually-annotated corpus, which categorizes entity use-                   
+       ful for materials scientists and thus provides new ideas in 1              
+                                            https://www.elsevier.com/ data/promismisc/SMM%20Keywords.pdf
+                            Category  Explanation           Example               
+                            Characterization characterizationmethods X-raydiffraction,SEM
+                            Process   synthesisandprocess   sol-gel,calcination,sputtering
+                            Property  materialsproperties   electrical,cryogenic,magneticfields
+                            Material  structuralentities,sampledescriptors tetragonal,P4/nmm,bulk,film,grain
+                            Element   elements,compounds    Ti,oxygen,YBa Cu O    
+                                                                      2 3 7       
+                            Doping    dopingoperation       doping,addition,doped 
+                            Value     quantitativeinformationwithunits 100K,5-10µm
+                                               Table1: Termcategories             
+                       /2019/MI1000v3/0922                                                         bbrraatt
+                           E Doping E    Element  Value Value Value Val Value Material Process
+                     1The effect of Ca substitution in Ba site of Y(Ba1− x Ca x )2Cu3O7−δ, (x =0.00, 0.04, 0.08, 0.1 and 0.125), ceramics prepared by thermal treatment method was investigated.
+                        Material Material Property   Characterization Char Characterization C
+                     2Surface morphology, structural and superconducting were studied using field emission electron microscope (FESEM), X-ray Diffraction (XRD) and four-probe method.
+                      Char               Material Property      E Doping          
+                     3FESEM analysis showed an increasing of samples’ grain size, homogeneity and compactness with increasing of Ca substitution.
+                         C        Material Material Material Mat                  
+                     4From XRD, the samples had orthorhombic crystal structure of space group Pmmm besides small amount of unknown peaks.
+                          Property Property Val      Val     Value               Value
+                     5The critical temperature (Tc R=zero ) decreased from 87K for the pure sample to 80K for sample with x =0.08, and it remained the same for samples with x ⩾0.08.
+                            Value         Property Prop        Material Material Material
+                     6Sample with x =0.04 showed the sharpest superconducting transition (ΔT c), which could be due to good microstructure morphology and better crystallinity.
+                                              Figure1: Annotationsample           
+                     Material: TheMaterialcategoryliststhetermsof 3.1. DocumentCollection
+                     structural entities and sample descriptors such as tetrago- We collected abstracts through ScienceDirect Web API
+                     nal crystal symmetry, bulk/film sample, and grain bound- fromFebruarytoJunein2019.
+                     ary. The information augments the details of the sample In the first round, we first selected about 4,000 abstracts,
+                     whosecompositionisdefinedbyElement.                          
+                                                       issuedfrom1983to2018,withthequery“supercond*”and
+                                                       finallyselected200abstractsthatinclude:
+                     Element: The Element category lists names and                
+                     symbols of elements and compounds such as Ti, oxygen, • atleastonesuperconductivityterm,
+                     andYBa Cu O orYBCO.Thisisstrictlydistinguishable             
+                         2  3 7                                                   
+                     fromtheMaterialcategoryasentitiesintheElement • at least one term which means doping or transition
+                     categorycanbeexpressedbychemicalcompositionformu- temperature,
+                     lae.                                                         
+                                                         • morethanorequalto100words.
+                     Doping: Since the doping often changes materials             
+                                                       Inthesecondround,weweremoreconfidentaboutabstract
+                     propertiessignificantly,weaddedtheDopingcategoryto           
+                                                       selectionbasedontheexperienceinthefirstroundandse-
+                     representdopingoperationssuchasdoping,substitute,and         
+                                                       lected about 11,000 abstracts, issued from 2010 to 2019,
+                     addition.                                                    
+                                                       bythequery“superconductivity”. Thenwefinallyselected
+                                                       800 abstracts that are not included in the 200 first round
+                     Value: The Value category targets numerical values           
+                                                       abstractsandinclude:       
+                     withunits,suchas160K.Thisenablestoextracttransition          
+                     temperaturesandprocessconditions,forexample. • atleastonetermforeachofsuperconductivity,doping,
+                                                          element/compound,       
+                        3. CorpusConstructionWorkflow    • morethanorequal100words.
+                     This section explains the corpus creation workflow from 3.2. AutomaticLabelingbyPatternMatching
+                     datacollectiontoannotationsteps.                             
+                                                       We then conducted pattern matching-based automatic an-
+                     We conducted two-round annotation processes. The first notationusingatermlistforeachcategorycompliedfrom
+                     round was conducted as a trial annotation since there was the annotated corpus and the keyword list enriched by ex-
+                     noannotationsthatwecanreferredtowhenwestartedthis perts in addition to the original list of scripta materialia.
+                     annotationin2018. Wecollected200abstractsandmanu- This pattern matching-based annotation step was included
+                     allyannotatedthem. Inthesecondround,wecollected800 toalleviatethemanualannotationburden.
+                     abstractsandthenconductedpatternmatching-basedauto- In the pattern matching of term lists against abstracts, we
+                     matic annotation using a term list for each category. We basically performed matching within generated variations
+                     finallymanuallyannotatedtermsinthe800abstracts. of term list entries. Specifically, we applied lemmatiza-
+                     Intheremainderofthissection,weexplaindocumentcol- tionprocessandregularexpressionbasedpatternmatching.
+                     lection,patternmatching,andmanualannotation. Inthelemmatizationprocess,weremovedentryinflections
+                                      Annotator         A                B        
+                                      Category   Precision Recall F1 Precision Recall F1
+                                      Characterization 0.947 0.900 0.923 0.905 0.950 0.927
+                                      Material     0.867 0.697 0.773 0.771 0.607 0.679
+                                      Property     0.817 0.744 0.779 0.774 0.774 0.774
+                                      Element      0.964 0.951 0.957 0.837 0.796 0.816
+                                      Doping       1.000 1.000 1.000 0.974 0.884 0.927
+                                      Process      0.933 0.824 0.875 0.906 0.853 0.879
+                                      Value        0.730 0.836 0.780 0.750 0.927 0.829
+                                      Total(micro-ave.) 0.879 0.822 0.850 0.812 0.777 0.794
+                                      Annotator         C                D        
+                                      Category   Precision Recall F1 Precision Recall F1
+                                      Characterization 0.727 0.800 0.762 0.900 0.900 0.900
+                                      Material     0.779 0.607 0.682 0.911 0.754 0.825
+                                      Property     0.703 0.732 0.717 0.757 0.649 0.699
+                                      Element      0.818 0.761 0.788 0.815 0.838 0.826
+                                      Doping       0.966 0.651 0.778 0.969 0.721 0.827
+                                      Process      0.735 0.735 0.735 0.788 0.765 0.776
+                                      Value        0.776 0.945 0.852 0.688 0.800 0.739
+                                      Total(micro-ave.) 0.769 0.729 0.749 0.813 0.752 0.781
+                           Table3: Agreementscoresoffourannotator’s(A,B,C,andD)annotationswithrespecttothereferenceannotations
+                          corpuswouldhavebetterannotationqualitythantheagree- 5.3. LearningCurves
+                          mentratesinTable3.                                      
+                                                             To see whether the number of training data is sufficient
+                                                             or not, we draw learning curves by changing the num-
+                                    5. Experiments           ber of training data from 100 to 900 by the 100 unit.
+                                                             We trained each model ten times and computed the aver-
+                          5.1. ExperimentalSettings                               
+                                                             age of the scores. The results are displayed in Figure 4.
+                          Recently, Bidirectional Encoder Representations from The scores grow as the number of data increases. When
+                          Transformers (BERT) (Devlin et al., 2018) is used in var- we used 900 abstracts, the recognition performance of
+                          ious NLP applications and contributed to improve perfor-
+                                                             Doping, Characterization,andPropertyseems
+                          mance. We used the pre-trained embedding model SciB- to be saturated but that of Process and the other cat-
+                          ERT(Beltagyetal.,2019),whichisaBERTmodelthatis egories are still slightly increasing. The number of oc-
+                          trainedonalarge-scalescientificliterature. BERTisacon- currences of Characterization terms in the corpus
+                          textualembeddingmodel,whichmeansthatanembedding is relatively small; however, since its NER performance
+                          vectorofthesamewordchangesaccordingtothesurround- seems to be saturated using 900 training abstracts, the
+                          ingwords. WeusedtheSciBERTNERmodelwiththede- number of Characterization terms in the corpus is
+                          fault parameter settings, which is provided along with the not a serious problem; while its NER performance has
+                          SciBERTmodel.2                     room to improve as its human annotator performance is
+                                                             mostly much higher. We believe that we need to use do-
+                          The input for SciBERT NER was the SciBERT (uncased)     
+                                                             main knowledge to improve the recognition performance
+                          pre-trained model. SciBERT NER is a stack of Bi-        
+                                                             ofCharacterizationterms.Ingeneral,thesizeofthe
+                          LSTM→CRFlayersanddeterminescategorylabelsinthe          
+                                                             SC-CoMIcscorpusisprovedtobemostlysufficientwhile
+                          form of IOB2 tagging. In the preprocessing, we removed  
+                                                             thelargerdataisthebetterforsomecategories,sameasthe
+                          innerNEannotationsinthenestedannotations.               
+                                                             casesinanymachinelearning-basedapproaches.
+                          5.2. NERPerformance                                     
+                                                             5.4. ApplicationswithWordSimilarity
+                          WeevaluatedtheNERperformanceusingthe10-foldcross        
+                                                             To see the usefulness of our corpus, we created a term re-
+                          validation. In the training, SciBERT embedding models   
+                                                             trieval tool (Figure 5) based on the word similarity using
+                          were fixed, i.e., no fine tuning applied. The evaluation re-
+                                                             word2vec (Mikolov et al., 2013). We used the word2vec
+                          sultsareshowninTable4. Thescoresinthetablearethe        
+                                                             module in the gensim (Rˇehu˚ˇrek and Sojka, 2010) Python
+                          averagesoftentimesoftraining. Comparedtothehuman        
+                                                             library. The used algorithm is the skip-gram with nega-
+                          annotatoragreementrates,theNERachievedquitecompa-       
+                                                             tive sampling. The details of the parameter settings are
+                          rableperformancetomostofthehumanannotators.Table5       
+                                                             showninTable6. WhileBERTanditsfamilyarecontex-
+                          showsresultsforeachfoldofthecrossvalidation.            
+                                                             tualembeddingmodelsandneedalargeamountofcorpus,
+                                                             word2vecismoresuitableforgeneratingwordvectorsfrom
+                           2https://github.com/allenai/scibert annotated10,000abstracts.
+                   Category    Precision Recall F1      Characterization Material Property
+                   Characterization 0.780 0.771 0.774   Element   Doping    Process
+                                                        Value     Total           
+                   Material      0.752 0.738 0.743    1                           
+                   Property      0.734 0.689 0.711                                
+                                                     0.95                         
+                   Element       0.842 0.869 0.855                                
+                   Doping        0.960 0.964 0.961    0.9                         
+                   Process       0.739 0.729 0.733                                
+                                                     0.85                         
+                   Value         0.807 0.635 0.709  e r                           
+                                                    o                             
+                   Total(micro-ave.) 0.784 0.754 0.768 c s 0.8                    
+                                                    F                             
+                                                    o-                            
+                                                     0.75                         
+                       Table4: ScoresofSciBERTNER   r c                           
+                                                    im                            
+                                                      0.7                         
+                       Fold Precision Recall F1                                   
+                                                     0.65                         
+                        1∗   0.793 0.752 0.772                                    
+                        2∗   0.706 0.714 0.710        0.6                         
+                        3    0.721 0.754 0.737       0.55                         
+                        4    0.788 0.756 0.772         0    200  400   600  800  1,000
+                        5    0.809 0.778 0.793                 Number of training data
+                        6    0.806 0.751 0.778                                    
+                        7    0.786 0.734 0.759           Figure4: Learningcurvesbycategories
+                        8    0.809 0.757 0.782                                    
+                        9    0.817 0.778 0.797                                    
+                                                   rized, legitimating the present NER model; except a few
+                        10   0.809 0.761 0.784                                    
+                                                   errorssuchasfield-cooledandliquidnitrogentemperature
+                                                   whichseemtobeinProcessbutshouldbeconditionsof
+                Table5: Scoresforeachfold: *indicatesthefoldinwhich               
+                                                   Characterization. The entities selected with ”film”
+                the first annotated 200 abstracts are used as a test data for     
+                                                   query include overall typical processing for film samples;
+                SciBERTNERtool.                                                   
+                                                   those selected with ”bulk” query include reasonably the
+                                                   bulk processing. These Process entities can be further
+                Every multi-word NE term is converted into a single to- selectedbycombininganotherquery,forexample,acom-
+                kenexceptfortheElementtermthatconsistsofalistof poundname. Incontrast,withoutannotateddocuments,we
+                compoundnames,whichrepresentsamaintargetsupercon- cannotfocusonaspecificcategoryoftermsasshowninTa-
+                ductingmaterialentityoftheabstract. Inthepresentstudy, ble8,wherewefindfewtermscategorizedinProcess.
+                we separated Element terms, which include more than               
+                                                             6. RelatedWork       
+                oneelement,intopieces. Forexample,anElementterm                   
+                “YBa Cu O ”isseparatedinto“Y”,“Ba”,“Cu”,“O”.This ThereareplentyofNERdatasetswhichtargetgeneralEn-
+                    2 3 7                                                         
+                simpleconversionofcompoundnamesisusefultocapture glish documents, mostly news articles. The CoNLL 2003
+                distances among elements based on existing compounds dataset(SangandDeMeulder,2003)havefournameden-
+                andtherelatedentitiesthroughembedding. tity tags: LOC (location), ORG (organization), PER (per-
+                Weautomaticallyannotated9,000abstractsusingtheNER son) and MISC (miscellaneous). Ontonotes 5.0 (Pradhan
+                modeltrainedoverourcorpus. Usingthecorpusandauto- et al., 2013) handles wider range of documents including
+                maticallyannotatedabstracts,wecreatedwordvectorswith phone conversations and Web pages. In the biomedical
+                the300dimensionalitybythegensimword2vectool. area,therearealotofannotatedcorpus,suchastheGENIA
+                The term retrieval tool finds terms relevant to the query corpus(Kimetal.,2003). Inthechemistryarea,CHEMD-
+                term using the trained word2vec word vectors. The spe- NER(Krallingeretal.,2015)targetsextractionofchemical
+                cial feature of this tool is that we can specify categories materialswithsevenfinegrainedcategories,suchasabbre-
+                to show as relevant terms. Table 7 shows the ranked re- viationsandidentifiers. i2b2challenge2010data(Uzuner
+                trievalresultsofqueries“film”and“bulk”intheProcess etal.,2011)targetstheextractionofmedicalconceptsfrom
+                category. Note that, abbreviations are removed from radiologyreports.
+                the ranked terms. The terms with * are those which On the other hand, there are few manually annotated cor-
+                are judged by experts reasonably to be categorized in porainMaterialsScienceandEngineering. Exceptionsare
+                Process. The most of the terms are correctly catego- matscholar (Weston et al., 2019), the materials synthesis
+                                                   corpus (Mysore et al., 2019), and (Foppiano et al., 2019).
+                                                   The matscholar has annotations of seven entities, such as
+                          Parameter Value          materialnames,synthesismethods,andapplications.How-
+                          dimentionality 300       ever, it targets the general material science domain while
+                          windowsize   8           we focus on superconducting domain. In addition, we in-
+                          minimumcount 5           clude numerical expressions, such as temperatures, which
+                          negative     1           are essential for finding new superconductors. For refer-
+                                                   ence, inter-annotatoragreementofthiscorpuswas87.4%.
+                    Table6: Hyperparametersofword2vecmodel Thematerialssynthesiscorpusisannotatedinformationre-
+                             Query          film                    bulk          
+                             Rank Term             Similarity Term         Similarity
+                              1   *epitaxially       0.4384 *melt-processed  0.3608
+                              2   *epitaxiallygrown  0.4070 *sintered        0.3018
+                              3   *substratetemperature 0.4009 *milled       0.2905
+                              4   *ionbeam           0.3951 *welded          0.2762
+                              5   *epitaxialgrowth   0.3916 *Growth          0.2760
+                              6   *deposited         0.3905 *pressed         0.2729
+                              7   *partialmelting    0.3884 *infiltration    0.2678
+                              8   *depositions       0.3856 *ex-situ         0.2659
+                              9   *Growth            0.3802 *heattreatmenttemperature 0.2599
+                              10  *reactivesputtering 0.3785 *sinteringtemperatures 0.2598
+                              11  *growthparameters  0.3779 *joined          0.2586
+                              12  *deposition        0.3757 *ball-milled     0.2580
+                              13  *seeding           0.3747 *powder-in-tubemethod 0.2576
+                              14  *pyrolysis         0.3692 *solidified      0.2570
+                              15  *heattreatmenttemperature 0.3684 *solid-statereactions 0.2555
+                              16  *melt-processed    0.3682 field-cooled     0.2531
+                              17  *sputteringpressure 0.3678 liquidnitrogentemperature 0.2517
+                              18  *dcsputtering      0.3656 *partialmelting  0.2512
+                              19  *growthtemperature 0.3647 field-cooling    0.2415
+                              20  *as-deposited      0.3635 *meltgrowth      0.2385
+                                    Table7: TermretrievalresultswithProcesscategoryrestriction.
+                              Query         film                   bulk           
+                              Rank Term          Similarity Term          Similarity
+                               1   films           0.5081 magnetized        0.3870
+                               2   crack-free      0.4472 single-domain     0.3738
+                               3   *epitaxially    0.4384 iron-arsenide     0.3683
+                               4   magneticshield  0.4339 Bulk              0.3644
+                               5   buffered        0.4270 *melt-processed   0.3608
+                               6   filmsurface     0.4264 single-grain      0.3591
+                               7   c-axisorientation 0.4230 singlegrains    0.3552
+                               8   bufferlayers    0.4170 levitationforce   0.3537
+                               9   substrate       0.4150 *levitation       0.3513
+                               10  sapphire        0.4122 guidanceforce     0.3497
+                               11  Flat            0.4112 permanentmagnetguideway 0.3463
+                               12  domainstructure 0.4108 singledomain      0.3424
+                               13  substratesurface 0.4104 high-Tcsuperconductor 0.3318
+                               14  bufferlayer     0.4072 bulkmagnet        0.3241
+                               15  *epitaxiallygrown 0.4070 pellet          0.3200
+                               16  nanodots        0.4066 magneticstiffness 0.3198
+                               17  faceted         0.4021 criticalcurrentanisotropy 0.3196
+                               18  *substratetemperature 0.4009 bulks       0.3195
+                               19  surfaceroughness 0.3992 typeIIsuperconductor 0.3144
+                               20  *ionbeam        0.3951 jointresistance   0.3100
+                                   Table8: TermretrievalresultswithoutProcesscategoryrestriction.
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                                                                  
+                                           Proceedings of the LREC 2010 Workshop on New
+                                           Challenges for NLP Frameworks, pages 45–50, Val-
+              BibliographicalReferences    letta, Malta, May. ELRA. http://is.muni.cz/
+                                           publication/884893/en.                 
+       Bednorz, J. and Mu¨ller, K. (1986). Possible hightc su-                    
+                                          Sang,E.F.andDeMeulder,F. (2003). Introductiontothe
+         perconductivityintheba-la-cu-osystem. Zeitschriftfu¨r                    
+                                           conll-2003 shared task: Language-independent named
+         PhysikBCondensedMatter,64(2):189–193.                                    
+                                           entityrecognition. arXivpreprintcs/0306050.
+       Beltagy, I., Cohan, A., and Lo, K. (2019). Scibert: Pre-                   
+                                          Stenetorp, P., Pyysalo, S., Topic´, G., Ohta, T., Ananiadou,
+         trained contextualized embeddings for scientific text.                   
+                                           S.,andTsujii,J. (2012). brat: aweb-basedtoolfornlp-
+         arXivpreprintarXiv:1903.10676.                                           
+                                           assisted text annotation. In Proceedings of the Demon-
+       Devlin, J., Chang, M.-W., Lee, K., and Toutanova, K.                       
+                                           strationsatthe13thConferenceoftheEuropeanChapter
+         (2018). Bert: Pre-training of deep bidirectional trans-                  
+                                           of the Association for Computational Linguistics, pages
+         formers for language understanding. arXiv preprint                       
+                                           102–107.AssociationforComputationalLinguistics.
+         arXiv:1810.04805.                                                        
+                                          Tamari, R., Shindo, H., Shahaf, D., and Matsumoto, Y.
+       Foltyn, S., Civale, L., and MacManus-Driscoll, J.                          
+                                           (2019). Playing by the book: An interactive game ap-
+         e. a. (2007). Materials science challenges for high-                     
+                                           proachforactiongraphextractionfromtext. InProceed-
+         temperature superconducting wire. Nature Mater.,                         
+                                           ings of the Workshop on Extracting Structured Knowl-
+         6:631–642.                                                               
+                                           edge from Scientific Publications, pages 62–71, Min-
+       Foppiano, L., Thaer, M. D., Suzuki, A., and Ishii, M.                      
+                                           neapolis, Minnesota, June. Association for Computa-
+         (2019). Proposalforautomaticextractionframeworkof                        
+                                           tionalLinguistics.                     
+         superconductorsrelatedinformationfromscientificliter- Uzuner, O¨., South, B. R., Shen, S., and DuVall, S. L.
+         ature. LettersandTechnologyNews,119(66):1–5.                             
+                                           (2011). 2010i2b2/vachallengeonconcepts, assertions,
+       Kim,J.-D.,Ohta,T.,Tateisi,Y.,andTsujii,J. (2003). Ge-                      
+                                           and relations in clinical text. Journal of the American
+         nia corpus – a semantically annotated corpus for bio-                    
+                                           MedicalInformaticsAssociation,18(5):552–556.
+         textmining. Bioinformatics,19(suppl 1):i180–i182.                        
+                                          Weston, L., Tshitoyan, V., Dagdelen, J., Kononova, O.,
+       Krallinger,M.,Leitner,F.,Rabal,O.,Vazquez,M.,Oyarz-                        
+                                           Trewartha, A., Persson, K. A., Ceder, G., and Jain, A.
+         abal,J.,andValencia,A. (2015). Chemdner: Thedrugs                        
+                                           (2019). Namedentityrecognitionandnormalizationap-
+         and chemical names extraction challenge. Journal of                      
+                                           pliedtolarge-scaleinformationextractionfromthemate-
+         cheminformatics,7(1):S1.                                                 
+                                           rialsscienceliterature. Journalofchemicalinformation
+       Malozemoff,A.P.,Mannhart,J.,andScalapino,D. (2005). andmodeling,59(9):3692–3702.
+         High-temperature cuprate superconductors get to work.                    
+         PhysicsToday,April:41–47.                                                
+       Mikolov, T., Sutskever, I., Chen, K., Corrado, G. S., and                  
+         Dean, J. (2013). Distributed representations of words                    
+         and phrases and their compositionality. In Advances                      
+         in neural information processing systems, pages 3111–                    
+         3119.                                                                    
+       Mysore, S., Jensen, Z., Kim, E., Huang, K., Chang, H.-                     
+         S.,Strubell,E.,Flanigan,J.,McCallum,A.,andOlivetti,                      
+         E. (2019). Thematerialsscienceproceduraltextcorpus:                      
+         Annotatingmaterialssynthesisprocedureswithshallow                        
+         semanticstructures. arXivpreprintarXiv:1905.06939.                       
+       Olson, G. (2013). Genomicmaterialsdesign: Theferrous                       
+         frontier. Acta Materialia, 61(3):771 – 781. The Dia-                     
+         mondJubileeIssue.                                                        
+       Onishi, T., Kadohira, T., and Watanabe, I. (2018). Rela-                   
+         tionextractionwithweaklysupervisedlearningbasedon                        
+         process-structure-property-performancereciprocity. Sci-                  
+         enceandtechnologyofadvancedmaterials, 19(1):649–                         
+         659.                                                                     
+       Pradhan,S.,Moschitti,A.,Xue,N.,Ng,H.T.,Bjo¨rkelund,                        
+         A., Uryupina, O., Zhang, Y., and Zhong, Z. (2013).                       
+         Towards robust linguistic analysis using ontonotes. In                   
+         Proceedings of the Seventeenth Conference on Compu-                      
+         tationalNaturalLanguageLearning,pages143–152.                            
+       Ramprasad,R.,Batra,R.,andPilania,G.e.a. (2017). Ma-                        
+         chine learning in materials informatics: recent applica-                 
+         tionsandprospects. npjComput.Mater.,3:54.                                
+       Rˇehu˚ˇrek, R. and Sojka, P. (2010). Software Frame-                       
+         work for Topic Modelling with Large Corpora. In

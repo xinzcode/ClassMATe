@@ -1,0 +1,9 @@
+{
+    "cmt": "Characterization method (CMT): Any method used to characterize a material, experiment or theory: e.g., \u201cphotoluminescence\u201d, \u201cXRD\u201d, \u2018tight binding\u201d, \u201cDFT\u201d.```",
+    "mat": "Any inorganic solid or alloy, any non-gaseous element (at RT), e.g., \u201cBaTiO3\u201d, \u201ctitania\u201d, \u201cFe\u201d.```",
+    "dsc": "Sample descriptor (DSC): Special descriptions of the type/shape of the sample. Examples include \"single crystal\", \"nanotube\", \"quantum dot\".```",
+    "pro": "Property: Anything measurable that can have a unit and a value, e.g., \u201cconductivity\u201d, \u201cband gap\u201d; or, any qualitative property or phenomenon exhibited by a material, e.g., \u201cferroelectric\u201d, \u201cmetallic\u201d.```",
+    "smt": "Any technique for synthesising a material, e.g., \u201cpulsed laser deposition\u201d, \u201csolid state reaction\u201d, or any other step in sample production such as \u201cannealing\u201d or \u201cetching\u201d.```",
+    "apl": "\"Application (APL): Any high-level application such as \u201cphotovoltaics\u201d, or any specific device such as \u201cfield-effect transistor\u201d.\"",
+    "spl": "Symmetry/phase label (SPL): Names for crystal structures/phases, e.g., \u201ctetragonal\u201d, \u201cfcc\u201d, \u201crutile\u201d, \u201cperovskite\u201d; or, any symmetry label such as \u201cPbnm\u201d, or \u201cPnma\u201d.```"
+}

@@ -1,0 +1,73 @@
+ULSA: unified language of synthesis actions for the representation of inorganic synthesis protocols
+
+Applying AI power to predict syntheses of novel materials requires high-quality, large-scale datasets.
+Extraction of synthesis information from scientific publications is still challenging, especially for
+extracting synthesis actions, because of the lack of a comprehensive labeled dataset using a solid,
+robust, and well-established ontology for describing synthesis procedures. In this work, we propose the
+first unified language of synthesis actions (ULSA) for describing inorganic synthesis procedures. We
+created a dataset of 3040 synthesis procedures annotated by domain experts according to the proposed
+ULSA scheme. To demonstrate the capabilities of ULSA, we built a neural network-based model to map
+arbitrary inorganic synthesis paragraphs into ULSA and used it to construct synthesis flowcharts for
+synthesis procedures. Analysis of the flowcharts showed that (a) ULSA covers essential vocabulary used
+by researchers when describing synthesis procedures and (b) it can capture important features of
+synthesis protocols. The present work focuses on the synthesis protocols for solid-state, sol–gel, and
+solution-based inorganic synthesis, but the language could be extended in the future to include other
+synthesis methods. This work is an important step towards creating a synthesis ontology and a solid
+foundation for autonomous robotic synthesis.
+
+ Unied language of synthesis actions and annotation
+scheme
+To unify terminology used to describe a synthesis procedure, we
+dened 8 action terms that unambiguously identify a type of
+synthesis action. Every action word (or multi-word phrase) in
+the dataset is mapped to the corresponding action term
+according to the following rule: the word (or multi-word phrase)
+is recognized as an action if it (a) results in modication of the
+state of the material or mixture during the synthesis or (b)
+carries a piece of information affecting the outcome of the
+synthesis procedure. The action terms used within the unied
+language are explained below. In each example, the text
+underlined is the word or phrase that is annotated.
+ Starting: a word or a multi-word phrase that marks the
+beginning of a synthesis procedure. Specically, this oen
+indicates which materials will be produced. For example: “PMNPT was synthesized by the columbite precursor method”, “solidstate synthesis was used to prepare the target material”, “the
+powder was obtained aer the aforementioned procedure”.
+ Mixing: a word or a multi-word phrase that marks the
+combination of different materials (in a solid or liquid phase) to
+form one substance or mass. For example: “precursors were
+weighted and ball-milled”, “precursors were mixed in appropriate amounts”, “Sb2O3 is added to the solution”, “the solution
+was neutralized”, “the mixture was stabilized by the addition of
+sodium citrate”.
+ Purication: a word or a multi-word phrase that marks the
+separation of the sample phases. This also includes drying of
+a material. For example: “samples were exfoliated from
+substrates”, “the liquid was discarded and the remaining
+product was ltered off and washed several times with distilled
+water”, “the precursors were heated in order to remove the
+moisture”, “the precipitate was collected by washing the solution in distilled water”.
+ Heating: a word or a multi-word phrase that marks
+increasing or maintaining high temperature for the purpose of
+obtaining a specic sample phase or promoting a reaction
+rather than drying a sample. For example: “the powder sample
+was annealed to obtain a crystalline phase”, “the mixture was
+subjected to heating at 240 C for 24 h”.
+ Cooling: a word or a multi-word phrase that marks rapid,
+regular, or slow cooling of a sample. For example: “the product
+was cooled down to room temperature in the furnace”, “the
+sample was quenched rapidly in the solid CO2”, “the product
+was le to cool down to room temperature”.
+ Shaping: a word or a multi-word phrase that marks the
+compression of powder or forming the sample to a specic
+shape. For example: “the powder was pressed into circular
+pellets”, “the powder was then pelletized with a uniaxial press”.
+ Reaction: a word or a multi-word phrase that marks
+a transformation without any external action. For example: “the
+sample was le to react for 6 h”, “the temperature was kept at
+1000 K”, “the solution was maintained at 200 K for 12 h”.
+ Non-Altering: a word or a multi-word phrase that marks an
+action done on a sample that either does not induce any
+transformation of the sample or does not belong to any of the
+above classes. “The pellets were placed in a sealed alumina
+crucible”, “the reaction vessel was wrapped with aluminum
+foil”, “the sample was sealed in a tube”, “the gel was transferred
+to an oven”.

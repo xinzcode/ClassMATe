@@ -1,0 +1,199 @@
+The SOFC-Exp Corpus and Neural Approaches to Information Extraction in the Materials Science Domain
+
+1 EXPERIMENT MENTIONS
+As a first step, we identify sentences that describe a relevant solid oxide fuel cell experiment. Such sentences
+should explicitly mention at least one of the following elements:
+· The material composition of the fuel cell
+· The condition of operation of the fuel cell
+· The type of fuel cell
+· A chemico-physical property of the whole fuel cell
+Among other things, we do not mark descriptions of processes, experiments unrelated to fuel cells, characterization
+techniques, synthesis procedures, explanations or evaluations. In this annotation pass, we do not mark material
+structure or any general material properties either.
+Usually, but not necessarily, an experiment is introduced to the text by a frame-evoking verb such as test, evaluate,
+measure, or generate. Depending on the context, the same verb may occur as frame-evoking element or not.
+We annotate the words that introduce the experiments involving fuel cells with one of these labels:
+· current_experiment: when original and novel content is introduced.
+· previous_work: when the sentence focuses on specific previous work described in detail in other sources.
+· general_info: when the state of the art of fuel cells is described, e.g., general knowledge that one could find in a
+textbook or in a survey.
+· future_work: when the authors suggest further research topics.
+
+Examples
+Note: For the sake of clarity, the examples in these guidelines are only partially annotated. In each section, they
+display exclusively the frame participants and relations that are being discussed.
+· Solid oxide fuel cells (SOFCs) are based [general_info] on a ceramic electrolyte and work at elevated temperature
+between 600 and 1000 °C. [PMC4021905]
+· In this report, we demonstrate [current_experiment] a prototypical, AAO-supported thin-film fuel cell with a
+bilayered electrolyte comprising a GDC film and a thin protective YSZ layer. [PMC3564701]
+· Shim et al. demonstrated [previous_work] that a fuel cell employing a 40-nm-thick yttria-stabilized zirconia (YSZ)
+can generate a power density of 270 mW/cm2 at 350°C [11], while Kerman et al. demonstrated [previous_work]
+1,037 mW/cm2 at 500°C from a 100-nm-thick YSZ-based fuel cell [12]. [PMC3564701]
+· Further optimization of BEC thickness may enhance the cell performance, which could lead [future_work] to
+wider potential applications of AAO supporting TF-SOFCs as high-efficiency power sources. [PMC4578433]
+· Citric acid (99+%, Alfa Aesar), in a 2:1 molar ratio to the metal ions in the final product, was added and heated till
+a solution was formed. [synthesis route: no annotations here] [PMC5075869]
+· In general, a scan rate of 2Hz and a resolution of 512×512 pixels over a scan area of 1×1 µm2 2were chosen.
+[characterization technique: no annotations here] [PMC6158676]
+· X-ray diffraction of SrFe0
+· 9−xCuxNb0
+· 1O3−δ (x = 0–0.4) showed that it exhibited a single phase cubic perovskite
+structure (SG: Pm-3m) for all compounds. [Experiment not about SOFC: no annotations here] [PMC5075869]
+· La2O3
+, SrCO3 and Co powders (all Sigma-Aldrich, 99.995%) were individually dissolved in nitric acid, mixed
+inappropriate ratios and citric acid (TraceSELECT, 99.9998%) was added for chelation. [synthesis route: no
+annotations here] [PMC6158676]
+· The electrolyte support cell used in this study was prepared through a tape casting process, with the outer two
+layers having pore formers. [processing: no annotations here] [PMC5075869]
+
+2 PARTICIPANT TYPES
+This section describes the high-level entity or concept types that are used to mark the spans in the text referring
+to the participants of an experiment. In order to keep the amount of required annotation feasible, but also provide
+training data for these types independent of the frame mentions, we decide to mark all mentions of instances of
+these types that occur within or in the neighbourhood of sentences actually describing a fuel cell experiment. We use
+a loose definition of neighbourhood, including the paragraph or, if paragraph boundaries are unclear, the surrounding
+sentences. Annotators are asked to apply their own common sense to define the “relevant neighborhood” for a
+sentence.
+2.1 MATERIAL
+We use the type MATERIAL to annotate text spans referring to materials, elements or substances that are mentioned
+as a participant in a fuel cell experiment. (For a list of such participants, see Section 3.) These participants
+may be specified by a particular material composition formula (e.g. La0.75Sr0.25Cr0.5Mn0.5O3
+) or, at the other end
+of the spectrum, just by a mention of the general class of materials such as oxides or hydrocarbons. If a cell
+component (e.g., an electrode) is composed of multiple materials, we annotate all of them, if possible as a single
+span. References to previous mentions of the material as in material, this, new anode etc. can also be annotated as
+spans of type MATERIAL. (In this case, if the mention is not informative on its own, a coreference link should be
+added as described in Section 4.2.) Adjectives relative to the material are included in the annotation only if they are
+necessary to distinguish between different materials that may have the same composition.
+Examples
+In the following examples, all underlined spans are marked as MATERIAL.
+· Gadolinium-doped ceria (GDC) has been considered as a promising electrolyte material due to its excellent
+oxygen ion conductivity at low temperatures. [PMC3564701]
+· A low temperature active cathode (like LaSrCoFe-oxide or SmSrCo-oxide) can be used, together with an interlayer
+against diffusion or reaction for long term stability. [PMC4021905]
+· They run not only on hydrogen, but also on widely available hydrocarbon fuels. [PMC4222441]
+· The cells consisted of Ni-YSZ functional anode, YSZ electrolyte and (La0.8Sr0.2)0.95MnO3-δ (LSM)-YSZ cathode
+prepared in sequence on the substrate by dip-coating and sintering. [PMC4313086]
+· The cell stacks composed of Ce0.9Gd0.1O1.95 porous electrolyte and La1−xSrxMnO3 (x = 0.15, and 0.5)
+composite electrode were investigated by Werchmeister et al. [80]. [PMC3730159]
+2.2 VALUE
+We annotate numerical values and their respective units with the type VALUE. As illustrated by the examples below,
+we include both the numbers and the units in the annotation span. In addition, we include comparative specifiers like
+more than, between etc.
+Examples
+In the following example, all underlined spans are marked as VALUE.
+· The single-phase SP parent material Ba0.5Sr0.5(Co0.8Fe0.2)O3−δ itself is an MIEC and effective SOFC cathode
+that displays a range of ASR values from 0.03 to 10 Ω·cm2 at 650 °C. [PMC3793895]
+2.3 DEVICE
+The type DEVICE is used to mark mentions of the device used in the fuel cell experiment. We do not include any
+modifiers such as adjectives in the annotation span.1
+Examples
+· The corresponding SOFC with Pt/SmNiO3/Pt geometry demonstrated dramatic power output of 225 mW cm-2 at
+500°C. [PMC5793538]
+
+3 EXPERIMENT PARTICIPANTS (RELATIONS)
+The relations explained in this section are used to indicate the participants of an experiment frame. In order to group
+the various materials, values etc. into experiments, we connect them to the word in the text that indicates that an
+experiment was conducted, i.e., the frame-evoking element. All of these relations have their starting point at the
+frame-evoking element and their end point at the respective participant.
+An experiment participant should always be connected to the closest frame-evoking element, which should be
+located in the same sentence and preferably in the same clause of the participant. If the information about the
+participants of an experiment is spread over multiple sentences, please connect the participant mention to the
+closest experiment-evoking verb and then group these verbs by connecting the frame-evoking elements with
+same_experiment.
+3.1 anode_material
+This relation is used to mark connections between the frame-evoking element and the material that makes up the
+anode.
+As a convention, we will always annotate the fuel electrode as anode material (even in case of electrolytic cells).
+We annotate as anode materials also the ion conductive material in a composite anode even if the electrolyte is
+made of the same material. For example, if there are two materials present in the anode, we annotate them both as
+anode_material, even if one of them is also the electrolyte material.
+See 6.3 for more information about anodes in solid oxide fuel cells.
+3.2 cathode_material
+This relation is used to connect the frame-evoking element and the material that makes up the cathode.
+As a convention, we will always annotate the oxygen electrode as a cathode material (even in case of electrolytic
+cells). We annotate as cathode materials also the ion conductive material in a composite cathode even if the
+electrolyte is made of the same material. For example, if there are two materials present in the cathode, we annotate
+them both as cathode_material, even if one of them is also the electrolyte material.
+See Section 6.2 for more information about cathodes in solid oxide fuel cells.
+3.3 electrolyte_material
+This relation connects the frame-evoking element and the material that makes up the electrolyte.
+Electrolytes are briefly discussed in section 6.4
+3.4 support_material
+This relation connects the frame-evoking element and the material that makes up the support of the cell.
+For more information, see Section 6.7.
+3.5 interlayer_material
+This relation connects the frame-evoking element with a material used as interlayer or buffer layer in a SOFC.
+3.6 fuel_used
+This relation connects the frame-evoking element and the chemical composition or the class of a fuel or the oxidant
+species (indicated as a material).
+3.7 device
+This relation is used to connect the frame-evoking element and the device tested in this experiment.
+3.8 degradation_rate
+This relation connects the frame-evoking element with the degradation rate of the cell, which can be also expressed
+as a percentage.
+3.9 power_density
+This relation connects the frame-evoking element with the values of the (maximum/peak) power density obtained
+from a device.
+3.10 resistance
+This relation connects the frame-evoking element to the mention of the electrical resistance of a cell or cell component.
+In SOFC experiments, the resistance is usually expressed in area specific units: Ω cm2
+. Ohmic resistance and
+polarization resistance can be distinguished via the corresponding entries in the knowledge base.
+3.11 conductivity
+This relation connects the frame-evoking element to the mention of the electrical conductivity of a certain cell or cell
+component. Electronic and ionic conductivites can be distinguished via the corresponding entries in the knowledge
+base.
+3.12 open_circuit_voltage
+This relation connects the frame-evoking element and the value of the open circuit voltage (OCV) obtained from a
+device.
+3.13 working_temperature
+This relation connects the frame-evoking element with the value of the temperature at which the cell is operated or at
+which a certain experiment has been performed. If the temperature is expressed as a range (e.g., “between 700 and
+800 ◦C”), this VALUE is marked as a single span. If a sentence mentions several experiments with differing temperatures, but only one frame-evoking element can be identified, simply link all temperature values to this element. For
+example: “It can be seen[EXPERIMENT ] that the electrode polarization resistances in air are 0.027 Ωcm2, 0.11 Ωcm2, and 0.88 Ωcm2 at 800 ◦C[working_temperature], 700 ◦C[working_temperature] and 600 ◦C[working_temperature],
+respectively.” [PMC4673446] Note that in this case, each of the values is annotated as a separate link as they do not
+correspond to a range of values but to different experiments.
+3.14 time_of_operation
+This relation connects the frame-evoking element with the value of the duration of an experiment. The duration of an
+experiment can be expressed in hours or as a number of RedOx cycles.
+3.15 voltage
+This relation connects the frame-evoking element with the value of the voltage at which a cell was operated. Not to
+be confused with open_circuit_voltage (see Section 3.12).
+3.16 current_density
+This relation connects the frame-evoking element with the value of the current density of that experimental setup.
+
+4 ADDITIONAL ANNOTATIONS
+We here describe several relations that are not part of the Experiment frame.
+4.1 same_experiment and experiment_variation
+The relations described in Section 3 all assume that the frame-evoking elements occurs in the same sentence as the
+participants of the frame. Very often, however, the description of an experiment is spread over several sentences.
+Annotators are then asked to link the frame participants to the closest frame-evoking element, which usually is in the
+same sentence. The relations explained here are used to connect several frame-evoking elements that describe the
+exact same experiment or variations of the experimental settings explained above. While at times it may be difficult
+to differentiate them, we distinguish the following two cases:
+· same_experiment: This relation connects words introducing a fuel cell experiment with a following frame-evoking
+element indicating more experimental information on the same cell with the same experimental conditions. Sometimes the frame-evoking elements of this kind have a meaning of further or deeper investigation or explanation,
+e.g. can be seen, exhibit etc.
+· experiment_variation: This relation connects a frame-evoking element with another frame-evoking element
+indicating an experiment on the same cell, but with further specifications or slightly different operating conditions. It
+can also relate two frame-evoking elements that refer to two measurements performed on different materials/cells,
+but at the same experimental conditions. Often the frame evoking elements of a subexperiment convey an idea of
+comparison, e.g., increase or reach.
+In the above example, same_experiment was used to connect the experiment descriptions if the participants, i.e.,
+the experimental settings and measurements, should be grouped together. Another example is given in Section 4.2.
+4.2 coreference
+This relation connects the mention of a frame participant with an earlier mention of the same entity. We do not aim at
+a comprehensive coreference annotation, but use this only if the mention of a frame participant is uninformative, e.g.,
+if pronouns or abbreviations are used. In this case, we link it to an earlier informative mention. (This procedure will
+not allow us to evaluate coreference in the domain of materials science, but using these annotations, we can simulate
+a setting where perfect coreference information would be available for frame participants in our experiments.)
+4.3 thickness
+This relation can be used to give further information on a material used for composing cell. It relates the MATERIAL
+mention with the mention of the VALUE expressing the material’s thickness.
+
+
+
+
+
+
